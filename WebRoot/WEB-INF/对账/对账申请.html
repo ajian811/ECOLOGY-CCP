@@ -1,0 +1,107 @@
+<script type="text/javascript">
+/*
+*  TODO
+ *  请在此处编写javascript代码
+ */
+
+	var mysearch = '<input type="button" onclick="mySearch()" class="middle e8_btn_top_first" value="点击查询" style="width:200px;position:relative;top:3px;left:140px"/>';
+	jQuery(".mysearch").append(mysearch);
+	function mySearch(){
+		delRowFunJM(0);
+		var compcode=jQuery("#field11989").val();//公司代码
+		var startdate=jQuery("#field11990").val();//对账开始日期
+		var enddate=jQuery("#field11991").val();//对账结束日期
+		var costtype=jQuery("#field12001").val();//费用类型
+		var kpyz=jQuery("#field12004").val();//合并开票原则
+		var carriercode=jQuery("#field12002").val();//承运商编码
+		console.log("开始查询");
+		var js={"compcode":compcode,"startdate":startdate,"enddate":enddate,"costtype":costtype,
+				"kpyz":kpyz,"carriercode":carriercode}
+		console.log(js);
+		jQuery.ajax({
+			 url:"/sapjsp/checkAcount.jsp",
+			 data: { "js":JSON.stringify(js) },
+             type: "POST",
+             dataType: "json",
+             success: function(responseJSON) {
+             if(responseJSON){
+             	console.log(JSON.stringify(responseJSON));
+                        jQuery.each(responseJSON, function(i, item) {
+                            addRow0(0);
+                            hang_number0 = parseInt(jQuery("#indexnum0").val()) - 1;
+                            fillMX(12012, item.zxplanno); //装卸计划号
+                           fillMXVAL(12015, item.fylx); //费用类型
+                          jQuery("#field12015_" + hang_number0).val(item.fylx); //input赋值
+                           var html = '<a title="">'+item.fylx2+'</a>&nbsp;<span class="e8_delClass" id="'+item.fylx2+'" onclick="del(event,this,2,false,{});" style="opacity: 0; visibility: hidden;">&nbsp;x&nbsp;</span>';
+							$("#field12015_"+hang_number0+"span").append(html);
+                         // fillMXVAL(12016, item.cysname); //承运商名称
+                         jQuery("#field12016_" + hang_number0).val(item.cysname); //input赋值
+                          	html = '<a title="">'+item.cysname2+'</a>&nbsp;<span class="e8_delClass" id="'+item.cysname2+'" onclick="del(event,this,2,false,{});" style="opacity: 0; visibility: hidden;">&nbsp;x&nbsp;</span>';
+							$("#field12016_"+hang_number0+"span").append(html);
+                          
+                            fillMX(12020, item.carno); //车牌
+                            fillMX(12023, item.amount); //暂估含税金额
+                            fillMX(12024, item.notaxamt); //暂估不含税金额
+                            fillMXVAL(12030, item.djlx); //单据类型
+                           	jQuery("#disfield12030_"+hang_number0).val(item.djlx); 
+                           
+                            
+                            fillMXVAL(12018,item.cx);//车型
+                            html = '<a title="">'+item.cx2+'</a>&nbsp;<span class="e8_delClass" id="'+item.cx2+'" onclick="del(event,this,2,false,{});" style="opacity: 0; visibility: hidden;">&nbsp;x&nbsp;</span>';
+							$("#field12018_"+hang_number0+"span").append(html);
+							
+                            fillMX(12019,item.dw);//吨位
+                            fillMX(12022,item.khdz);//客户地址
+                            fillMX(12026,item.orderitem);//项次
+                            fillMX(12027,item.wlh);//物料号
+                            
+                            fillMX(12014,item.pono);//订单号
+                            fillMX(12021,item.zl);//重量
+                            fillMX(12025,item.jfms);//计费模式
+                            fillMX(12022,item.shiptoaddr);//客户地址
+                            
+                            
+                            fillMX(12601,item.zfdx);//支付对象
+                            fillMX(12602,item.currency);//暂估币种
+                            fillMX(12603,item.hl);//汇率
+                            fillMX(12604,item.costcenter);//成本中心
+                            fillMX(12605,item.account);//总账科目
+                            
+                            fillMX(12641,item.djbh);//单据编号
+                            fillMX(12642,item.sappzh);//SAP凭证号
+                            
+                            fillMX(13406,item.lgbh);//理柜编号
+                        });
+             }
+             }
+		
+		})
+		
+	}
+function fillMX(fieldid, value) {
+        jQuery("#field" + fieldid + "_" + hang_number0).val(value); //input赋值
+        jQuery("#field" + fieldid + "_" + hang_number0 + "span").html(value); //span赋值
+
+    }
+function fillMXVAL(fieldid, value) {
+        jQuery("#field" + fieldid + "_" + hang_number0).val(value); //input赋值
+      //  jQuery("#field" + fieldid + "_" + hang_number0 + "span").html(value); //span赋值
+
+    }
+</script>
+<script type="text/javascript" src="/sapjsp/utilJM.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

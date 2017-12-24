@@ -1,0 +1,1277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="jar://D:/e-cology/lib/activation.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/asm-1.0.2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/bcmail-jdk14-132.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/bcprov-jdk14-132.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/bsh-2[1].0b4.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/c3p0-0.8.5.2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/c3p0-oracle-thin-extras-0.8.5.2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/castor.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-beanutils.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-codec-1.3.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-collections.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-configuration-1.5.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-dbcp-1.2.1.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-discovery.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-fileupload.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-httpclient-3.1.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-io-1.3.1.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-lang.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-logging.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/commons-net-3.1.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/concurrent.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/csvjdbc.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/ddjdbc.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/dom.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/dom4j.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/ejb-15.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/ezmorph-1.0.4.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/FontBox-0.1.0-dev.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/fontbox-1.5.0.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/freemarker-2.3.8.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/generic-axis1.3-api-100525.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/hessian.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/hivemind.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/ibatis-common-2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/ibatis-dao-2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/ibatis-sqlmap-2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/ifxjdbc221_CE.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/iTextAsian.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/j2ee-management-10.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jai_codec.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jai_core.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jakarta-oro-2.0.8.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jakarta-poi-1.9.0-dev-20021010.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/javassist.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/javax.mail-1.5.0.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jaws.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jaxen-core.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jaxen-jdom.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jaxrpc.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jaxrpc-15.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jaxws-api.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jca-15.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jce1_2_2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jconn2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jdbc2_0-stdext.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jdk12.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jdom.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jgroups-all.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jms-11.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jmx.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jndi.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jpa-15.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jsdk-15.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jsdk22.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jsf-12.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/json-lib-2.2.1-jdk13.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/json-path-2.0.0.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/json-smart-2.1.1.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jsoup-1.6.1.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jsr88.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jstl-11.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jta-101.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jta-spec1_0_1.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jtds-1.2.2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/jws-15.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/local_policy.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/log4j-1.2.13.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/lucene-core-2.1.0.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/lucene-highlighter-2.1.0.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/mlibwrapper_jai.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/MMAnalyzer.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/msbase.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/mssqlserver.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/msutil.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/mysql_both_uncomp.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/mysql-connector-java-3.1.11-bin.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/ojdbc14.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/onlinedebug.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/Opta2000.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/PDFBox-0.7.3.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/pdfbox-1.5.0.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/pinyin4j.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/poi-2.5.1-final-20040804.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/poi-contrib-2.5.1-final-20040804.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/poi-scratchpad-2.5.1-final-20040804.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/portlet-10.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/proxool-0.9.0RC2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/quartz.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/quercus.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/resin.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/resin-deploy.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/resin-hook.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/resin-util.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/rt.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/saaj.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/sac.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/sax.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/saxpath.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/script-10.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/sqljdbc.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/sunjce_provider.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/tm-extractors-0.4.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/truezip-6.6.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/US_export_policy.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/webbeans-16.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/webutil.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/WkJavaApi.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/wsdl4j.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/wsdl4j-1.5.1.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/wsdl4j-1.6.2.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/xalan.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/xerces.jar!/" />
+    <libelement value="jar://D:/e-cology/lib/xml-apis.jar!/" />
+    <libelement value="file://C:\Users\chen\Workspaces\MyEclipse 2016\ECOLOGY开发\classbean" />
+    <libelement value="jar://$MODULE_DIR$/WebRoot/WEB-INF/lib/sapjco.jar!/" />
+    <conelement value="com.genuitec.runtime.library/com.genuitec.generic_6.0" />
+    <conelement value="org.eclipse.jst.j2ee.internal.web.container" />
+    <conelement value="org.eclipse.jst.j2ee.internal.module.container" />
+    <conelement value="com.genuitec.runtime.library/com.genuitec.jstl_1.2.1" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
+    </src_description>
+  </component>
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/WebRoot/WEB-INF/classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+    <orderEntry type="library" name="com.genuitec.runtime.library/com.genuitec.generic_6.0" level="application" />
+    <orderEntry type="library" name="org.eclipse.jst.j2ee.internal.web.container" level="application" />
+    <orderEntry type="library" name="org.eclipse.jst.j2ee.internal.module.container" level="application" />
+    <orderEntry type="library" name="com.genuitec.runtime.library/com.genuitec.jstl_1.2.1" level="application" />
+    <orderEntry type="module-library">
+      <library name="activation.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/activation.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="asm-1.0.2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/asm-1.0.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="bcmail-jdk14-132.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/bcmail-jdk14-132.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="bcprov-jdk14-132.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/bcprov-jdk14-132.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="bsh-2[1].0b4.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/bsh-2[1].0b4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="c3p0-0.8.5.2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/c3p0-0.8.5.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="c3p0-oracle-thin-extras-0.8.5.2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/c3p0-oracle-thin-extras-0.8.5.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="castor.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/castor.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-beanutils.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-beanutils.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-codec-1.3.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-codec-1.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-collections.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-collections.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-configuration-1.5.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-configuration-1.5.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-dbcp-1.2.1.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-dbcp-1.2.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-discovery.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-discovery.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-fileupload.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-fileupload.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-httpclient-3.1.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-httpclient-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-io-1.3.1.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-io-1.3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-lang.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-lang.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-logging.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-logging.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="commons-net-3.1.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/commons-net-3.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="concurrent.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/concurrent.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="csvjdbc.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/csvjdbc.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ddjdbc.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/ddjdbc.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="dom.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/dom.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="dom4j.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/dom4j.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ejb-15.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/ejb-15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ezmorph-1.0.4.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/ezmorph-1.0.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="FontBox-0.1.0-dev.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/FontBox-0.1.0-dev.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="fontbox-1.5.0.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/fontbox-1.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="freemarker-2.3.8.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/freemarker-2.3.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="generic-axis1.3-api-100525.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/generic-axis1.3-api-100525.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="hessian.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/hessian.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="hivemind.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/hivemind.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ibatis-common-2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/ibatis-common-2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ibatis-dao-2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/ibatis-dao-2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ibatis-sqlmap-2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/ibatis-sqlmap-2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ifxjdbc221_CE.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/ifxjdbc221_CE.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="iTextAsian.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/iTextAsian.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="j2ee-management-10.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/j2ee-management-10.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jai_codec.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jai_codec.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jai_core.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jai_core.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta-oro-2.0.8.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jakarta-oro-2.0.8.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jakarta-poi-1.9.0-dev-20021010.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jakarta-poi-1.9.0-dev-20021010.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="javassist.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/javassist.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="javax.mail-1.5.0.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/javax.mail-1.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jaws.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jaws.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jaxen-core.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jaxen-core.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jaxen-jdom.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jaxen-jdom.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jaxrpc.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jaxrpc.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jaxrpc-15.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jaxrpc-15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jaxws-api.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jaxws-api.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jca-15.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jca-15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jce1_2_2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jce1_2_2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jconn2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jconn2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jdbc2_0-stdext.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jdbc2_0-stdext.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jdk12.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jdk12.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jdom.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jdom.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jgroups-all.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jgroups-all.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jms-11.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jms-11.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jmx.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jmx.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jndi.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jndi.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jpa-15.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jpa-15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jsdk-15.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jsdk-15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jsdk22.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jsdk22.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jsf-12.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jsf-12.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="json-lib-2.2.1-jdk13.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/json-lib-2.2.1-jdk13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="json-path-2.0.0.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/json-path-2.0.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="json-smart-2.1.1.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/json-smart-2.1.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jsoup-1.6.1.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jsoup-1.6.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jsr88.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jsr88.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jstl-11.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jstl-11.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jta-101.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jta-101.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jta-spec1_0_1.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jta-spec1_0_1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jtds-1.2.2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jtds-1.2.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="jws-15.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/jws-15.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="local_policy.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/local_policy.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="log4j-1.2.13.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/log4j-1.2.13.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lucene-core-2.1.0.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/lucene-core-2.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="lucene-highlighter-2.1.0.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/lucene-highlighter-2.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mlibwrapper_jai.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/mlibwrapper_jai.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="MMAnalyzer.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/MMAnalyzer.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="msbase.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/msbase.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mssqlserver.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/mssqlserver.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="msutil.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/msutil.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mysql_both_uncomp.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/mysql_both_uncomp.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="mysql-connector-java-3.1.11-bin.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/mysql-connector-java-3.1.11-bin.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="ojdbc14.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/ojdbc14.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="onlinedebug.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/onlinedebug.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Opta2000.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/Opta2000.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="PDFBox-0.7.3.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/PDFBox-0.7.3.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="pdfbox-1.5.0.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/pdfbox-1.5.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="pinyin4j.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/pinyin4j.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-2.5.1-final-20040804.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/poi-2.5.1-final-20040804.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-contrib-2.5.1-final-20040804.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/poi-contrib-2.5.1-final-20040804.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="poi-scratchpad-2.5.1-final-20040804.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/poi-scratchpad-2.5.1-final-20040804.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="portlet-10.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/portlet-10.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="proxool-0.9.0RC2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/proxool-0.9.0RC2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="quartz.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/quartz.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="quercus.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/quercus.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="resin.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/resin.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="resin-deploy.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/resin-deploy.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="resin-hook.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/resin-hook.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="resin-util.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/resin-util.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="rt.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/rt.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="saaj.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/saaj.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="sac.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/sac.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="sax.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/sax.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="saxpath.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/saxpath.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="script-10.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/script-10.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="sqljdbc.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/sqljdbc.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="sunjce_provider.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/sunjce_provider.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="tm-extractors-0.4.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/tm-extractors-0.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="truezip-6.6.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/truezip-6.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="US_export_policy.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/US_export_policy.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="webbeans-16.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/webbeans-16.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="webutil.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/webutil.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="WkJavaApi.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/WkJavaApi.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="wsdl4j.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/wsdl4j.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="wsdl4j-1.5.1.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/wsdl4j-1.5.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="wsdl4j-1.6.2.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/wsdl4j-1.6.2.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xalan.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/xalan.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xerces.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/xerces.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="xml-apis.jar">
+        <CLASSES>
+          <root url="jar://D:/e-cology/lib/xml-apis.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="classbean">
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/classbean" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://D:/e-cology/classbean.src" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="sapjco.jar">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/WebRoot/WEB-INF/lib/sapjco.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>

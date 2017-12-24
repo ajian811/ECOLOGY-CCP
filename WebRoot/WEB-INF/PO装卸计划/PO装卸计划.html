@@ -1,0 +1,254 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+$(document).ready(function() {
+    var html = "<input type='button' value='生成辅线路' class='middle e8_btn_top_first' id='accquire' />";
+    $("#needButton").append(html);
+    $("#accquire").click(function() {
+        accquireYF();
+    });
+    var html = "<input type='button' value='重新生成辅线路' class='middle e8_btn_top_first' id='refreshYF' />";
+    $("#refresh").append(html);
+    $("#refreshYF").click(function() {
+        refreshYF();
+    });
+    var blurfield = "#field10581"; //进口到货提单号
+
+    $("#field10642").bind('change', function() {
+        var value = $("#field10642").val();
+        if (value == '0') {
+            delRowFunmd0(0);
+            $(".hideDt1").hide();
+            $(".hideDt2").show();
+        } else if (value == '1') {
+            delRowFunmd0(1);
+            $(".hideDt1").show();
+            $(".hideDt2").hide();
+        } else {
+            delRowFunmd0(0);
+            delRowFunmd0(1);
+            $(".hideDt1").hide();
+            $(".hideDt2").hide();
+        }
+    })
+    $(blurfield).bindPropertyChange(function() {
+        var ponos = $(blurfield).val();
+        var jkdhbh = $("#field10561").val(); //进口到货编号
+        console.log("ponos:" + ponos);
+        console.log("jkdhbh:" + jkdhbh);
+        delRowFunmd0(0);
+        if (ponos == '' || jkdhbh == '')
+            return;
+
+
+        $.post("/sapjsp/DG_PO_ZXJH.jsp?ponos=" + ponos + "&jkdhbh=" + jkdhbh, function(data) {
+            if (data) {
+                if (data.length > 48) {
+                    Dialog.alert("Data acquisition success!");
+                    var ponoses = data.split("![]");
+                    for (var i = 1; i < ponoses.length; i++) {
+                        console.log(ponoses[i]);
+                        var fields = ponoses[i].split("|");
+                        addRow0(0);
+                        var hang_number = parseInt(jQuery("#indexnum0").val()) - 1;
+                        jQuery("#field9711_" + hang_number).val(fields[0]);
+                        jQuery("#field9712_" + hang_number).val(fields[1]);
+                        jQuery("#field9713_" + hang_number).val(fields[2]);
+                        jQuery("#field9721_" + hang_number).val(fields[3]);
+                        jQuery("#field9744_" + hang_number).val(fields[4]);
+                        jQuery("#field9745_" + hang_number).val(fields[5]);
+                    }
+                } else {
+                    Dialog.alert("Data acquisition failure!");
+                }
+            }
+        });
+    })
+})
+
+function accquireYF() {
+    var sfyg = $("#field10642").val(); //是否有柜
+    var startCity = $("#field11742").val(); //起点城市
+    var endCity = $("#field11743").val(); //终点城市
+    var list = [];
+    var comm = [];
+    var cysjm = $("#field9691").val(); //承运商简码
+    var cx = $("#field9693").val(); //车型
+    var dw = $("#field9694").val(); //吨位
+    var ysrq = $("#field9695").val(); //运输日期
+    var jflx = $("#field9686").val(); //计费方式
+    var yslx = $("#field9688").val(); //运输方式
+    var xllx = "0";
+    var cqb = $("#field9683").val(); //厂区别
+    comm.push(cysjm, cx, dw, ysrq, jflx, yslx, xllx, cqb);
+    if (sfyg == '1') {
+        for (var i = 0; i < $("#indexnum0").val(); i++) {
+            if ($("#field9730_" + i).val() != '' && $("#field9730_" + i).val() != null) {
+
+                var temp = {
+                    'sendName': $("#field9727_" + i).val(),
+                    'sendAddress': $("#field9729_" + i).val(),
+                    'midCity': $("#field9730_" + i).val()
+
+                }
+                list.push(temp);
+            }
+        }
+    } else if (sfyg == '0') {
+        for (var i = 0; i < $("#indexnum1").val(); i++) {
+            if ($("#field10720_" + i).val() != '' && $("#field10720_" + i).val() != null) {
+
+                var temp = {
+                    'sendName': $("#field10717_" + i).val(),
+                    'sendAddress': $("#field10719_" + i).val(),
+                    'midCity': $("#field10720_" + i).val()
+
+                }
+                list.push(temp);
+            }
+        }
+    } else {
+        alert("请先选择是否有柜")
+        return
+    }
+
+
+    //alert(JSON.stringify(list));
+    jQuery.ajax({
+        url: "/weightJsp/ACCQUIRE_ASSISTYF.jsp",
+        data: { "startCity": startCity, "endCity": endCity, "list": JSON.stringify(list), "comm": comm },
+        type: "POST",
+        dateType: "json",
+        success: function(data) {
+            if (data) {
+                delRowFunmd0(2);
+                console.log(JSON.parse(data));
+                jQuery.each(JSON.parse(data), function(i, item) {
+                    addRow2(2);
+                    var hang_number = parseInt(jQuery("#indexnum2").val()) - 1;
+                    jQuery("#field11821_" + hang_number).val(item.sort); //城市点顺序
+                    jQuery("#field11827_" + hang_number).val(item.midCity); //城市点id
+                    //jQuery("#field11422_" + hang_number).val(item.sort); //到达城市
+                    jQuery("#field11823_" + hang_number).val(item.price); //辅线路价格
+                    jQuery("#field11824_" + hang_number).val(item.tcdj); //同城单价
+                    jQuery("#field11825_" + hang_number).val(item.index); //同城个数
+                    var totalPrice = parseFloat(item.index) * parseFloat(item.tcdj);
+                    jQuery("#field11826_" + hang_number).val(totalPrice); //同城总价
+
+                    jQuery("#field11821_" + hang_number + "span").html(item.sort); //城市点顺序
+                    jQuery("#field11827_" + hang_number + "span").html(item.midCity); //城市点id
+                    //jQuery("#field11422_" + hang_number + "span").val(item.sort); //
+                    jQuery("#field11823_" + hang_number + "span").html(item.price); //辅线路价格
+                    jQuery("#field11824_" + hang_number + "span").html(item.tcdj); //同城单价
+                    jQuery("#field11825_" + hang_number + "span").html(item.index); //同城个数
+                    jQuery("#field11826_" + hang_number + "span").html(totalPrice); //同城个数
+                });
+                Dialog.alert("获取辅线路数据成功！");
+            }
+        },
+        error: function() {
+            Dialog.alert("获取辅线路数据失败！");
+        }
+    })
+}
+
+function refreshYF() {
+    if ($("#indexnum2").val() - 0 <= 0) {
+        alert("请先点击生成辅线路");
+        return;
+    }
+    //var sfyg = $("#field10642").val(); //是否有柜
+    var startCity = $("#field11742").val(); //起点城市
+    var endCity = $("#field11743").val(); //终点城市
+    var list = [];
+    var comm = [];
+    var cysjm = $("#field9691").val(); //承运商简码
+    var cx = $("#field9693").val(); //车型
+    var dw = $("#field9694").val(); //吨位
+    var ysrq = $("#field9695").val(); //运输日期
+    var jflx = $("#field9686").val(); //计费方式
+    var yslx = $("#field9688").val(); //运输方式
+    var xllx = "0";
+    var cqb = $("#field9683").val(); //厂区别
+    comm.push(cysjm, cx, dw, ysrq, jflx, yslx, xllx, cqb);
+    for (var i = 0; i < $("#indexnum2").val(); i++) {
+        if ($("#field11827_" + i).val() != '' && $("#field11827_" + i).val() != null) {
+
+            var temp = {
+                'sort': $("#field11821_" + i).val(), //顺序
+                'midCity': $("#field11827_" + i).val(), //城市id
+                'tcdj': $("#field11824_" + i).val(), //同城单价
+                'index': $("#field11825_" + i).val(), //同城个数
+
+            }
+            list.push(temp);
+        }
+    }
+    jQuery.ajax({
+        url: "/weightJsp/REFRESH_ASSISTYF.jsp",
+        data: { "startCity": startCity, "endCity": endCity, "list": JSON.stringify(list), "comm": comm },
+        type: "POST",
+        dateType: "json",
+        success: function(data) {
+            if (data) {
+                console.log(JSON.parse(data));
+                delRowFunmd0(2);
+                console.log(data.length);
+                if (data.length > 28) {
+                    jQuery.each(JSON.parse(data), function(i, item) {
+                        addRow2(2);
+                        var hang_number = parseInt(jQuery("#indexnum2").val()) - 1;
+                        jQuery("#field11821_" + hang_number).val(item.sort); //城市点顺序
+                        jQuery("#field11827_" + hang_number).val(item.midCity); //城市点id
+                        //jQuery("#field11422_" + hang_number).val(item.sort); //到达城市
+                        jQuery("#field11823_" + hang_number).val(item.price); //辅线路价格
+                        jQuery("#field11824_" + hang_number).val(item.tcdj); //同城单价
+                        jQuery("#field11825_" + hang_number).val(item.index); //同城个数
+                        var totalPrice = parseFloat(item.index) * parseFloat(item.tcdj);
+                        jQuery("#field11826_" + hang_number).val(totalPrice); //同城总价
+
+                        jQuery("#field11821_" + hang_number + "span").html(item.sort); //城市点顺序
+                        jQuery("#field11827_" + hang_number + "span").html(item.midCity); //城市点id
+                        //jQuery("#field11422_" + hang_number + "span").val(item.sort); //
+                        jQuery("#field11823_" + hang_number + "span").html(item.price); //辅线路价格
+                        jQuery("#field11824_" + hang_number + "span").html(item.tcdj); //同城单价
+                        jQuery("#field11825_" + hang_number + "span").html(item.index); //同城个数
+                        jQuery("#field11826_" + hang_number + "span").html(totalPrice); //同城个数
+                    });
+                    Dialog.alert("获取辅线路数据成功！");
+                } else {
+                    Dialog.alert("获取辅线路数据失败！");
+                }
+
+            }
+        },
+        error: function() {
+            Dialog.alert("获取辅线路数据失败！");
+        }
+    })
+}
+</script>
+<script type="text/javascript" src="/sapjsp/util.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

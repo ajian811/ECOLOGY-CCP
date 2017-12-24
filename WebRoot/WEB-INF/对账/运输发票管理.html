@@ -1,0 +1,21 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+    *  TODO
+     *  请在此处编写javascript代码
+     */
+     jQuery(document).ready(function(){
+			checkCustomize=function(){
+				var se=jQuery("#field12284").val();//税额
+				var mxse=jQuery("#field12561").val();//明细税额
+				if(se==mxse){
+				
+				 return true;
+				}else{
+				 alert("税额必须与明细税额一致");
+				 return false;
+				}
+			}     	
+     
+     });
+</script>

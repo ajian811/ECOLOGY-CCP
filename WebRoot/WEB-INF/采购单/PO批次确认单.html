@@ -1,0 +1,85 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+    *  TODO
+     *  请在此处编写javascript代码
+     */
+     
+     jQuery(document).ready(function() {
+     	
+     	
+     	 jQuery("#field11401").bindPropertyChange(function(){
+    var trdh=jQuery("#field11401").val();
+    console.log(trdh);
+    jQuery.ajax({
+    url : "/sapjsp/PO_PCQR.jsp",
+				data : {
+					"trdh" : trdh,
+					"type":"search"
+				},
+				type : "POST",
+				dataType : "json",
+				success : function(responseJSON) {
+					if (responseJSON) {
+						console.log(JSON.stringify(responseJSON));
+						var errmsg=responseJSON.err;
+						if(errmsg.length>0){
+						Dialog.alert(errmsg);
+						return;
+						}
+						var dt0=responseJSON.dt0;
+						if(dt0.length>0){
+						jQuery.each(dt0, function(i, item) {
+							addRow0(0);
+							var hang_number0 = parseInt(jQuery("#indexnum0").val()) - 1;
+							fillMX(11288, item.cp,hang_number0); //车牌
+							fillMX(11284, item.gc,hang_number0); //工厂
+							fillMX(11381, item.wlh,hang_number0); //物料号
+							fillMX(11382, item.wlms,hang_number0); //物料描述
+							fillMX(11383, item.wlqypc,hang_number0); //物料启用批次
+							fillMX(11384, item.bz1,hang_number0); //备注1
+							fillMX(11385, item.bz2,hang_number0); //备注2
+							fillMX(11386, item.bz3,hang_number0); //备注3
+							fillMX(11292, item.LSMNG,hang_number0); //交货单的计量单位数量
+							fillMX(11289, item.LSMEH,hang_number0); //计量单位
+							//fillMX(11386, item.bz3,hang_number0); //备注3
+							
+							fillMX(11290, item.BSART1,hang_number0); //订单类型
+							fillMX(11291, item.packxz,hang_number0); //包装性质
+							
+
+						});
+						}
+						var dt1=responseJSON.dt1;
+						if(dt1.length>0){
+						jQuery.each(dt1, function(i, item) {
+							addRow1(1);
+							var hang_number0 = parseInt(jQuery("#indexnum1").val()) - 1;
+							fillMX(11310, item.cp,hang_number0); //车牌
+							fillMX(11306, item.gc,hang_number0); //工厂
+							fillMX(11387, item.wlh,hang_number0); //物料号
+							fillMX(11388, item.wlms,hang_number0); //物料描述
+							fillMX(11389, item.wlqypc,hang_number0); //物料启用批次
+							fillMX(11390, item.bz1,hang_number0); //备注1
+							fillMX(12442, item.LSMNG,hang_number0); //交货单的计量单位数量
+							fillMX(11312, item.LSMEH,hang_number0); //计量单位
+							
+							fillMX(11316, item.BSART1,hang_number0); //订单类型
+							fillMX(11314, item.packxz,hang_number0); //包装性质
+
+						});
+						}
+					}
+
+				}
+			});
+
+		})
+});
+     function fillMX(fieldid, value,hang_number0) {
+		jQuery("#field" + fieldid + "_" + hang_number0).val(value); //input赋值
+		jQuery("#field" + fieldid + "_" + hang_number0 + "span").html(value); //span赋值
+
+	}
+    
+</script>
