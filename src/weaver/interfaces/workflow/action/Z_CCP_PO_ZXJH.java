@@ -109,8 +109,8 @@ public class Z_CCP_PO_ZXJH extends BaseBean implements Action{
                             rs2.writeLog("已出货为：" + YCHL + ",总数量为：" + LFIMG + ",剩余数量为：" + nowCounts);
                             Double insertSL2 = calCulate(YCHL, jsObject.getString("bczxsl"), "add");
 
-                            sql = "UPDATE uf_jmclxq SET YCHL='" + insertSL2 + "' WHERE DELIVERYNO='"
-                                    + jsObject.getString("ddh") + "' and DELIVERYITEM='" + jsObject.getString("xc") + "'";
+                            sql = "UPDATE uf_jmclxq SET YCHL='" + insertSL2 + "' WHERE PONO='"
+                                    + jsObject.getString("ddh") + "' and POITEM='" + jsObject.getString("xc") + "'";
                             rs2.writeLog(sql);
                             rs2.execute(sql);
                         }

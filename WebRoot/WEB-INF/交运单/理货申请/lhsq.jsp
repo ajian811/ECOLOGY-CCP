@@ -76,7 +76,12 @@ while(iterator.hasNext()){
 			//sql="UPDATE uf_spghsr SET YCHL='"+insertSL2+"' WHERE DELIVERYNO='"+jsObject.getString("ddh")+"' and DELIVERYITEM='"+jsObject.getString("xc")+"'";
 			//rs2.writeLog(sql);
 			//rs2.execute(sql);
-			out.write("success");
+                response.setContentType("text/html;charset=UTF-8");
+				PrintWriter pw=response.getWriter();
+				pw.write("success");
+				pw.flush();
+				pw.close();
+			rs.writeLog("返回success");
 			return;
 			}
 			

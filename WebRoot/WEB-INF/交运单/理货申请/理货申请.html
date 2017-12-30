@@ -169,15 +169,16 @@
 				"mxdata" : JSON.stringify(jsonArr)
 			},
 			type : "POST",
-			dataType : "JSON",
 			async : false,
 			success : function(data) {
-				if (data) {
-					if (data = "success") {
+               var newData=data.replace(/(^\s*)|(\s*$)/g, "");
+                console.log(newData);
+				if (newData) {
+					if (newData =="success") {
 						console.log("数据更新成功");
 						result = true;
 					} else {
-						Dialog.alert(data);
+						Dialog.alert(newData);
 					}
 
 
