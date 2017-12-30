@@ -2,24 +2,20 @@ package weaver.interfaces.workflow.action;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import com.sap.mw.jco.JCO;
-
 import weaver.conn.RecordSet;
 import weaver.general.BaseBean;
 import weaver.general.Util;
-import weaver.hrm.resource.ResourceComInfo;
 import weaver.soa.workflow.request.RequestInfo;
 import weaver.workflow.workflow.WorkflowComInfo;
 
+
 public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
-	// shipping柜号输入接口
+	@Override
 	public String execute(RequestInfo request) {
 		BaseBean log = new BaseBean();
 
 		log.writeLog("调用Create_Sequence_ZXJH_PO开始");
 		try {
-			ResourceComInfo resourceComInfo = new ResourceComInfo();
 			// 获取输入参数
 			WorkflowComInfo workflowComInfo = new WorkflowComInfo();
 			int requestid = Util.getIntValue(request.getRequestid());
@@ -30,28 +26,40 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 			String tablename = "";
 			RecordSet rs = new RecordSet();
 			RecordSet rs1 = new RecordSet();
-			RecordSet rs2 = new RecordSet();
 			Date d = new Date();
 			SimpleDateFormat format = new SimpleDateFormat("yyyyMM");
 			String currdate1 = format.format(d);
 			// 定义字段
-			String gys = "";// 供应商
-			String hgc = "";// DEPOH（货柜厂）
-			String ksrq = "";// 开始日期
-			String jsrq = "";// 结束日期
+			String gys = "";
+			// 供应商
+			String hgc = "";
+			// DEPOH（货柜厂）
+			String ksrq = "";
+			// 开始日期
+			String jsrq = "";
+			// 结束日期
 			String wrongError = "";
-			String sfyg = "";// 是否有柜
-			String mainid = "";// 数据id
-			String trdh = "";// 提入单号
-			String sfzf = "";// 是否作废
+			String sfyg = "";
+			// 是否有柜
+			String mainid = "";
+			// 数据id
+			String trdh = "";
+			// 提入单号
+			String sfzf = "";
+			// 是否作废
 
-			String soldto = "";// 售达方
-			String shipto = "";// 送达方
-			String gyscode = "";// 供应商代码
-			String goodgroup = "";// 产品组
-			String kwdesc = "";// 库存地址
-			String inout = "";// 运入运出
-
+			String soldto = "";
+			// 售达方
+			String shipto = "";
+			// 送达方
+			String gyscode = "";
+			// 供应商代码
+			String goodgroup = "";
+			// 产品组
+			String kwdesc = "";
+			// 库存地址
+			String inout = "";
+			// 运入运出
 			if (isbill == 0) {
 				tablename = "workflow_form";// 老表单的主表单名字
 			} else {
@@ -69,18 +77,19 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 			log.writeLog("查询主表的selectSql:" + selectSql);
 			// String selectSql = "select * from " + tablename + " where
 			// requestid = '" + requestid + "'";
+			RecordSet rs2=new RecordSet();
 			rs2.execute(selectSql);
 			if (rs2.next()) {
 				sfyg = rs2.getString("sfyg");
 				mainid = rs2.getString("id");
 				trdh = rs2.getString("trdh");
-				inout = rs2.getString("inout");
+				inout = rs2.getString("ycyr");
 				sfzf = rs2.getString("sfzf");
 				if (!"".equals(inout)) {
 					if ("0".equals(inout)) {
-						inout = "I";
-					} else {
 						inout = "O";
+					} else {
+						inout = "I";
 					}
 				}
 			}
@@ -101,25 +110,38 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 						// String shipno = rs.getString("shipno");//
 						// 获取shippingno
 						// 调用存储过程自编号
-						soldto = rs.getString("soldto");
-						shipto = rs.getString("shipto");
+						soldto = Util.null2String(rs.getString("soldto"));
+						shipto =Util.null2String( rs.getString("shipto"));
 						gyscode = rs.getString("gyscode");
 						goodgroup = rs.getString("goodgroup");
 						kwdesc = rs.getString("kwdesc");
-
 						log.writeLog("调用存储过程Create_Seq_Po");
 						rs1.executeProc("Create_Seq_Po", "");
 						rs1.next();
 						lcbh += formatString(rs1.getInt(1));
 
-						updateSql = "update " + tablename + "_dt2 set trdh = '" + lcbh + "' where soldto = '" + soldto
-								+ "'";
-						updateSql += " and shipto = '" + shipto + "'";
+						updateSql = "update " + tablename + "_dt2 set trdh = '" + lcbh + "' where 1=1";
+
+						if(!"".equals(soldto)) {
+							updateSql += " and soldto = '" + soldto + "'";
+						}
+						if("".equals(soldto)) {
+							updateSql += " and soldto is null";
+						}
+						if(!"".equals(shipto)){
+							updateSql += " and shipto = '" + shipto + "'";
+						}
+						if("".equals(shipto)){
+							updateSql += " and shipto is null";
+						}
+
 						updateSql += " and gyscode = '" + gyscode + "'";
 						updateSql += " and goodgroup = '" + goodgroup + "'";
 						updateSql += " and kwdesc = '" + kwdesc + "'";
+						updateSql += " and mainid = " + mainid;
 						log.writeLog("更新语句:" + updateSql);
-						rs2.executeSql(updateSql);
+						RecordSet rs3=new RecordSet();
+						rs3.execute(updateSql);
 					}
 				} else if ("1".equals(sfyg) && "".equals(trdh)) {
 					String lcbh = "7020" + inout + currdate1;
@@ -132,7 +154,8 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 						updateSql = "update " + tablename + "_dt1 set trdh = '" + lcbh + "' where mainid = '" + mainid
 								+ "'";
 						log.writeLog("更新语句:" + updateSql);
-						rs2.executeSql(updateSql);
+						RecordSet rs3=new RecordSet();
+						rs3.execute(updateSql);
 					}
 				}
 			}
@@ -147,12 +170,12 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 
 	/**
 	 * 将数字转换为字符串(当不足4位时高位补0)
-	 * 
+	 *
 	 * @param input
 	 * @return
 	 */
 	public String formatString(int input) {
-		String result;
+		String result="";
 		// 大于1000时直接转换成字符串返回
 		if (input > 1000) {
 			result = input + "";

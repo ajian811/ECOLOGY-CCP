@@ -17,7 +17,7 @@
 <%@page import="java.text.DecimalFormat"%>
 
 <%@page
-        import="com.weaver.integration.datesource.SAPInterationDateSourceImpl;"%>
+        import="com.weaver.integration.datesource.SAPInterationDateSourceImpl"%>
 
 <%
     /**

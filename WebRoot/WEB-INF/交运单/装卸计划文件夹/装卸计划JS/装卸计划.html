@@ -1,37 +1,37 @@
 <!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
 <script type="text/javascript">
-        /*
+    /*
      *  TODO
      *  请在此处编写javascript代码
      */
     var hang_number0;
     jQuery(document).ready(function() {
         var sfyg = jQuery("#field8087").val();
-            if (sfyg.length > 0) {
-                if (sfyg == 0) {
-                    jQuery(".wg").show();
-                    jQuery(".yg").hide();
-                } else {
-                    jQuery(".yg").show();
-                    jQuery(".wg").hide();
-                }
-                }
-                
-             var sfyyf = jQuery("#field8088").val();
-            if (sfyyf.length > 0) {
-                console.log(sfyyf);
-                if (sfyyf == 1) {
-                    jQuery(".yyf").show();
-                } else {
-                    jQuery(".yyf").hide();
-                }
+        if (sfyg.length > 0) {
+            if (sfyg == 0) {
+                jQuery(".wg").show();
+                jQuery(".yg").hide();
+            } else {
+                jQuery(".yg").show();
+                jQuery(".wg").hide();
             }
+        }
+
+        var sfyyf = jQuery("#field8088").val();
+        if (sfyyf.length > 0) {
+            console.log(sfyyf);
+            if (sfyyf == 1) {
+                jQuery(".yyf").show();
+            } else {
+                jQuery(".yyf").hide();
+            }
+        }
 
         checkCustomize = function() {
-			var sfzf=jQuery("#field13403 option:selected").val();
-       		if(sfzf=="1"){
-        	return true;
-        }
+            var sfzf = jQuery("#field13403 option:selected").val();
+            if (sfzf == "1") {
+                return true;
+            }
             return checkALL();
         }
 
@@ -43,9 +43,10 @@
             } else if ($("#field8107").val() == '') {
                 alert("没有记录选择，请选择车型！");
                 return;
-            } else if ($("#field8110").val() == '') {
+                /*         } else if ($("#field8110").val() == '') {
                 alert("没有记录选择，请选择吨位！");
                 return;
+*/
             } else if ($("#field8111").val() == '') {
                 alert("没有记录选择，请选择预计运输日期！");
                 return;
@@ -116,7 +117,7 @@
             var ghs = new Array();
             var i = 0;
             jQuery("#field9541span").find('a').each(function() {
-                ghs[i] = jQuery(this).html()
+                ghs[i] = jQuery(this).html();
                 i++;
             });
             console.log(ghs);
@@ -133,7 +134,10 @@
 
             jQuery.ajax({
                 url: "/sapjsp/zxjh.jsp",
-                data: { "ghs": ghs, "type": "yg" },
+                data: {
+                    "ghs": ghs,
+                    "type": "yg"
+                },
                 type: "POST",
                 dataType: "json",
                 success: function(responseJSON) {
@@ -145,7 +149,7 @@
                             fillMX(8143, item.gh); //柜号
                             fillMX(8144, item.cp); //产品
                             fillMX(8145, item.sl); //数量
-                            
+
                             fillMX(9310, item.sl); //本次装卸数量
                             fillMX(9301, item.jydh); //交运单号
                             fillMX(9302, item.xc); //项次
@@ -157,10 +161,10 @@
                             fillMX(9311, item.REALSHIPNUM); //已运载量
                             // fillMX(9312, item.);//剩余运载量
                             fillMX(11961, item.SALEUNIT); //单位代码
-                            fillMX(9314, item.LOCATION);//库位代码
+                            fillMX(9314, item.LOCATION); //库位代码
                             // fillMX(9315, item.);//单位描述
                             fillMX(9316, item.LOCATION); //库存地址
-                             fillMX(9317, item.PACK);//包装性质
+                            fillMX(9317, item.PACK); //包装性质
                             fillMX(9318, item.SHIPTOADDR); //送达方
                             fillMX(9319, item.SHIPTO); //送达方名称
                             // fillMX(9320, item.);//送达地址描述
@@ -173,7 +177,16 @@
                             fillMX(9327, item.COSTCENTER); //成本中心
                             // fillMX(9328, item.);//供应商代码
                             // fillMX(9329, item.);//供应商名称
-                            fillMX(10841, item.NTGEW);//净重
+                            fillMX(10841, item.NTGEW); //净重
+                            var closedate=item.CLOSEDATE;
+                            var gjrq=jQuery("#field13475").val();
+                            console.log("获得关节日期："+gjrq);
+                            if(closedate.length>0) {
+                                if(gjrq.length==0||gjrq<closedate) {
+                                    jQuery("#field13475").val(closedate);
+                                }
+                            }
+
                         });
                     }
 
@@ -187,6 +200,7 @@
         jQuery("#field8162").bindPropertyChange(function() {
             delRowFunmd0(2);
 
+            var jgrq = jQuery("#field13475").val();
             var ghs = new Array();
             var i = 0;
             jQuery("#field8162span").find('a').each(function() {
@@ -194,13 +208,12 @@
                 i++;
             });
             console.log(ghs);
-
-
-
-
             jQuery.ajax({
                 url: "/sapjsp/zxjh.jsp",
-                data: { "ghs": ghs, "type": "wg" },
+                data: {
+                    "ghs": ghs,
+                    "type": "wg"
+                },
                 type: "POST",
                 dataType: "json",
                 success: function(responseJSON) {
@@ -209,6 +222,9 @@
                         jQuery.each(responseJSON, function(i, item) {
                             addRow2(2);
                             var hang_number = parseInt(jQuery("#indexnum2").val()) - 1;
+                            if (jgrq = '' || jgrq > item.CLOSEDATE) {
+                                fillMX(13475, item.CLOSEDATE); //结关日期
+                            }
                             jQuery("#field8147_" + hang_number).val(item.SHIPADVICENO); //SHIPPING
                             jQuery("#field8148_" + hang_number).val(item.PROCATEGORY); //产品
                             jQuery("#field10663_" + hang_number).val(item.DELIVERYNO); //交运单号
@@ -246,7 +262,7 @@
                             jQuery("#field8148_" + hang_number + "span").html(item.PROCATEGORY); //产品
                             jQuery("#field10663_" + hang_number + "span").html(item.DELIVERYNO); //交运单号
                             jQuery("#field10664_" + hang_number + "span").html(item.DELIVERYITEM); //项次
-                            jQuery("#field8149_"+hang_number+"span").html(item.LFIMG);//数量
+                            jQuery("#field8149_" + hang_number + "span").html(item.LFIMG); //数量
                             //jQuery("#field9336_"+hang_number+"span").html(item.);//单据类型
                             //  jQuery("#field9337_"+hang_number+"span").html(item.);//订单类型
                             jQuery("#field9338_" + hang_number + "span").html(item.ORDERITEM); //销售订单项次
@@ -271,11 +287,16 @@
                             //  jQuery("#field9358_"+hang_number+"span").html(item.);//危险品标识
                             jQuery("#field9360_" + hang_number + "span").html(item.COSTCENTER); //成本中心
                             jQuery("#field10821_" + hang_number + "span").html(item.ZWEIGHT); //包材重量
-
-							
-							jQuery("#field10921_" + hang_number + "span").html(item.NTGEW); //净重
-
-
+                            jQuery("#field10921_" + hang_number + "span").html(item.NTGEW); //净重
+                            var closedate=item.CLOSEDATE;
+                            var gjrq=jQuery("#field13475").val();
+                            console.log("获得关结日期："+closedate);
+                            if(closedate.length>0) {
+                                if(gjrq.length==0||gjrq<closedate) {
+                                    jQuery("#field13475").val(closedate);
+                                    jQuery("#field13475span").html(closedate);
+                                }
+                            }
                         });
                     }
 
@@ -300,7 +321,7 @@
         var comm = [];
         var cysjm = $("#field8105").val(); //承运商简码
         var cx = $("#field8107").val(); //车型
-        var dw = $("#field8110").val(); //吨位
+        // var dw = $("#field8110").val(); //吨位
         var ysrq = $("#field8111").val(); //运输日期
         var jflx = $("#field8441").val(); //计费方式
         var yslx = $("#field8261").val(); //运输方式
@@ -342,7 +363,12 @@
         //alert(JSON.stringify(list));
         jQuery.ajax({
             url: "/weightJsp/ACCQUIRE_SO_ASSISTYF.jsp",
-            data: { "startCity": startCity, "endCity": endCity, "list": JSON.stringify(list), "comm": comm },
+            data: {
+                "startCity": startCity,
+                "endCity": endCity,
+                "list": JSON.stringify(list),
+                "comm": comm
+            },
             type: "POST",
             dateType: "json",
             success: function(data) {
@@ -382,7 +408,7 @@
         var comm = [];
         var cysjm = $("#field8105").val(); //承运商简码
         var cx = $("#field8107").val(); //车型
-        var dw = $("#field8110").val(); //吨位
+        // var dw = $("#field8110").val(); //吨位
         var ysrq = $("#field8111").val(); //运输日期
         var jflx = $("#field8441").val(); //计费方式
         var yslx = $("#field8261").val(); //运输方式
@@ -404,7 +430,12 @@
         }
         jQuery.ajax({
             url: "/weightJsp/REFRESH_SO_ASSISTYF.jsp",
-            data: { "startCity": startCity, "endCity": endCity, "list": JSON.stringify(list), "comm": comm },
+            data: {
+                "startCity": startCity,
+                "endCity": endCity,
+                "list": JSON.stringify(list),
+                "comm": comm
+            },
             type: "POST",
             dateType: "json",
             success: function(data) {
@@ -454,7 +485,11 @@
             var index = submitdtlid0[i];
             var gh = jQuery("#field8141_" + index).val(); //柜号
             var fqh = jQuery("#field8142_" + index).val(); //封签号
-            var jn = { "gh": gh, "fqh": fqh, "index": index };
+            var jn = {
+                "gh": gh,
+                "fqh": fqh,
+                "index": index
+            };
             jnArr.push(jn);
         }
         console.log(JSON.stringify(jnArr));
@@ -492,7 +527,7 @@
             var plannum = parseFloat(jQuery("#field9343_" + submitdtlid2[i]).val()); //计划装卸量
             var totalnum = parseFloat(jQuery("#field8149_" + submitdtlid2[i]).val()); //总量
             var shipNum = parseFloat(jQuery("#field9344_" + submitdtlid2[i]).val()); //已运载量
-            
+
             console.log("plannum:" + plannum + ",totalnum:" + totalnum);
             if (plannum > totalnum - shipNum) {
                 alert("计划装卸数量超过了剩余量");
@@ -501,18 +536,22 @@
 
             var sono = jQuery("#field10663_" + submitdtlid2[i]).val(); //po单号
             var soitem = jQuery("#field10664_" + submitdtlid2[i]).val(); //po项次
-            var jn = { "sono": sono, "soitem": soitem, "plannum": plannum.toString() }
+            var jn = {
+                "sono": sono,
+                "soitem": soitem,
+                "plannum": plannum.toString()
+            }
             jnArr.push(jn);
         }
-        var sfzf=jQuery("#field13403  option:selected").val();//是否作废
+        var sfzf = jQuery("#field13403  option:selected").val(); //是否作废
         console.log(jnArr);
-        console.log("是否作废："+sfzf);
+        console.log("是否作废：" + sfzf);
         jQuery.ajax({
             url: "/sapjsp/zxjh.jsp",
             data: {
                 "dtdata": JSON.stringify(jnArr),
                 "type": "checkCount",
-                "sfzf":sfzf
+                "sfzf": sfzf
             },
             type: "POST",
             async: false,
@@ -532,19 +571,8 @@
             }
         });
 
-
-
-
-
-
-
         return result;
     }
 </script>
 <script type="text/javascript" src="/sapjsp/util.js"></script>
-
-
-
-
-
 

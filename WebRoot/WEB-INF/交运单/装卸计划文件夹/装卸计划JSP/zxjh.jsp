@@ -1,6 +1,6 @@
 <%@page import="weaver.general.Util"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+		 pageEncoding="UTF-8"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
@@ -15,23 +15,31 @@
 	String type = request.getParameter("type");
 	RecordSet rs = new RecordSet();
 	rs.writeLog("进入zxjh.jsp");
-	
+
 	JSONArray jsonArr = new JSONArray();
-	
+
 	if (type.equals("yg")) {
 		strs = request.getParameterValues("ghs[]");
 		rs.writeLog("获得的数组为：" + strs.toString() + ",类型为：" + type);
 		StringBuffer sql = new StringBuffer();
 		sql.append("SELECT c.gh,c.ph,c.sl,d.* from ")
 				.append(" (SELECT a.gh gh,b.jydh jydh,b.xc xc,b.ph ph,b.bczxsl sl")
-				.append(" from formtable_main_43 a,formtable_main_43_dt1 b where a.id=b.mainid)")
-				.append(" c,uf_spghsr d where c.xc=d.DELIVERYITEM and c.JYDH=d.DELIVERYNO");
-		for (int i = 0; i < strs.length; i++) {
-			if (i == 0)
-				sql.append(" and c.gh='").append(strs[i] + "'");
-			else
-				sql.append(" or c.gh='").append(strs[i] + "'");
-		}
+				.append(" from formtable_main_43 a,formtable_main_43_dt1 b where a.SFZF='0'and a.id=b.mainid");
+                if(strs.length>1){
+                        sql.append(" and a.gh in (");
+                    for (int i = 0; i <strs.length ; i++) {
+                        sql.append("'"+strs[i]+"'");
+                        if(i!=strs.length-1){
+                            sql.append(",");
+                        }else{
+                            sql.append(")");
+                        }
+                    }
+                }else{
+                    sql.append(" and a.gh='"+strs[0]+"'");
+                }
+				sql.append(") c,uf_spghsr d where c.xc=d.DELIVERYITEM and c.JYDH=d.DELIVERYNO");
+
 		//out.print(sql);
 		rs.executeSql(sql.toString());
 		rs.writeLog("装卸计划有柜执行sql：" + sql.toString());
@@ -67,8 +75,9 @@
 			map.put("LOCATION", Util.null2String(rs.getString("LOCATION")));//库位代码
 			map.put("PACK", Util.null2String(rs.getString("PACK")));//包装性质
 			map.put("SHIPTOADDR", Util.null2String(rs.getString("SHIPTOADDR")));//送达方
+			map.put("CLOSEDATE",Util.null2String(rs.getString("CLOSEDATE")));//预计结关日期
 
-			
+
 			jsonArr.add(map);
 		}
 	}
@@ -111,7 +120,7 @@
 			map.put("SOLDTOADDR", Util.null2String(rs.getString("SOLDTOADDR")));//售达方地址
 			map.put("ZWEIGHT", Util.null2String(rs.getString("ZWEIGHT")));//包材重量
 			map.put("NTGEW", Util.null2String(rs.getString("NTGEW")));//净数量
-
+			map.put("CLOSEDATE",Util.null2String(rs.getString("CLOSEDATE")));//预计结关日期
 			jsonArr.add(map);
 		}
 
@@ -128,7 +137,7 @@
 				out.write("success");
 				return;
 			}
-			
+
 
 			if (mxdata.equals("") || mxdata == null) {
 				out.write("获得数据为空！");
@@ -238,23 +247,23 @@
 %>
 
 <%!public Double calCulate(String str1, String str2, String action) {
-		if (str1.equals("") || str1 == null) {
+	if (str1.equals("") || str1 == null) {
 
-			str1 = "0.00";
-		}
-		if (str2.equals("") || str2 == null) {
+		str1 = "0.00";
+	}
+	if (str2.equals("") || str2 == null) {
 
-			str2 = "0.00";
-		}
-		//计算净重的绝对值
-		BigDecimal b1 = new BigDecimal(str1);
-		BigDecimal b2 = new BigDecimal(str2);
-		Double b3 = 0.00;
-		if (action.equals("add")) {
-			b3 = b1.add(b2).doubleValue();
-		}
-		if (action.equals("sub")) {
-			b3 = b1.subtract(b2).doubleValue();
-		}
-		return b3;
-	}%>
+		str2 = "0.00";
+	}
+	//计算净重的绝对值
+	BigDecimal b1 = new BigDecimal(str1);
+	BigDecimal b2 = new BigDecimal(str2);
+	Double b3 = 0.00;
+	if (action.equals("add")) {
+		b3 = b1.add(b2).doubleValue();
+	}
+	if (action.equals("sub")) {
+		b3 = b1.subtract(b2).doubleValue();
+	}
+	return b3;
+}%>

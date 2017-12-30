@@ -1,10 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<script type="text/javascript">
+    /*
+    *  TODO
+     *  请在此处编写javascript代码
+     */
+
+    var sapupload = '<input type="button" onclick="sapUpLoad()" class="middle e8_btn_top_first" value="SAP数据上抛" style="width:200px"/>';
+    jQuery(".sapupload").children("td").children("div").append(sapupload);
+
+    function sapUpLoad() {
+        var hang_number0 = parseInt(jQuery("#indexnum0").val()) ;
+        var mx0 = [];
+        if (hang_number0 > 0) {
+
+
+            for (var i = 0; i < hang_number0; i++) {
+                var js = {};
+                //js.MANDT=jQuery("#11281_"+i).val();//集团
+                js.EBELN = jQuery("#field11281_" + i).val(); //采购凭证号
+                js.EBELP = jQuery("#field11282_" + i).val(); //采购凭证的项目编号
+                //js.LGORT=jQuery("#_"+i).val();//存储位置
+                js.WERKS = jQuery("#field11284_" + i).val(); //工厂
+                js.LFIMG = jQuery("#field11286_" + i).val(); //以录入项单位表示的数量
+                js.CAR_NO = jQuery("#field11288_" + i).val(); //车号
+                js.BUDAT = jQuery("#field11287_" + i).val(); //凭证中的过帐日期
+                //js.EWEI = jQuery("#field11289_" + i).val(); //重量单位
+                js.PACK = jQuery("#field11291_" + i).val(); //包装性质
+                js.BSART = jQuery("#field11290_" + i).val(); //订单类型（采购）
+                js.LSMNG = jQuery("#field11292_" + i).val(); //交货单的计量单位数量
+
+                js.MATNR = jQuery("#field11381_" + i).val(); //物料号
+
+                js.ERFMG = jQuery("#field11286_" + i).val(); //以录入项单位表示的数量
+                js.ERFME = jQuery("#field12581_" + i).val(); //条目单位
+                js.LSMNG = jQuery("#field11292_" + i).val(); //交货单的计量单位数量
+                js.LSMEH = jQuery("#field11289_" + i).val(); //交货单的计量单位
+
+                js.BEIZHU1 = jQuery("#field11384_" + i).val();
+                js.BEIZHU2 = jQuery("#field11385_" + i).val();
+                js.BEIZHU3 = jQuery("#field11386_" + i).val();
+                mx0.push(js);
+
+            }
+        }
+
+        var hang_number1 = parseInt(jQuery("#indexnum1").val());
+        var mx1 = [];
+        if (hang_number1 > 0) {
+
+
+            for (var i = 0; i < hang_number1; i++) {
+                var js = {};
+                //js.MANDT=jQuery("#11281_"+i).val();//集团
+                js.EBELN = jQuery("#field11301_" + i).val(); //采购凭证号
+                js.EBELP = jQuery("#field11303_" + i).val(); //采购凭证的项目编号
+                js.LGORT = jQuery("#field11304_" + i).val(); //存储位置
+                js.WERKS = jQuery("#field11306_" + i).val(); //工厂
+                js.LFIMG = jQuery("#field11308_" + i).val(); //以录入项单位表示的数量
+                js.CAR_NO = jQuery("#field11310_" + i).val(); //车号
+                js.BUDAT = jQuery("#field11315_" + i).val(); //凭证中的过帐日期
+                js.EWEI = jQuery("#field11312_" + i).val(); //重量单位
+                js.PACK = jQuery("#field11314_" + i).val(); //包装性质
+                js.BSART = jQuery("#field11316_" + i).val(); //订单类型（采购）
+                //js.LSMNG=jQuery("#_"+i).val();//交货单的计量单位数量
+
+                js.LSMNG = jQuery("#field12442_" + i).val(); //交货单的计量单位数量
+                js.LSMEH = jQuery("#field11312_" + i).val(); //交货单的计量单位
+                js.BEIZHU1 = jQuery("#field11390_" + i).val();
+                js.BEIZHU2 = jQuery("#field11391_" + i).val();
+                js.BEIZHU3 = jQuery("#field11392_" + i).val();
+                mx1.push(js);
+
+            }
+        }
+        console.log("mx0:"+JSON.stringify(mx0));
+        console.log("mx1:"+JSON.stringify(mx1));
+        if(mx0.length>0){
+            mx0=JSON.stringify(mx0);
+        }
+        if(mx1.length>0){
+            mx1=JSON.stringify(mx1);
+        }
+        jQuery.ajax({
+            url : "/sapjsp/PO_PCQR.jsp",
+            data : {
+                "mx0" : mx0,
+                "mx1" : mx1,
+                "type" : "sapupload"
+            },
+            type : "POST",
+            success : function(data) {
+                var newData=data.replace(/(^\s*)|(\s*$)/g, "");
+                alert(newData);
+
+
+            }
+        });
+
+
+    }
+</script>
+
+
+
+
+
+
+
+

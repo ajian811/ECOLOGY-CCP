@@ -16,6 +16,11 @@ import weaver.workflow.workflow.WorkflowComInfo;
 
 public class Z_CCP_PO_ZXJH extends BaseBean implements Action{
 
+
+    static void main(String[] args) {
+
+    }
+
 	@Override
 	public String execute(RequestInfo requestInfo) {
 		// TODO Auto-generated method stub
@@ -46,13 +51,12 @@ public class Z_CCP_PO_ZXJH extends BaseBean implements Action{
             String sfzf="";//是否作废
 			if (rs.next()) {
                 sfyg = Util.null2String(rs.getString("sfyg"));
-                RecordSet rs1 = new RecordSet();
                 id = Util.null2String(rs.getString("id"));
                 sfzf = Util.null2String(rs.getString("sfzf"));
-                //如果作废则直接返回
-                if (sfzf.equals("1")) {
-                    return SUCCESS;
-                }
+            }
+            //如果作废则直接返回
+            if (sfzf.equals("1")) {
+                return SUCCESS;
             }
 				//  有柜情况
 				if (sfyg.equals("1")) {

@@ -74,9 +74,9 @@ public class Create_Sequence extends BaseBean implements Action {
 
 				if (!"".equals(crzt)) {
 					if ("0".equals(crzt)) {
-						crzt = "I";
-					} else {
 						crzt = "O";
+					} else {
+						crzt = "I";
 					}
 				}
 			}

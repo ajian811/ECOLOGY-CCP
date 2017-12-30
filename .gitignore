@@ -1,1 +1,64 @@
 # Created by .ignore support plugin (hsz.mobi)
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen### Java template
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+.idea/dataSources.local.xml
+.idea/file.template.settings.xml
+.idea/fileTemplates/
+.idea/workspace.xml
+"WebRoot/WEB-INF/PO\346\211\271\346\254\241\347\241\256\350\256\244/PO_PCQR.jsp"
+"WebRoot/WEB-INF/PO\346\211\271\346\254\241\347\241\256\350\256\244/util.js"
+"WebRoot/WEB-INF/PO\346\211\271\346\254\241\347\241\256\350\256\244/utilJM.js"
+"WebRoot/WEB-INF/SAP\344\270\212\346\212\233/PO\344\270\212\346\212\233/"
+WebRoot/WEB-INF/classes/
+classbean/sourcecode/
+classbean/weaver/filter/msg/vssver2.scc
+classbean/weaver/filter/security/freeValidators/vssver2.scc
+classbean/weaver/filter/security/validators/vssver2.scc
+classbean/weaver/filter/watch/vssver2.scc
+classbean/weaver/security/access/vssver2.scc
+classbean/weaver/security/base/vssver2.scc
+classbean/weaver/security/boot/vssver2.scc
+classbean/weaver/security/classLoader/vssver2.scc
+classbean/weaver/security/core/vssver2.scc
+classbean/weaver/security/file/vssver2.scc
+classbean/weaver/security/filter/vssver2.scc
+classbean/weaver/security/freeValidators/vssver2.scc
+classbean/weaver/security/msg/vssver2.scc
+classbean/weaver/security/thread/vssver2.scc
+classbean/weaver/security/util/vssver2.scc
+classbean/weaver/security/validators/vssver2.scc
+classbean/weaver/security/watch/vssver2.scc
+classbean/weaver/security/webcontainer/vssver2.scc
+src/com/
+src/weaver/workflow/
+/WebRoot/WEB-INF/bootstrap/
+/WebRoot/WEB-INF/tld/
