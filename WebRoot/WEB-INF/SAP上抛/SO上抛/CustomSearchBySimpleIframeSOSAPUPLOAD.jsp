@@ -2799,17 +2799,23 @@ function getAll() {
         return;
     }
     
-     jQuery.getJSON("/sapjsp/SOSapUpload.jsp",{billids:billids},function(data){
+     jQuery.post("/sapjsp/SOSapUpload.jsp",{billids:billids},function(data){
       console.log(data);
       if(data){
-        for(var i = 0; i<data.result.length;i++){
-          if(data.result[i].sfdy == '1'){
-            Dialog.alert("该提入单已经被打印,提入单号为:" + data.result[i].trdh);
-            //alert("该提入单已经被打印,提入单号为:" + data.result[i].trdh);
-          }else {
-            window.open("/formmode/view/FormModePrint.jsp?isfromTab=0&modeId=381&formId=-55&type=4&billid="+data.result[i].id+"&viewfrom=fromsearchlist&opentype=1&customid=281");
-          }
+          /*
+       for(var i = 0; i<data.result.length;i++){
+
+         if(data.result[i].sfdy == '1'){
+           Dialog.alert("该提入单已经被打印,提入单号为:" + data.result[i].trdh);
+           //alert("该提入单已经被打印,提入单号为:" + data.result[i].trdh);
+         }else {
+           window.open("/formmode/view/FormModePrint.jsp?isfromTab=0&modeId=381&formId=-55&type=4&billid="+data.result[i].id+"&viewfrom=fromsearchlist&opentype=1&customid=281");
+         }
+
+
         }
+        */
+          Dialog.alert(data);
         _table.reLoad();
       }
 	});

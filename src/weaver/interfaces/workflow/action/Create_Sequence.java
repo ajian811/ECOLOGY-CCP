@@ -14,6 +14,7 @@ import weaver.workflow.workflow.WorkflowComInfo;
 
 public class Create_Sequence extends BaseBean implements Action {
 	// shipping柜号输入接口
+	@Override
 	public String execute(RequestInfo request) {
 		BaseBean log = new BaseBean();
 
@@ -74,9 +75,9 @@ public class Create_Sequence extends BaseBean implements Action {
 
 				if (!"".equals(crzt)) {
 					if ("0".equals(crzt)) {
-						crzt = "O";
-					} else {
 						crzt = "I";
+					} else {
+						crzt = "O";
 					}
 				}
 			}
@@ -101,6 +102,7 @@ public class Create_Sequence extends BaseBean implements Action {
 						lcbh += formatString(rs1.getInt(1));
 
 						updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where shipno = '" + shipno
+								+ "' and  mainid = '" + mainid
 								+ "'";
 						log.writeLog("更新语句:" + updateSql);
 						rs2.executeSql(updateSql);

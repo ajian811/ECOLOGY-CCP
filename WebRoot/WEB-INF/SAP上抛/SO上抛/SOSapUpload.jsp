@@ -351,6 +351,7 @@
 		out.write("fail" + e);
 		e.printStackTrace();
 		bs.writeLog("报错了！错误详情：" + e);
+		out.write("报错了！错误详情：" + e);
 
 	}
 %>

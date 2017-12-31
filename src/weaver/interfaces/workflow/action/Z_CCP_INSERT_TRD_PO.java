@@ -1,14 +1,12 @@
 package weaver.interfaces.workflow.action;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import com.sap.mw.jco.JCO;
 
 import weaver.conn.RecordSet;
+import weaver.formmode.setup.ModeRightInfo;
 import weaver.general.BaseBean;
 import weaver.general.Util;
 import weaver.hrm.resource.ResourceComInfo;
@@ -22,6 +20,7 @@ import weaver.workflow.workflow.WorkflowComInfo;
  */
 public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 	// shipping柜号输入接口
+	@Override
 	public String execute(RequestInfo request) {
 		BaseBean log = new BaseBean();
 
@@ -110,7 +109,8 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 
 							buffer.append("insert into UF_TRDPLDY");
 							buffer.append(
-									"(TRDH,ZXJHH,LCID,LCBH,DYCS,SFDY,SFYG,YJYSRQ,YJYSSJ,FORMMODEID,LX,cp,sfzf,MODEDATACREATER) values");
+									"(TRDH,ZXJHH,LCID,LCBH,DYCS,SFDY,SFYG,YJYSRQ,YJYSSJ,FORMMODEID,LX,cp,sfzf,MODEDATACREATER," +
+											"modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values");
 							buffer.append("('").append(trdh).append("',");
 							buffer.append("'").append(zxjhh).append("',");
 							buffer.append("'").append(requestid).append("',");
@@ -124,10 +124,20 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 							buffer.append("'").append("1").append("',");
 							buffer.append("'").append(carno).append("',");
 							buffer.append("'").append("0").append("',");
-							buffer.append("'").append(userid).append("')");
+							buffer.append("'").append(userid).append("',");
+
+							buffer.append("'").append("0").append("',");
+							Date d1=new Date();
+							SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+							SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
+							buffer.append("'").append(dateFormat.format(d1)).append("',");
+							buffer.append("'").append(dateFormat1.format(d1)).append("',");
+							String str1 = UUID.randomUUID().toString();
+							buffer.append("'").append(str1).append("')");
+
 							log.writeLog("插入建模主表执行的sql :" + buffer.toString());
 							rs1.executeSql(buffer.toString());// 先插入主表
-
+			/*
 							StringBuffer sb = new StringBuffer();// 插入权限表
 							sb.append("insert into MODEDATASHARE_381");
 							sb.append("(SOURCEID,TYPE,CONTENT,SECLEVEL,SHARELEVEL) values");
@@ -139,6 +149,17 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 							sb.append("'").append("3").append("')");
 							log.writeLog("插入权限执行的sql:" + sb.toString());
 							rs1.executeSql(sb.toString());// 先插入主表
+*/
+							sql="select id from UF_TRDPLDY where modeuuid='"+str1+"'";
+							log.writeLog(sql);
+							rs1.execute(sql);
+							String id="";
+							if(rs1.next()){
+								id=Util.null2String(rs1.getString("id"));
+							}
+							ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
+							localModeRightInfo1.setNewRight(true);
+							localModeRightInfo1.editModeDataShare(userid, 381, Integer.parseInt(id));
 
 							String dt3Sql = "select * from " + tablename + "_dt2 where trdh = '" + trdh + "'";
 							rs.execute(dt3Sql);
@@ -208,7 +229,8 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 					StringBuffer buffer = new StringBuffer();
 					buffer.append("insert into UF_TRDPLDY");
 					buffer.append(
-							"(TRDH,ZXJHH,LCID,LCBH,DYCS,SFDY,SFYG,YJYSRQ,YJYSSJ,FORMMODEID,LX,cp,sfzf,MODEDATACREATER) values");
+							"(TRDH,ZXJHH,LCID,LCBH,DYCS,SFDY,SFYG,YJYSRQ,YJYSSJ,FORMMODEID,LX,cp,sfzf,MODEDATACREATER" +
+									"modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values");
 					buffer.append("('").append(trdh).append("',");
 					buffer.append("'").append(zxjhh).append("',");
 					buffer.append("'").append(requestid).append("',");
@@ -222,10 +244,31 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 					buffer.append("'").append("1").append("',");
 					buffer.append("'").append(carno).append("',");
 					buffer.append("'").append("0").append("',");
-					buffer.append("'").append(userid).append("')");
+					buffer.append("'").append(userid).append("',");
+
+					buffer.append("'").append("0").append("',");
+					Date d1=new Date();
+					SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+					SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
+					buffer.append("'").append(dateFormat.format(d1)).append("',");
+					buffer.append("'").append(dateFormat1.format(d1)).append("',");
+					String str1 = UUID.randomUUID().toString();
+					buffer.append("'").append(str1).append("')");
+
 					log.writeLog("插入建模主表执行的sql :" + buffer.toString());
 					rs1.executeSql(buffer.toString());// 先插入主表
 
+					String sql="select id from UF_TRDPLDY where modeuuid='"+str1+"'";
+					log.writeLog(sql);
+					rs1.execute(sql);
+					String id="";
+					if(rs1.next()){
+						id=Util.null2String(rs1.getString("id"));
+					}
+					ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
+					localModeRightInfo1.setNewRight(true);
+					localModeRightInfo1.editModeDataShare(userid, 381, Integer.parseInt(id));
+/*
 					StringBuffer sb = new StringBuffer();// 插入权限表
 					sb.append("insert into MODEDATASHARE_381");
 					sb.append("(SOURCEID,TYPE,CONTENT,SECLEVEL,SHARELEVEL) values");
@@ -236,6 +279,7 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 					sb.append("'").append("3").append("')");
 					log.writeLog("插入权限执行的sql:" + sb.toString());
 					rs1.executeSql(sb.toString());// 先插入主表
+					*/
 
 					for (int i = 0; i < list.size(); i++) {
 						String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,gbm,jydh,ddxc,wlhm,wlms,sl) values ";

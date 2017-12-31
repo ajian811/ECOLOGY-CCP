@@ -22,6 +22,7 @@ import weaver.workflow.workflow.WorkflowComInfo;
  */
 public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 	// shipping柜号输入接口
+	@Override
 	public String execute(RequestInfo request) {
 		BaseBean log = new BaseBean();
 

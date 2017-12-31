@@ -62,3 +62,8 @@ src/com/
 src/weaver/workflow/
 /WebRoot/WEB-INF/bootstrap/
 /WebRoot/WEB-INF/tld/
+/classbean/
+"PO\350\275\246\350\276\206\351\234\200\346\261\202/"
+!/classbean/
+/Test/
+Test/
