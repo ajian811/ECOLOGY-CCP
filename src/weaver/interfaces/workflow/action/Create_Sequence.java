@@ -57,6 +57,13 @@ public class Create_Sequence extends BaseBean implements Action {
 					tablename = Util.null2String(rs.getString("tablename"));
 				}
 			}
+			String currentnodetype = "";
+			String sql0="SELECT currentnodetype FROM workflow_requestbase where REQUESTID="+requestid;
+			rs.writeLog(sql0);
+			rs.execute(sql0);
+			while (rs.next()){
+				currentnodetype=Util.null2String(rs.getString("currentnodetype"));
+			}
 
 			String selectSql = "select t1.*,t2.trdh from " + tablename + " t1 ";
 			selectSql += " left join " + tablename + "_dt2 t2 on t1.id = t2.mainid";
@@ -84,6 +91,9 @@ public class Create_Sequence extends BaseBean implements Action {
 			if (!"1".equals(sfzf)) {
 				String updateSql = "";
 				if ("0".equals(sfyg)) {
+					if("0".equals(currentnodetype)){
+						return SUCCESS;
+					}
 					String sql = "select t2.shipno from " + tablename + " t1 ";
 					sql += " left join " + tablename + "_dt3 t2 on t1.id = t2.mainid";
 					sql += " where t1.requestid= '" + requestid + "'";
@@ -108,6 +118,9 @@ public class Create_Sequence extends BaseBean implements Action {
 						rs2.executeSql(updateSql);
 					}
 				} else if ("1".equals(sfyg) && "".equals(trdh)) {
+					if(!"0".equals(currentnodetype)){
+						return  SUCCESS;
+					}
 					String lcbh = "1010" + crzt + currdate1;
 					// 调用存储过程自编号
 					log.writeLog("调用存储过程fn_no_make");

@@ -4,88 +4,37 @@
      *  TODO
      *  请在此处编写javascript代码
      */
-     
-    var html='<input class="e8_btn_top_first" _disabled="true" onclick="printAll()" value="CLICK TO PRINT" style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="print" type="button">';
-    jQuery(".printbutton").append(html);
-    
-    function printAll(){
-        var ifprint=confirm("是否确认打印");
-        console.log("ifprint"+ifprint);
-    	if(ifprint==false){
-    		return;
-    	}
-    	if(ifprint==true){
-    	var head=' <!DOCTYPE html><html><head><meta charset="UTF-8"></head><link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" /><body>';
-    	var foot='</body></html>';  
-    	var html='';
-    	var zxjhh=jQuery("#field8083").val();
-    	var date1=new Date();
-    	
-    	html+='<h1>DELIVERY ORDER TEST</h1><table style="width:100%"><tbody><tr><td><div style="margin: inherit;float: left;"><div>INVOICE NO:<span> '+zxjhh+'<span/></div>'; 
-    	html+='<div> Goods Deliver To:<span>SOD TO/ON BEHALF<span></div><div>Shipping/Delivery Remarks: <br/><span>12321dfaf</span></div></div></td>';
-    	html+='   <td><div style="margin: inherit;float: left;"><div>Date:<span>'+date1+'</span></div><div>Our D/O No:<span>DO:1607259</span></div><div>Our Sales No:<span></span></div><div> Buyer No<span></span></div>  ';
-    	html+='</div></td></tbody></table><table style="width:100%"  class="table">';
-    	html+='<thead><tr><th style="width:30%">SHIPPING</th><th style="width:30%">单号</th><th style="width:20%">项次</th><th style="width:20%">计划装卸量</th></tr></thead><tbody>';
-    	
-    	var sfyg=jQuery("#field8087").val();
-    	
-    	if(sfyg=="0"){
-    	   var indexs=jQuery("#submitdtlid2").val().split(",");
-    	   console.log(indexs);
-    	   for(var i=0;i<indexs.length;i++){
-    	   var index =indexs[i];
-    	   var shipno=jQuery("#field8147_"+index).val();
-    	   var dh=jQuery("#field10663_"+index).val();
-    	   var xc=jQuery("#field10664_"+index).val();
-    	   var zxl=jQuery("#field9343_"+index).val();
-    	   
-    	   html+='<tr><td>'+shipno+'</td><td>'+dh+'</td><td>'+xc+'</td><td>'+zxl+'</td></tr>';
-    	   }
-    	}
-    	html+='</tbody></table>';
-    	var bdhtml=window.document.body.innerHTML;//获取当前页的html代码
-    	var prnhtml=head+html+foot;
-    	window.document.body.innerHTML=prnhtml;
-		window.print();
-		window.document.body.innerHTML=bdhtml;
-		jQuery("#field12621").val("1");
-		}
-    	
-    }
     var hang_number0;
     jQuery(document).ready(function() {
-    
-    		
-    		var sfyg = jQuery("#field8087").val();
-            if (sfyg.length > 0) {
-                if (sfyg == 0) {
-                    jQuery(".wg").show();
-                    jQuery(".yg").hide();
-                } else {
-                    jQuery(".yg").show();
-                    jQuery(".wg").hide();
-                }
-                }
-                
-             var sfyyf = jQuery("#field8088").val();
-            if (sfyyf.length > 0) {
-                console.log(sfyyf);
-                if (sfyyf == 1) {
-                    jQuery(".yyf").show();
-                } else {
-                    jQuery(".yyf").hide();
-                }
+        var sfyg = jQuery("#field8087").val();
+        if (sfyg.length > 0) {
+            if (sfyg == 0) {
+                jQuery(".wg").show();
+                jQuery(".yg").hide();
+            } else {
+                jQuery(".yg").show();
+                jQuery(".wg").hide();
             }
-    
-    checkCustomize = function() {
-    //如果作废，则不需要校验
-        var sfzf=jQuery("#field13403 option:selected").val();
-       		if(sfzf=="1"){
-        	return true;
         }
-        return checkALL();
-    }
-    
+
+        var sfyyf = jQuery("#field8088").val();
+        if (sfyyf.length > 0) {
+            console.log(sfyyf);
+            if (sfyyf == 1) {
+                jQuery(".yyf").show();
+            } else {
+                jQuery(".yyf").hide();
+            }
+        }
+
+        checkCustomize = function() {
+            var sfzf = jQuery("#field13403 option:selected").val();
+            if (sfzf == "1") {
+                return true;
+            }
+            return checkALL();
+        }
+
 
         $("#field11001_browserbtn").bind('click', function() {
             if ($("#field8241").val() == '') {
@@ -94,9 +43,10 @@
             } else if ($("#field8107").val() == '') {
                 alert("没有记录选择，请选择车型！");
                 return;
-            } else if ($("#field8110").val() == '') {
+                /*         } else if ($("#field8110").val() == '') {
                 alert("没有记录选择，请选择吨位！");
                 return;
+*/
             } else if ($("#field8111").val() == '') {
                 alert("没有记录选择，请选择预计运输日期！");
                 return;
@@ -111,19 +61,19 @@
                 return;
             }
         });
-        var html = "<input type='button' value='生成辅线路' id='accquire' />";
+        var html = "<input type='button' value='生成辅线路' class='middle e8_btn_top_first' id='accquire' />";
         $("#needButton").append(html);
         $("#accquire").click(function() {
             accquireYF();
         });
-        var html = "<input type='button' value='重新生成辅线路' id='refreshYF' />";
+        var html = "<input type='button' value='重新生成辅线路' class='middle e8_btn_top_first' id='refreshYF' />";
         $("#refresh").append(html);
         $("#refreshYF").click(function() {
             refreshYF();
         });
-		
-		
-		
+
+
+
         //是否有运费联动
         jQuery("#field8088").bindPropertyChange(function() {
             var sfyyf = jQuery("#field8088").val();
@@ -138,7 +88,7 @@
                 delRowFunmd0(3);
             }
         });
-        
+
         //是否有柜联动
         jQuery("#field8087").bindPropertyChange(function() {
             var sfyg = jQuery("#field8087").val();
@@ -167,7 +117,7 @@
             var ghs = new Array();
             var i = 0;
             jQuery("#field9541span").find('a').each(function() {
-                ghs[i] = jQuery(this).html()
+                ghs[i] = jQuery(this).html();
                 i++;
             });
             console.log(ghs);
@@ -178,12 +128,16 @@
                 addRow0(0);
                 var _index = jQuery("#indexnum0").val() - 1;
                 jQuery("#field8141_" + _index).val(ghs[index]);
+                jQuery("#field8141_" + _index + "span").html(ghs[index]);
                 console.log("#field8141_" + _index)
             }
 
             jQuery.ajax({
                 url: "/sapjsp/zxjh.jsp",
-                data: { "ghs": ghs, "type": "yg" },
+                data: {
+                    "ghs": ghs,
+                    "type": "yg"
+                },
                 type: "POST",
                 dataType: "json",
                 success: function(responseJSON) {
@@ -195,6 +149,8 @@
                             fillMX(8143, item.gh); //柜号
                             fillMX(8144, item.cp); //产品
                             fillMX(8145, item.sl); //数量
+
+                            fillMX(9310, item.sl); //本次装卸数量
                             fillMX(9301, item.jydh); //交运单号
                             fillMX(9302, item.xc); //项次
 
@@ -204,11 +160,11 @@
                             fillMX(9309, item.STOCKDESC); //物料描述
                             fillMX(9311, item.REALSHIPNUM); //已运载量
                             // fillMX(9312, item.);//剩余运载量
-                            fillMX(9313, item.SALEUNIT); //单位代码
-                            // fillMX(9314, item.);//库位代码
+                            fillMX(11961, item.SALEUNIT); //单位代码
+                            fillMX(9314, item.LOCATION); //库位代码
                             // fillMX(9315, item.);//单位描述
                             fillMX(9316, item.LOCATION); //库存地址
-                            // fillMX(9317, item.);//包装性质
+                            fillMX(9317, item.PACK); //包装性质
                             fillMX(9318, item.SHIPTOADDR); //送达方
                             fillMX(9319, item.SHIPTO); //送达方名称
                             // fillMX(9320, item.);//送达地址描述
@@ -221,6 +177,16 @@
                             fillMX(9327, item.COSTCENTER); //成本中心
                             // fillMX(9328, item.);//供应商代码
                             // fillMX(9329, item.);//供应商名称
+                            fillMX(10841, item.NTGEW); //净重
+                            var closedate=item.CLOSEDATE;
+                            var gjrq=jQuery("#field13475").val();
+                            console.log("获得关节日期："+gjrq);
+                            if(closedate.length>0) {
+                                if(gjrq.length==0||gjrq<closedate) {
+                                    jQuery("#field13475").val(closedate);
+                                }
+                            }
+
                         });
                     }
 
@@ -234,6 +200,7 @@
         jQuery("#field8162").bindPropertyChange(function() {
             delRowFunmd0(2);
 
+            var jgrq = jQuery("#field13475").val();
             var ghs = new Array();
             var i = 0;
             jQuery("#field8162span").find('a').each(function() {
@@ -247,7 +214,10 @@
 
             jQuery.ajax({
                 url: "/sapjsp/zxjh.jsp",
-                data: { "ghs": ghs, "type": "wg" },
+                data: {
+                    "ghs": ghs,
+                    "type": "wg"
+                },
                 type: "POST",
                 dataType: "json",
                 success: function(responseJSON) {
@@ -256,11 +226,14 @@
                         jQuery.each(responseJSON, function(i, item) {
                             addRow2(2);
                             var hang_number = parseInt(jQuery("#indexnum2").val()) - 1;
+                            if (jgrq = '' || jgrq > item.CLOSEDATE) {
+                                fillMX(13475, item.CLOSEDATE); //结关日期
+                            }
                             jQuery("#field8147_" + hang_number).val(item.SHIPADVICENO); //SHIPPING
                             jQuery("#field8148_" + hang_number).val(item.PROCATEGORY); //产品
                             jQuery("#field10663_" + hang_number).val(item.DELIVERYNO); //交运单号
                             jQuery("#field10664_" + hang_number).val(item.DELIVERYITEM); //项次
-                             jQuery("#field8149_"+hang_number).val(item.NTGEW);//数量
+                            jQuery("#field8149_" + hang_number).val(item.LFIMG); //数量
                             //jQuery("#field9336_"+hang_number).val(item.);//单据类型
                             //  jQuery("#field9337_"+hang_number).val(item.);//订单类型
                             jQuery("#field9338_" + hang_number).val(item.ORDERITEM); //销售订单项次
@@ -285,12 +258,15 @@
                             //  jQuery("#field9358_"+hang_number).val(item.);//危险品标识
                             jQuery("#field9360_" + hang_number).val(item.COSTCENTER); //成本中心
 
+                            jQuery("#field10821_" + hang_number).val(item.ZWEIGHT); //包装重量
+                            jQuery("#field10921_" + hang_number).val(item.NTGEW); //净重
+
 
                             jQuery("#field8147_" + hang_number + "span").html(item.SHIPADVICENO); //SHIPPING
                             jQuery("#field8148_" + hang_number + "span").html(item.PROCATEGORY); //产品
                             jQuery("#field10663_" + hang_number + "span").html(item.DELIVERYNO); //交运单号
                             jQuery("#field10664_" + hang_number + "span").html(item.DELIVERYITEM); //项次
-                            // jQuery("#field8149_"+hang_number+"span").html(item.SHIPNUM);//数量
+                            jQuery("#field8149_" + hang_number + "span").html(item.LFIMG); //数量
                             //jQuery("#field9336_"+hang_number+"span").html(item.);//单据类型
                             //  jQuery("#field9337_"+hang_number+"span").html(item.);//订单类型
                             jQuery("#field9338_" + hang_number + "span").html(item.ORDERITEM); //销售订单项次
@@ -298,7 +274,7 @@
                             //  jQuery("#field9340_"+hang_number+"span").html(item.);//产品组
                             jQuery("#field9341_" + hang_number + "span").html(item.STOCKNO); //物料号
                             jQuery("#field9342_" + hang_number + "span").html(item.STOCKDESC); //物料描述
-                            jQuery("#field8149_" + hang_number + "span").html(item.NTGEW); //数量
+                            //jQuery("#field8149_" + hang_number + "span").html(item.NTGEW); //数量
                             jQuery("#field9344_" + hang_number + "span").html(item.SHIPNUM); //已运载量
                             //  jQuery("#field9345_"+hang_number+"span").html(item.);//剩余运载量
                             jQuery("#field9346_" + hang_number + "span").html(item.SALEUNIT); //单位代码
@@ -314,10 +290,20 @@
                             //  jQuery("#field9357_"+hang_number+"span").html(item.);//是否固废
                             //  jQuery("#field9358_"+hang_number+"span").html(item.);//危险品标识
                             jQuery("#field9360_" + hang_number + "span").html(item.COSTCENTER); //成本中心
+                            jQuery("#field10821_" + hang_number + "span").html(item.ZWEIGHT); //包材重量
 
 
+                            jQuery("#field10921_" + hang_number + "span").html(item.NTGEW); //净重
 
-
+                            var closedate=item.CLOSEDATE;
+                            var gjrq=jQuery("#field13475").val();
+                            console.log("获得关结日期："+closedate);
+                            if(closedate.length>0) {
+                                if(gjrq.length==0||gjrq<closedate) {
+                                    jQuery("#field13475").val(closedate);
+                                    jQuery("#field13475span").html(closedate);
+                                }
+                            }
 
                         });
                     }
@@ -343,7 +329,7 @@
         var comm = [];
         var cysjm = $("#field8105").val(); //承运商简码
         var cx = $("#field8107").val(); //车型
-        var dw = $("#field8110").val(); //吨位
+        // var dw = $("#field8110").val(); //吨位
         var ysrq = $("#field8111").val(); //运输日期
         var jflx = $("#field8441").val(); //计费方式
         var yslx = $("#field8261").val(); //运输方式
@@ -385,7 +371,12 @@
         //alert(JSON.stringify(list));
         jQuery.ajax({
             url: "/weightJsp/ACCQUIRE_SO_ASSISTYF.jsp",
-            data: { "startCity": startCity, "endCity": endCity, "list": JSON.stringify(list), "comm": comm },
+            data: {
+                "startCity": startCity,
+                "endCity": endCity,
+                "list": JSON.stringify(list),
+                "comm": comm
+            },
             type: "POST",
             dateType: "json",
             success: function(data) {
@@ -425,7 +416,7 @@
         var comm = [];
         var cysjm = $("#field8105").val(); //承运商简码
         var cx = $("#field8107").val(); //车型
-        var dw = $("#field8110").val(); //吨位
+        // var dw = $("#field8110").val(); //吨位
         var ysrq = $("#field8111").val(); //运输日期
         var jflx = $("#field8441").val(); //计费方式
         var yslx = $("#field8261").val(); //运输方式
@@ -447,7 +438,12 @@
         }
         jQuery.ajax({
             url: "/weightJsp/REFRESH_SO_ASSISTYF.jsp",
-            data: { "startCity": startCity, "endCity": endCity, "list": JSON.stringify(list), "comm": comm },
+            data: {
+                "startCity": startCity,
+                "endCity": endCity,
+                "list": JSON.stringify(list),
+                "comm": comm
+            },
             type: "POST",
             dateType: "json",
             success: function(data) {
@@ -477,165 +473,138 @@
             }
         })
     }
-    
-    function checkALL(){
-		var sfyg=jQuery("#field8087").val();
-		if(sfyg=="1"){
-		return updateFqh();
-		}
-		if(sfyg=="0"){
-		return checkDate();
-		}
-		}
-	function updateFqh(){
-		var submitdtlid0=jQuery("#submitdtlid0").val().split(",");
-		var jnArr=[];
-		var result=false;
-		var shipno=jQuery("#field9521").val();//shipping
-		for(var i=0;i<submitdtlid0.length;i++){
-			var index=submitdtlid0[i];
-			var gh=jQuery("#field8141_"+index).val();//柜号
-			var fqh=jQuery("#field8142_"+index).val();//封签号
-			var jn={"gh":gh,"fqh":fqh,"index":index};
-			jnArr.push(jn);
-		}
-		console.log(JSON.stringify(jnArr));
-		jQuery.ajax({
-			url: "/sapjsp/zxjh.jsp",
-            data: { "dtdata":JSON.stringify(jnArr),
-            		"type":"updateFqh",
-            		"shipno":shipno
+
+    function checkALL() {
+        var sfyg = jQuery("#field8087").val();
+        if (sfyg == "1") {
+            return updateFqh();
+        }
+        if (sfyg == "0") {
+          //  return checkDate();
+            return true;
+        }
+    }
+
+    function updateFqh() {
+        var submitdtlid0 = jQuery("#submitdtlid0").val().split(",");
+        var jnArr = [];
+        var result = false;
+        var shipno = jQuery("#field9521").val(); //shipping
+        for (var i = 0; i < submitdtlid0.length; i++) {
+            var index = submitdtlid0[i];
+            var gh = jQuery("#field8141_" + index).val(); //柜号
+            var fqh = jQuery("#field8142_" + index).val(); //封签号
+            var jn = {
+                "gh": gh,
+                "fqh": fqh,
+                "index": index
+            };
+            jnArr.push(jn);
+        }
+        console.log(JSON.stringify(jnArr));
+        jQuery.ajax({
+            url: "/sapjsp/zxjh.jsp",
+            data: {
+                "dtdata": JSON.stringify(jnArr),
+                "type": "updateFqh",
+                "shipno": shipno
             },
             type: "POST",
-            async:false,
+            async: false,
             dateType: "json",
             success: function(data) {
-            	var datatext=data.replace(/(^\s*)|(\s*$)/g, "");
-            	console.log(datatext);
+                var datatext = data.replace(/(^\s*)|(\s*$)/g, "");
+                console.log(datatext);
                 if (datatext) {
-                if(datatext=="success"){
-                console.log("数据更新成功");
-                 result= true;
-                }else{
-                 Dialog.alert(datatext);
+                    if (datatext == "success") {
+                        console.log("数据更新成功");
+                        result = true;
+                    } else {
+                        Dialog.alert(datatext);
+                    }
                 }
-                }
-                }
-		})
-		return result;
-	}
-	function checkDate(){
-		var submitdtlid2=jQuery("#submitdtlid2").val().split(",");
-		var jnArr=[];
-		var result=false;
-		for(var i=0;i<submitdtlid2.length;i++){
-			var plannum=parseFloat(jQuery("#field9343_"+submitdtlid2[i]).val());//计划装卸量
-			var totalnum=parseFloat(jQuery("#field8149_"+submitdtlid2[i]).val());//总量
-			var shipNum=parseFloat(jQuery("#field9344_"+submitdtlid2[i]).val());//已运载量
-			console.log("plannum:"+plannum+",totalnum:"+totalnum);
-			if(plannum>totalnum-shipNum){
-				alert("计划装卸数量超过了剩余量");
-				return false;
-			};
-			
-			var sono=jQuery("#field10663_"+submitdtlid2[i]).val();//po单号
-			var soitem=jQuery("#field10664_"+submitdtlid2[i]).val();//po项次
-			var jn={"sono":sono,"soitem":soitem,"plannum":plannum.toString()}
-			jnArr.push(jn);
-			}
-			console.log(jnArr);
-			jQuery.ajax({
-			url: "/sapjsp/zxjh.jsp",
-            data: { "dtdata":JSON.stringify(jnArr),
-            		"type":"checkCount"
+            }
+        })
+        return result;
+    }
+
+    function checkDate() {
+        var submitdtlid2 = jQuery("#submitdtlid2").val().split(",");
+        var jnArr = [];
+        var result = false;
+        for (var i = 0; i < submitdtlid2.length; i++) {
+            var plannum = parseFloat(jQuery("#field9343_" + submitdtlid2[i]).val()); //计划装卸量
+            var totalnum = parseFloat(jQuery("#field8149_" + submitdtlid2[i]).val()); //总量
+            var shipNum = parseFloat(jQuery("#field9344_" + submitdtlid2[i]).val()); //已运载量
+
+            console.log("plannum:" + plannum + ",totalnum:" + totalnum);
+            if (plannum > totalnum - shipNum) {
+                alert("计划装卸数量超过了剩余量");
+                return false;
+            };
+
+            var sono = jQuery("#field10663_" + submitdtlid2[i]).val(); //po单号
+            var soitem = jQuery("#field10664_" + submitdtlid2[i]).val(); //po项次
+            var jn = {
+                "sono": sono,
+                "soitem": soitem,
+                "plannum": plannum.toString()
+            }
+            jnArr.push(jn);
+        }
+        var sfzf = jQuery("#field13403  option:selected").val(); //是否作废
+        console.log(jnArr);
+        console.log("是否作废：" + sfzf);
+        jQuery.ajax({
+            url: "/sapjsp/zxjh.jsp",
+            data: {
+                "dtdata": JSON.stringify(jnArr),
+                "type": "checkCount",
+                "sfzf": sfzf
             },
             type: "POST",
-            async:false,
+            async: false,
             dateType: "json",
             success: function(data) {
-            var datatext=data.replace(/(^\s*)|(\s*$)/g, "");
+                var datatext = data.replace(/(^\s*)|(\s*$)/g, "");
                 if (datatext) {
-                if(datatext=="success"){
-                console.log("数据更新成功");
-                 result= true;
-                }else{
-                 Dialog.alert(datatext);
+                    if (datatext == "success") {
+                        console.log("数据更新成功");
+                        result = true;
+                    } else {
+                        Dialog.alert(datatext);
+                    }
+
+
                 }
-                
-               
-                }
-                }
-                });
-			
-			
-			
-			
-			
-			
-		
-		return result;
-	}
+            }
+        });
+
+        return result;
+    }
+
+    jQuery(document).ready(function() {
+        jQuery("#field13476").bindPropertyChange(function() {
+            var jgrq = jQuery("#field13475").val();
+            if (jgrq != null && jgrq != '') {
+                jgtime();
+            } else {
+                jQuery("#field13477").val(0);
+            }
+        })
+    })
+
+    function jgtime() {
+        var jjzt = jQuery("#field13476").val();
+        if (jjzt < 7) {
+            jQuery("#field13477").val(1);
+        } else {
+            jQuery("#field13477").val(0);
+        }
+    }
+
 </script>
 <script type="text/javascript" src="/sapjsp/util.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

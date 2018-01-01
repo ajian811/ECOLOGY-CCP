@@ -36,6 +36,13 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 			RecordSet rs2 = new RecordSet();
 			RecordSet rs3 = new RecordSet();
 			int userid = request.getRequestManager().getUser().getUID();
+			String currentnodetype = "";
+			String sql0="SELECT currentnodetype FROM workflow_requestbase where REQUESTID="+requestid;
+			rs.writeLog(sql0);
+			rs.execute(sql0);
+			while (rs.next()){
+				currentnodetype=Util.null2String(rs.getString("currentnodetype"));
+			}
 			if (isbill == 0) {
 				tablename = "workflow_form";// 老表单的主表单名字
 			} else {
@@ -86,8 +93,14 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 				carno = Util.null2String(rs.getString("cp"));// 车牌
 				sfzf = Util.null2String(rs.getString("sfzf"));// 是否作废
 				log.writeLog("是否有柜:" + sfyg);
-				if (!"1".equals(sfzf)) {
+				if ("1".equals(sfzf)) {
+					return SUCCESS;
+				}
+
 					if ("0".equals(sfyg)) {
+					if("0".equals(currentnodetype)){
+						return SUCCESS;
+					}
 						String sql = "select t2.TRDH from " + tablename + " t1 ";
 						sql += " left join " + tablename + "_dt3 t2 on t1.id = t2.mainid";
 						sql += " where t1.requestid= '" + requestid + "'";
@@ -214,10 +227,13 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 							list.add(map);
 						}
 					}
-				}
+
 			}
-			if (!"1".equals(sfzf)) {
+
 				if ("1".equals(sfyg)) {
+					if (!"0".equals(currentnodetype)) {
+						return SUCCESS;
+					}
 					StringBuffer buffer = new StringBuffer();
 					buffer.append("insert into UF_TRDPLDY");
 					buffer.append(
@@ -286,7 +302,7 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 						rs1.executeSql(insertSql);// 后插入明细
 					}
 				}
-			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.writeLog(e);

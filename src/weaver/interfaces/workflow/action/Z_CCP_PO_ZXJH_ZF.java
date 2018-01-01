@@ -38,7 +38,7 @@ public class Z_CCP_PO_ZXJH_ZF extends BaseBean implements Action {
                     tablename = Util.null2String(rs.getString("tablename"));
                 }
             }
-            sql = "select id,sfyg,zxjhh,jfyyf,sfzf,YGSHIPNO from " + tablename + " where requestid=" + requestid;
+            sql = "select id,sfyg,zxjhh,jfyyf,sfzf from " + tablename + " where requestid=" + requestid;
             rs.writeLog(sql);
             rs.execute(sql);
             String sfyg = "";//是否有柜

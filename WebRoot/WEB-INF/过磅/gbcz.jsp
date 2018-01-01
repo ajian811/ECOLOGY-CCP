@@ -487,7 +487,7 @@
 			rs.writeLog("插入sql4:" + sql4);
 			rs.executeSql(sql4);
 			message += "过磅插入成功";
-
+			/*
 			StringBuffer sb = new StringBuffer();
 			sb.append("insert into MODEDATASHARE_841");
 			sb.append(
@@ -498,7 +498,7 @@
 			sb.append("'").append("0").append("',");
 			sb.append("'").append("3").append("')");
 			rs.writeLog("插入权限执行的sql:" + sb.toString());
-			rs.executeSql(sb.toString());
+			rs.executeSql(sb.toString());*/
 
 			//最后查询目前的已过磅的提入单数量是否等于总数
 			sql0="SELECT ID FROM UF_GBJL WHERE ZXJHH='"+ zxjhh + "'";

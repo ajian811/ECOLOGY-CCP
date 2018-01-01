@@ -1,0 +1,40 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+     *  TODO
+     *  请在此处编写javascript代码
+     */
+
+    jQuery(document).ready(function() {
+        jQuery(".vgm1").hide();
+        jQuery(".vgm2").hide();
+        jQuery("#field13485").bindPropertyChange(function() {
+            hiddenVGM();
+        })
+        jQuery("#field10883").bindPropertyChange(function() {
+            delRowFunJM(0);
+        })
+        jQuery("#indexnum0").bindPropertyChange(function() {
+            calSum(0);
+        })
+        jQuery("#indexnum1").bindPropertyChange(function() {
+            calSum(1);
+        })
+
+    })
+
+    function hiddenVGM() {
+        var lx = jQuery("#field13485").val(); //类型
+        if (lx == 0) {
+            jQuery(".vgm2").hide();
+            delRowFunJM(1);
+            jQuery(".vgm1").show();
+        } else {
+            jQuery(".vgm1").hide();
+            delRowFunJM(0);
+            jQuery(".vgm2").show();
+        }
+    }
+</script>
+<script type="text/javascript" src="/sapjsp/util.js"></script>
+

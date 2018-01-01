@@ -2,13 +2,10 @@ package weaver.interfaces.workflow.action;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import weaver.conn.RecordSet;
+import weaver.formmode.setup.ModeRightInfo;
 import weaver.general.BaseBean;
 import weaver.general.Util;
 import weaver.hrm.resource.ResourceComInfo;
@@ -21,6 +18,7 @@ import weaver.workflow.workflow.WorkflowComInfo;
  * @date 2017-12-18
  */
 public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
+	private static int userid=0;
 	// shipping柜号输入接口
 	@Override
 	public String execute(RequestInfo request) {
@@ -40,7 +38,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 			RecordSet rs = new RecordSet();
 			RecordSet dtrs = new RecordSet();
 
-			//int userid = request.getRequestManager().getUser().getUID();
+			userid = request.getRequestManager().getUser().getUID();
 			if (isbill == 0) {
 				tablename = "workflow_form";// 老表单的主表单名字
 			} else {
@@ -341,7 +339,8 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 		if (mainMap.size() > 0) {
 			StringBuffer buffer = new StringBuffer();
 			buffer.append(
-					"Insert into UF_ZGFY (REQUESTID,lgbh,feename,djtitle,djstatus,zxplanno,comcode,comname,hbkpyz,pztype,currency,carno,dw,notaxamt,amount,zgfylx,credate,cysname,cyscode,creditpsn,creditdate,remark,djbh,djlx,fylx,cx,sz,FORMMODEID,hl) values (");
+					"Insert into UF_ZGFY (REQUESTID,lgbh,feename,djtitle,djstatus,zxplanno,comcode,comname,hbkpyz,pztype,currency,carno,dw,notaxamt,amount,zgfylx,credate,cysname,cyscode,creditpsn,creditdate,remark,djbh,djlx,fylx,cx,sz,FORMMODEID,hl" +
+							"MODEDATACREATER,modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values (");
 			buffer.append("'").append(mainMap.get("requestid")).append("',");// 流程Id
 			buffer.append("'").append(mainMap.get("lcbh")).append("',");// 理柜编号
 			buffer.append("'").append(mainMap.get("feename")).append("',");// 费用名称
@@ -370,11 +369,36 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 			buffer.append("'").append(mainMap.get("cx")).append("',");// 车型
 			buffer.append("'").append(mainMap.get("sz")).append("',");// 税则
 			buffer.append("'").append("721").append("',");
-			buffer.append("'").append(mainMap.get("hl")).append("')");// 汇率、
+			buffer.append("'").append(mainMap.get("hl")).append("',");// 汇率、
+
+			buffer.append("'").append(userid).append("',");
+
+			buffer.append("'").append("0").append("',");
+			Date d1=new Date();
+			SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
+			buffer.append("'").append(dateFormat.format(d1)).append("',");
+			buffer.append("'").append(dateFormat1.format(d1)).append("',");
+			String str1 = UUID.randomUUID().toString();
+			buffer.append("'").append(str1).append("')");
+
 			log.writeLog("插入建模主表的sql:" + buffer.toString());
 			if (inrs.executeSql(buffer.toString())) {
 				String sql = "select id from UF_ZGFY where djbh = '" + mainMap.get("djbh") + "'";
 
+
+				String sqlx="select id from UF_TRDPLDY where modeuuid='"+str1+"'";
+				log.writeLog(sqlx);
+				rs1.execute(sqlx);
+				String id="";
+				if(rs1.next()){
+					id=Util.null2String(rs1.getString("id"));
+				}
+				ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
+				localModeRightInfo1.setNewRight(true);
+				localModeRightInfo1.editModeDataShare(userid, 381, Integer.parseInt(id));
+
+				/*
 				StringBuffer sb = new StringBuffer();// 插入权限表
 				sb.append("insert into MODEDATASHARE_721");
 				sb.append("(SOURCEID,TYPE,CONTENT,SECLEVEL,SHARELEVEL) values");
@@ -386,7 +410,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 				sb.append("'").append("3").append("')");
 				log.writeLog("插入权限执行的sql:" + sb.toString());
 				rs1.executeSql(sb.toString());
-
+				*/
 				if (rs.execute(sql)) {
 					if (rs.next()) {
 						jmid = Util.null2String(rs.getString("id"));

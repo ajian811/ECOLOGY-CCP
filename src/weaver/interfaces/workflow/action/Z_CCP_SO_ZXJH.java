@@ -24,6 +24,13 @@ public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 			int formid = Util.getIntValue(workflowComInfo.getFormId(workflowId), 0);
 			int isbill = Util.getIntValue(workflowComInfo.getIsBill(workflowId), 0);
 			String tablename = "";
+			String currentnodetype = "";
+			String sql0="SELECT currentnodetype FROM workflow_requestbase where REQUESTID="+requestid;
+			rs.writeLog(sql0);
+			rs.execute(sql0);
+			while (rs.next()){
+				currentnodetype=Util.null2String(rs.getString("currentnodetype"));
+			}
 			if (isbill == 0) {
 				tablename = "workflow_form";
 			} else {
@@ -47,6 +54,9 @@ public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 				
 				// 有柜情况
 				if (sfyg.equals("1")) {
+					if(!"0".equals(currentnodetype)){
+						return SUCCESS;
+					}
 					String shipno = Util.null2String(rs.getString("ygshipno"));
 					sql = "select gbh,fqh from " + tablename + "_dt1 where mainid=" + id;
 					rs1.writeLog(sql);
@@ -71,6 +81,9 @@ public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 				}
 				// 无柜情况
 				if (sfyg.equals("0")) {
+					if("0".equals(currentnodetype)){
+						return  SUCCESS;
+					}
 					sql = "select jydh,xc,jhyzl from " + tablename + "_dt3 where mainid=" + id;
 					rs.writeLog(sql);
 					rs.execute(sql);
