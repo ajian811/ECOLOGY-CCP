@@ -1,15 +1,12 @@
 package weaver.interfaces.workflow.action;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.sap.mw.jco.JCO;
 
 import weaver.conn.RecordSet;
+import weaver.formmode.setup.ModeRightInfo;
 import weaver.general.BaseBean;
 import weaver.general.Util;
 import weaver.hrm.resource.ResourceComInfo;
@@ -186,12 +183,15 @@ public class Z_CCP_DELIVERY_DG_PO extends BaseBean implements Action {
 		String plantransdate = "";// 预计运输日期
 		String plantranstime = "";// 预计运输时间
 		String transtype = "";// 运输方式
+		String dept = "";//需求部门
+
+		String zweight="";//净重量
 
 		RecordSet rs = new RecordSet();
 		RecordSet rs1 = new RecordSet();
 		RecordSet rs2 = new RecordSet();
 
-		String sql = "select t1.isfee,t1.inout,t1.transtype,t1.plantransdate,t1.plantranstime,t2.* from " + tablename
+		String sql = "select t1.isfee,t1.dept,t1.inout,t1.transtype,t1.plantransdate,t1.plantranstime,t2.* from " + tablename
 				+ " t1";
 		sql += " left join " + tablename + "_dt1 t2 on t1.id = t2.mainid";
 		sql += " where t1.requestid= '" + requestid + "'";
@@ -265,6 +265,11 @@ public class Z_CCP_DELIVERY_DG_PO extends BaseBean implements Action {
 			BEIZHU1 = Util.null2String(rs.getString("BEIZHU1"));// BEIZHU1
 			BEIZHU2 = Util.null2String(rs.getString("BEIZHU2"));// BEIZHU2
 			BEIZHU3 = Util.null2String(rs.getString("BEIZHU3"));// BEIZHU3
+			dept = Util.null2String(rs.getString("dept"));// 需求部门
+			zweight = Util.null2String(rs.getString("zweight"));// 净重
+
+
+
 
 			log.writeLog("isfee:" + isfee);// 是否有运费
 			log.writeLog("inout:" + inout);// 运入运出
@@ -331,13 +336,17 @@ public class Z_CCP_DELIVERY_DG_PO extends BaseBean implements Action {
 			log.writeLog("BEIZHU1:" + BEIZHU1);// BEIZHU1
 			log.writeLog("BEIZHU2:" + BEIZHU2);// BEIZHU2
 			log.writeLog("BEIZHU3:" + BEIZHU3);// BEIZHU3
+			log.writeLog("dept:" + dept);// BEIZHU3
+			log.writeLog("zweight:" + zweight);// 净重
 			if ("0".equals(lx)) {
 				StringBuffer buffer = new StringBuffer();
 				buffer.append("insert into uf_jmclxq");
 				buffer.append(
-						"(REQUESTID,FORMMODEID,MODEDATACREATER,pono,poitem,prno,pritem,goodgroup,wlh,wlname,jhyzl,yyzl,syyzl,unitcode,kwcode,unitdesc,kwdesc,packxz,shipto,shiptoname,shiptoaddr,shipcity,soldto,soldtoname,sfgf,isdanger,hbkpyz,costcenter,gyscode,gysname,packcode,BUKRS,EKORG,BSART,WERKS,MENGE,LFIMG,EINDT,EKGRP,MTART,LOEKZ,UEBTO,UEBTK,UNTTO,BSART1,AFNAM,NAME2,CHARG,ANLN1,ZYUP,ZGMZBH,ZMATNR,ZMENGE1,ZMEINS1,ZDATELOW2,ZDATEHIGH2,ZCHARG,RETPO,UMSON,BEIZHU1,BEIZHU2,BEIZHU3,isfee,inout,plantransdate,plantranstime,transtype) values");
+						"(REQUESTID,FORMMODEID,MODEDATACREATER,pono,poitem,prno,pritem,goodgroup,wlh,wlname,jhyzl,yyzl,syyzl,unitcode,kwcode,unitdesc,kwdesc,packxz,shipto,shiptoname,shiptoaddr,shipcity,soldto,soldtoname,sfgf,isdanger,hbkpyz,costcenter,gyscode,gysname,packcode,BUKRS,EKORG,BSART,WERKS,MENGE,LFIMG,EINDT,EKGRP,MTART,LOEKZ,UEBTO,UEBTK,UNTTO,BSART1,AFNAM,NAME2,CHARG,ANLN1,ZYUP,ZGMZBH,ZMATNR,ZMENGE1,ZMEINS1,ZDATELOW2,ZDATEHIGH2,ZCHARG,RETPO,UMSON,BEIZHU1,BEIZHU2,BEIZHU3,isfee,inout,plantransdate,plantranstime,transtype,dept," +
+								"zweight," +
+								"modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values");
 				buffer.append("('").append(requestid).append("',");
-				buffer.append("'").append("60").append("',");
+				buffer.append("'").append("441").append("',");
 				buffer.append("'").append(userid).append("',");
 				buffer.append("'").append(pono).append("',");
 				buffer.append("'").append(poitem).append("',");
@@ -402,10 +411,35 @@ public class Z_CCP_DELIVERY_DG_PO extends BaseBean implements Action {
 				buffer.append("'").append(inout).append("',");
 				buffer.append("'").append(plantransdate).append("',");
 				buffer.append("'").append(plantranstime).append("',");
-				buffer.append("'").append(transtype).append("')");
+				buffer.append("'").append(transtype).append("',");
+				buffer.append("'").append(dept).append("',");
+				buffer.append("'").append(zweight).append("',");
+
+
+				buffer.append("'").append("0").append("',");
+				Date d1=new Date();
+				SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+				SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
+				buffer.append("'").append(dateFormat.format(d1)).append("',");
+				buffer.append("'").append(dateFormat1.format(d1)).append("',");
+				String str1 = UUID.randomUUID().toString();
+				buffer.append("'").append(str1).append("')");
+
 				log.writeLog("插入建模表的sql:" + buffer.toString());
 				rs2.executeSql(buffer.toString());
 
+				String sql0="select id from uf_jmclxq where modeuuid='"+str1+"'";
+				log.writeLog(sql0);
+				rs2.execute(sql0);
+				String id="";
+				if(rs2.next()){
+					id=Util.null2String(rs2.getString("id"));
+				}
+				ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
+				localModeRightInfo1.setNewRight(true);
+				localModeRightInfo1.editModeDataShare(userid, 441, Integer.parseInt(id));
+
+				/*
 				StringBuffer sb = new StringBuffer();// 插入权限表
 				sb.append("insert into MODEDATASHARE_421");
 				sb.append("(SOURCEID,TYPE,CONTENT,SECLEVEL,SHARELEVEL) values");
@@ -416,6 +450,7 @@ public class Z_CCP_DELIVERY_DG_PO extends BaseBean implements Action {
 				sb.append("'").append("3").append("')");
 				log.writeLog("插入权限执行的sql:" + sb.toString());
 				rs1.executeSql(sb.toString());// 先插入主表
+				*/
 			}
 		} else if ("1".equals(lx)) {
 			StringBuffer buffer = new StringBuffer();
@@ -487,6 +522,9 @@ public class Z_CCP_DELIVERY_DG_PO extends BaseBean implements Action {
 			buffer.append(" where 1 =1 ");
 			buffer.append(" and pono").append("='").append(pono).append("'");
 			buffer.append(" and poitem").append("='").append(poitem).append("'");
+			buffer.append(" and dept").append("='").append(dept).append("'");
+			buffer.append(" and zweight").append("='").append(zweight).append("'");
+
 			log.writeLog("更新建模的sql:" + buffer.toString());
 			rs2.executeSql(buffer.toString());
 

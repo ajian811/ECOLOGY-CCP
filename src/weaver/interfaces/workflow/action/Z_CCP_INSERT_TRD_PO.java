@@ -80,8 +80,14 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 			String wlh = "";// 物料号码
 			String wlname = "";// 物料描述
 
-			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+			String gysname="";//供应商名称
 
+			String unitdesc="";//单位描述
+
+
+
+			List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+			String str1="";
 			String selectsql = "select * from " + tablename + " where requestid = '" + requestid + "'";
 			log.writeLog("查询流程表单的sql:" + selectsql);
 			rs.execute(selectsql);
@@ -132,8 +138,9 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 							SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
 							buffer.append("'").append(dateFormat.format(d1)).append("',");
 							buffer.append("'").append(dateFormat1.format(d1)).append("',");
-							String str1 = UUID.randomUUID().toString();
+							str1 = UUID.randomUUID().toString();
 							buffer.append("'").append(str1).append("')");
+
 
 							log.writeLog("插入建模主表执行的sql :" + buffer.toString());
 							rs1.executeSql(buffer.toString());// 先插入主表
@@ -162,22 +169,31 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 							localModeRightInfo1.editModeDataShare(userid, 381, Integer.parseInt(id));
 
 							String dt3Sql = "select * from " + tablename + "_dt2 where trdh = '" + trdh + "'";
+							rs.writeLog(dt3Sql);
 							rs.execute(dt3Sql);
 							while (rs.next()) {
 
 								// 明细数据
-								cp = Util.null2String(rs.getString("cpz"));// 产品
+								String cp0 = Util.null2String(rs.getString("goodgroup"));// 产品
+
 								sl = Util.null2String(rs.getString("jhyzl"));// 数量
 								// trdh =
 								// Util.null2String(rs.getString("trdh"));//
 								// 提入单号
-								shipping = Util.null2String(rs.getString("shipping"));// 提入单号
+								shipping = Util.null2String(rs.getString("pono"));// 提入单号
 								pono = Util.null2String(rs.getString("pono"));// 采购订单号
 								poitem = Util.null2String(rs.getString("poitem"));// 采购订单项次
 								wlh = Util.null2String(rs.getString("wlh"));// 物料号码
 								wlname = Util.null2String(rs.getString("wlname"));// 物料描述
+								gysname = Util.null2String(rs.getString("gysname"));//供应商名称
+								unitdesc = Util.null2String(rs.getString("unitdesc"));//单位描述
 
-								String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,shipping,jydh,ddxc,wlhm,wlms,sl) values ";
+								cp = queryCpByCpz(cp0);//通过产品组查询
+
+								String ph=getPhByPONO(pono,poitem);//查询批号
+
+
+								String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,shipping,jydh,ddxc,wlhm,wlms,bzfs,ph,sl) values ";
 								insertSql += "((select id from uf_trdpldy where trdh = '" + trdh + "'),";
 								insertSql += "'" + cp + "',";
 								insertSql += "'" + shipping + "',";
@@ -185,10 +201,15 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 								insertSql += "'" + poitem + "',";
 								insertSql += "'" + wlh + "',";
 								insertSql += "'" + wlname + "',";
+								insertSql += "'" + unitdesc + "',";
+								insertSql += "'" + ph + "',";
 								insertSql += "'" + sl + "')";
 								log.writeLog("插入建模明细执行的sql :" + insertSql);
 								rs3.executeSql(insertSql);// 后插入明细
 							}
+							//更新供应商名称
+							Boolean result=updateGysmcByModeUUID(str1,gysname);
+
 						}
 					} else {
 						String selectSql = " select t2.*,t1.* from " + tablename + " t1";
@@ -204,20 +225,28 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 							gh = Util.null2String(rs1.getString("gh"));// 柜号
 							sl = Util.null2String(rs1.getString("jhyzl"));// 计划运载量
 							trdh = Util.null2String(rs1.getString("trdh"));// 提入单号
-							cpz = Util.null2String(rs1.getString("cpz"));// 产品组
+							cpz = Util.null2String(rs1.getString("goodgroup"));// 产品组
+							shipping = Util.null2String(rs1.getString("pono"));// 产品组
 
 							pono = Util.null2String(rs1.getString("pono"));// 采购订单号
 							poitem = Util.null2String(rs1.getString("poitem"));// 采购订单项次
 							wlh = Util.null2String(rs1.getString("wlh"));// 物料号码
 							wlname = Util.null2String(rs1.getString("wlname"));// 物料描述
+							gysname = Util.null2String(rs1.getString("gysname"));// 物料描述
+							unitdesc = Util.null2String(rs1.getString("unitdesc"));// 单位描述
+							String ph=getPhByPONO(pono,poitem);//查询批号
 
-							map.put("cpz", cpz);
+							cp=queryCpByCpz(cpz);
+							map.put("cpz", cp);
 							map.put("sl", sl);
 							map.put("gh", gh);
 							map.put("pono", pono);
 							map.put("poitem", poitem);
 							map.put("wlh", wlh);
 							map.put("wlname", wlname);
+							map.put("unitdesc",unitdesc);
+							map.put("shipping",shipping);
+							map.put("ph",ph);
 							list.add(map);
 						}
 					}
@@ -252,7 +281,7 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 					SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
 					buffer.append("'").append(dateFormat.format(d1)).append("',");
 					buffer.append("'").append(dateFormat1.format(d1)).append("',");
-					String str1 = UUID.randomUUID().toString();
+					str1 = UUID.randomUUID().toString();
 					buffer.append("'").append(str1).append("')");
 
 					log.writeLog("插入建模主表执行的sql :" + buffer.toString());
@@ -282,7 +311,7 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 					*/
 
 					for (int i = 0; i < list.size(); i++) {
-						String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,gbm,jydh,ddxc,wlhm,wlms,sl) values ";
+						String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,gbm,jydh,ddxc,wlhm,wlms,bzfs,shipping,ph,sl) values ";
 						insertSql += "((select id from uf_trdpldy where trdh = '" + trdh + "'),";
 						insertSql += "'" + list.get(i).get("cpz") + "',";
 						insertSql += "'" + list.get(i).get("gh") + "',";
@@ -290,10 +319,15 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 						insertSql += "'" + list.get(i).get("poitem") + "',";
 						insertSql += "'" + list.get(i).get("wlh") + "',";
 						insertSql += "'" + list.get(i).get("wlname") + "',";
+						insertSql += "'" + list.get(i).get("unitdesc") + "',";
+						insertSql += "'" + list.get(i).get("shipping") + "',";
+						insertSql += "'" + list.get(i).get("ph") + "',";
 						insertSql += "'" + list.get(i).get("sl") + "')";
 						log.writeLog("插入建模明细执行的sql :" + insertSql);
 						rs1.executeSql(insertSql);// 后插入明细
 					}
+
+					Boolean result=updateGysmcByModeUUID(str1,gysname);
 				}
 			}
 		} catch (Exception e) {
@@ -307,5 +341,38 @@ public class Z_CCP_INSERT_TRD_PO extends BaseBean implements Action {
 			}
 		}
 		return Action.SUCCESS;
+	}
+
+	public boolean updateGysmcByModeUUID(String modeuuid,String gysmc){
+		Boolean result=false;
+		String sql="update UF_TRDPLDY set gysmc='"+gysmc+"' where modeuuid='"+modeuuid+"'";
+		RecordSet recordSet=new RecordSet();
+		recordSet.writeLog(sql);
+		result=recordSet.execute(sql);
+		return result;
+	}
+
+	public  String queryCpByCpz(String cpz){
+		String cp="";
+		String sql="select pdtdesc from uf_cpzwh where pdtgroup='"+cpz+"'";
+		RecordSet recordSet=new RecordSet();
+		recordSet.writeLog(sql);
+		recordSet.execute(sql);
+		if (recordSet.next()){
+			cp=Util.null2String(recordSet.getString("pdtdesc"));
+		}
+		return cp;
+	}
+
+	public String getPhByPONO(String pono,String poitem){
+		String ph="";
+		String sql="select CHARG from uf_jmclxq where pono='"+pono+"' and poitem='"+poitem+"'";
+		RecordSet recordSet=new RecordSet();
+		recordSet.writeLog(sql);
+		recordSet.execute(sql);
+		if (recordSet.next()){
+			ph=Util.null2String(recordSet.getString("CHARG"));
+		}
+		return ph;
 	}
 }

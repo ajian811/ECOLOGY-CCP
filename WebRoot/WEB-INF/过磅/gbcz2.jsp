@@ -11,12 +11,8 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <%@ page import="java.util.*" %>
 <%@ page import="weaver.formmode.setup.ModeRightInfo" %>
-<%@ page import="weaver.general.BaseBean" %>
-
-
-
 <%
-	BaseBean bs=new BaseBean();
+
 	String action = request.getParameter("action");
 	RecordSet rs = new RecordSet();
 	rs.writeLog("进入gbcz");
@@ -33,8 +29,16 @@
 			if(weighType.equals("weighkg")){
 				sql="SELECT * FROM UF_GBJL WHERE CP='"+carno+"' AND TRDH is NULL  ORDER BY GBRQ DESC,GBSJ DESC";
 			}else{
-				String zxjhh=getZxjhhByTrdh(trdh);
-				sql="select * from uf_gbjl where zxjhh='"+zxjhh+"'";
+				String sql0 = "SELECT b.ZXJHH FROM UF_TRDPLDY a,formtable_main_45 b where a.LCID=b.REQUESTID";
+				if (trdh != null) {
+					sql0 += " and a.TRDH = '" + trdh + "'";
+				}
+				rs.executeSql(sql0);
+				String zxjhh = "";
+				while (rs.next()) {
+					zxjhh = rs.getString("zxjhh");
+				}
+				sql = "select * from uf_gbjl where zxjhh='" + zxjhh + "'";
 			}
 			rs.writeLog(sql);
 			rs.executeSql(sql);
@@ -68,7 +72,7 @@
 			rs.writeLog("进入searchMX2");
 			String trdh = request.getParameter("plate");//提入单号
 			//String carno=request.getParameter("carno1");
-			String sql = "SELECT b.CP,b.GBM,b.SL,b.SHIPPING,b.jydh,b.ddxc,b.wlhm,b.wlms,b.bzfs from uf_trdpldy a,UF_TRDPLDY_DT1 b where a.id=b.mainid";
+			String sql = "SELECT b.CP,b.GBM,b.SL,b.SHIPPING from uf_trdpldy a,UF_TRDPLDY_DT1 b where a.id=b.mainid";
 			if (trdh != null) {
 				sql += " and a.trdh = '" + trdh + "'";
 			}
@@ -80,12 +84,6 @@
 				object.put("sl", Util.null2String(rs.getString("sl")));//数量
 				object.put("shipping", Util.null2String(rs.getString("shipping")));//shipping
 				object.put("gbm", Util.null2String(rs.getString("gbm")));//柜编码
-				object.put("ddh",Util.null2String(rs.getString("jydh")));
-				object.put("xc",Util.null2String(rs.getString("ddxc")));
-				object.put("wlh",Util.null2String(rs.getString("wlhm")));
-				object.put("wlms",Util.null2String(rs.getString("wlms")));
-				object.put("dwms",Util.null2String(rs.getString("bzfs")));
-
 				jsonArr.add(object);
 				rs.writeLog(object.toString());
 			}
@@ -105,7 +103,7 @@
 
 			JSONObject jsonObject = new JSONObject();
 			String message = "";
-			//计重空柜情况
+			//空柜情况
 			if(weighType.equals("weighkg")){
 				Date date = new Date();
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -136,8 +134,8 @@
 				out.write(jsonObject.toString());
 				return;
 			}
-			//计重有柜情况
-			String sql = "select ZXJHH,LCID,TRDH,SFDY,lx from UF_TRDPLDY where 1=1";
+			//有柜情况
+			String sql = "select ZXJHH,LCID,TRDH,SFDY from UF_TRDPLDY where 1=1";
 			String sfyg = "";//是否有柜
 			if (trdh != null) {
 				sql += " and TRDH = '" + trdh + "'";
@@ -148,8 +146,6 @@
 			while (rs.next()) {
 				String reqid = Util.null2String(rs.getString("lcid"));
 				String sfdy = Util.null2String(rs.getString("sfdy"));
-				String lx=Util.null2String(rs.getString("lx"));
-				String shipping=getShippingByRequestid(reqid,lx);
 				if (sfdy.equals("0")) {
 					message += "提入单没有打印";
 					jsonObject = addJsonJZ(message);
@@ -157,18 +153,16 @@
 					return;
 				} else if (sfdy.equals("1")) {
 					rs.writeLog("查询提入单已打印");
-					String formname="";
-					formname=getFormNameByLx(lx);
-					String sql1 = "select cp,zxjhh from "+formname+" where requestid='" + reqid
+					String sql1 = "select cp,ygshipno,zxjhh from formtable_main_45 where requestid='" + reqid
 							+ "'";
-
 					rs.writeLog(sql1);
 					rs.executeSql(sql1);
 
-					if (rs.next()) {
+					while (rs.next()) {
 						String zxjhh = Util.null2String(rs.getString("zxjhh"));
 						rs.writeLog("查询到提入单的装卸计划号：" + zxjhh);
 						String cp = Util.null2String(rs.getString("cp"));
+						String shipping = Util.null2String(rs.getString("shipping"));
 
 						String sql0 = "select id from UF_GBJL where zxjhh='" + zxjhh + "'";
 						rs.writeLog(sql0);
@@ -179,7 +173,7 @@
 						if (count == 0) {
 							rs.writeLog("装卸计划尚未计重");
 							if (cp == null || cp.equals("") || !cp.equals(carno)) {
-								String sql2 = "UPDATE "+formname+" set cp='" + carno + "' where REQUESTID="
+								String sql2 = "UPDATE formtable_main_45 set cp='" + carno + "' where REQUESTID="
 										+ reqid;
 								rs.writeLog(sql2);
 								rs.executeSql(sql2);
@@ -252,7 +246,6 @@
 
 		//过磅操作插入记录
 		if ("insertGB".equals(action)) {
-		    String formname="";
 			rs.writeLog("insertGB");
 			String jzzl = "0.00";//过磅重量
 
@@ -260,8 +253,6 @@
 			String weighType=Util.null2String(request.getParameter("weighType"));
 			String ggh=Util.null2String(request.getParameter("ggh"));
 			String trdh = request.getParameter("plate");//提入单号
-			String lx=getLxByTrdh(trdh);
-			formname=getFormNameByLx(lx);
 			String carno = request.getParameter("carno");//车牌
 			rs.writeLog("获得提入单号：" + trdh + ",车牌：" + carno + ",过磅重量" + jzzl+",计重类型"+weighType+",柜罐号："+ggh);
 			JSONObject jsonObject = new JSONObject();
@@ -321,7 +312,7 @@
 			int totalBillCounts=0;//该装卸计划总共的提入单数量
 			int nowBillCounts=0;//该装卸计划目前的已过磅提入单数量
 			String sql0="";
-			sql0 = "SELECT DISTINCT b.ZXJHH,a.lcid FROM UF_TRDPLDY a,"+formname+" b where a.LCID=b.REQUESTID";
+			sql0 = "SELECT DISTINCT b.ZXJHH,a.lcid FROM UF_TRDPLDY a,formtable_main_45 b where a.LCID=b.REQUESTID";
 
 			if (trdh != null) {
 				sql0 += " and a.TRDH = '" + trdh + "'";
@@ -450,16 +441,14 @@
 				if(rz.equals("")||cz.equals("")||gbrq0.equals("")||gbsj0.equals("")){
 					message+="查询数据有误";
 				}else{
-					Double gbzl=0.00;
-					gbzl=calculateJZ(rz, cz);
-					sql0="UPDATE "+formname+" SET SFGB='1',GBRQ='"+gbrq+"',GBSJ='"+gbsj+"',"	;
-					sql0+="CRZ='"+rz+"',CCZ='"+cz+"',GBZL='"+gbzl+"',sjysrq='"+gbrq+"' WHERE ZXJHH='"+zxjhh+"'";
+					sql0="UPDATE formtable_main_45 SET SFGB='1',GBRQ='"+gbrq+"',GBSJ='"+gbsj+"',"	;
+					sql0+="CRZ='"+rz+"',CCZ='"+cz+"' WHERE ZXJHH='"+zxjhh+"'";
 					rs.writeLog("更新装卸计划sql："+sql0);
 					rs.execute(sql0);
 					message+="--更新装卸计划成功";
 				}
 				request.setAttribute("message", message);
-				request.getRequestDispatcher("/weightJsp/Apportionment _Weight.jsp?zxjhh="+zxjhh+"&lx="+lx)
+				request.getRequestDispatcher("/weightJsp/Apportionment _Weight_SO.jsp?zxjhh="+zxjhh)
 						.forward(request, response);
 
 			};
@@ -477,7 +466,8 @@
 			String plate = request.getParameter("plate");
 			String carno = request.getParameter("carno");
 			rs.writeLog("获得的参数:plate--" + plate + ",carno--" + carno);
-			String sql1 = "select lcid,sfdy,lx,sfzf from uf_trdpldy where trdh='" + plate + "'";
+			String sql1 = "select lcid,sfdy,lx from uf_trdpldy where trdh='" + plate + "'";
+			String formname="";//表名
 			rs.writeLog(sql1);
 			rs.execute(sql1);
 			String message = "";//消息
@@ -487,18 +477,15 @@
 
 			JSONObject jsonObject;
 			while (rs.next()) {
-
-				String sfzf = Util.null2String(rs.getString("sfzf"));
-				if ("1".equals(sfzf)){
-					message = "提入单已作废";
-					jsonObject = addJson(message, newcp, trdStatus, ptStatus);
-					out.write(jsonObject.toString());
-					return;
+				String lcid = rs.getString(Util.null2String("lcid"));
+				String sfdy = rs.getString(Util.null2String("sfdy"));
+				String lx = rs.getString(Util.null2String("lx"));
+				if("0".equals(lx)){
+				    formname="formtable_main_45";
 				}
-				String lcid = Util.null2String(rs.getString("lcid"));
-				String sfdy = Util.null2String(rs.getString("sfdy"));
-				String lx = Util.null2String(rs.getString("lx"));
-				String formname=getFormNameByLx(lx);
+				if("1".equals(lx)){
+					formname="formtable_main_61";
+				}
 
 				if (lcid.equals("")) {
 					message = "提入单打印表中流程编号为空";
@@ -523,9 +510,7 @@
 					if (cp.equals("")) {
 						if (carno.equals("")) {
 							message = "装卸计划表中车牌为空";
-
 							jsonObject = addJson(message, newcp, trdStatus, ptStatus);
-							bs.writeLog(jsonObject.toString());
 							out.write(jsonObject.toString());
 							return;
 						}
@@ -536,7 +521,6 @@
 							rs.execute(sql3);
 							message = "提入单已打印，更新车牌成功";
 							jsonObject = addJson(message, newcp, trdStatus, ptStatus);
-							bs.writeLog(jsonObject.toString());
 							out.write(jsonObject.toString());
 							return;
 						}
@@ -546,7 +530,6 @@
 							newcp = cp;
 							message = "提入单可以查到装卸计划的车牌";
 							jsonObject = addJson(message, newcp, trdStatus, ptStatus);
-							bs.writeLog(jsonObject.toString());
 							out.write(jsonObject.toString());
 							return;
 						}
@@ -554,7 +537,6 @@
 							if (carno.equals(cp)) {
 								message = "输入的车牌与装卸计划表的一致";
 								jsonObject = addJson(message, newcp, trdStatus, ptStatus);
-								bs.writeLog(jsonObject.toString());
 								out.write(jsonObject.toString());
 								return;
 							}
@@ -565,7 +547,6 @@
 								rs.execute(sql4);
 								message = "输入的车牌与装卸计划表的不一致，已更新";
 								jsonObject = addJson(message, newcp, trdStatus, ptStatus);
-								bs.writeLog(jsonObject.toString());
 								out.write(jsonObject.toString());
 								return;
 							}
@@ -591,7 +572,6 @@
 		rs.writeLog("返回json：" + objectresult.toString());
 		//pw.flush();
 		//pw.close();
-		return;
 	} catch (Exception e) {
 		// TODO: handle exception
 		//out.write("fail" + e);
@@ -650,91 +630,3 @@
 	rs.executeSql(sql);
 	return rs;
 }%>
-<%!public String getFormNameByLx(String lx){
-    String formname="";
-	if("0".equals(lx)){
-		formname="formtable_main_45";
-	}
-	if("1".equals(lx)){
-		formname="formtable_main_61";
-	}
-	return  formname;
-}
-
-%>
-<%!public String getZxjhhByRequestid(String requestid,String formname){
-	String zxjhh="";
-	RecordSet recordSet=new RecordSet();
-	String sql="select zxjhh from "+formname+" where requestid="+requestid;
-	recordSet.writeLog(sql);
-	recordSet.execute(sql);
-	if(recordSet.next()){
-	    zxjhh=Util.null2String(recordSet.getString("zxjhh"));
-	}
-	return zxjhh;
-}
-%>
-<%!public String getZxjhhByTrdh(String trdh){
-    String zxjhh="";
-	RecordSet rs=new RecordSet();
-	String sql0 = "SELECT lcid,lx FROM UF_TRDPLDY  where 1=1";
-	if (trdh != null) {
-		sql0 += " and TRDH = '" + trdh + "'";
-	}
-	rs.writeLog(sql0);
-	rs.executeSql(sql0);
-	String requestid="";
-	String lx="";
-	if (rs.next()) {
-		lx = rs.getString("lx");
-		requestid=rs.getString("lcid");
-	}
-	String formname=getFormNameByLx(lx);
-	zxjhh=getZxjhhByRequestid(requestid,formname);
-    return zxjhh;
-}
-%>
-<%!public String getShippingByRequestid(String requestid,String lx){
-    String sql="";
-    String shipping="";
-    String formname=getFormNameByLx(lx);
-  	if("".equals(lx)){
-		sql="select YGSHIPNO from "+formname+" where requestid='"+requestid+"'";
-		RecordSet recordSet=new RecordSet();
-		recordSet.writeLog(sql);
-		recordSet.execute(sql);
-		if(recordSet.next()){
-			shipping=Util.null2String(recordSet.getString("ygshipno"));
-		}
-	}
-	return shipping;
-}
-%>
-<%!public String getLxByTrdh(String trdh){
-    String lx="";
-    RecordSet recordSet=new RecordSet();
-    String sql="select lx from uf_trdpldy where trdh='"+trdh+"'";
-    recordSet.writeLog(sql);
-    recordSet.execute(sql);
-    if(recordSet.next()){
-        lx=Util.null2String(recordSet.getString("lx"));
-	}
-    return lx;
-}
-%>
-<%!public String getFormnameByTrdh(String trdh){
-    String formname="";
-	String lx="";
-	RecordSet recordSet=new RecordSet();
-	String sql="SELECT LX FROM UF_TRDPLDY WHERE TRDH='"+trdh+"'";
-	recordSet.writeLog(sql);
-	recordSet.execute(sql);
-	if (recordSet.next()){
-	    lx=Util.null2String(recordSet.getString("lx"));
-	}
-	formname=getFormNameByLx(lx);
-    return formname;
-}
-
-
-%>

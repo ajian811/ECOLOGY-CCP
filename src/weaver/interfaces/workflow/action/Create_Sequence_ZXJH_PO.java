@@ -60,6 +60,8 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 			// 库存地址
 			String inout = "";
 			// 运入运出
+
+			String gsdm="";//公司代码
 			if (isbill == 0) {
 				tablename = "workflow_form";// 老表单的主表单名字
 			} else {
@@ -85,6 +87,8 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 				trdh = rs2.getString("trdh");
 				inout = rs2.getString("ycyr");
 				sfzf = rs2.getString("sfzf");
+				gsdm = rs2.getString("gsdm");
+
 				if (!"".equals(inout)) {
 					if ("0".equals(inout)) {
 						inout = "O";
@@ -105,16 +109,16 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 					log.writeLog("查询明细2的sql:" + sql);
 					rs.execute(sql);
 					while (rs.next()) {
-						String lcbh = "7020" + inout + currdate1;
+						String lcbh = gsdm + inout + currdate1;
 						// String id = rs.getString("id");// 获取明细表id
 						// String shipno = rs.getString("shipno");//
 						// 获取shippingno
 						// 调用存储过程自编号
 						soldto = Util.null2String(rs.getString("soldto"));
 						shipto =Util.null2String( rs.getString("shipto"));
-						gyscode = rs.getString("gyscode");
-						goodgroup = rs.getString("goodgroup");
-						kwdesc = rs.getString("kwdesc");
+						gyscode = Util.null2String(rs.getString("gyscode"));
+						goodgroup = Util.null2String(rs.getString("goodgroup"));
+						kwdesc = Util.null2String(rs.getString("kwdesc"));
 						log.writeLog("调用存储过程Create_Seq_Po");
 						rs1.executeProc("Create_Seq_Po", "");
 						rs1.next();
@@ -134,17 +138,24 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 						if("".equals(shipto)){
 							updateSql += " and shipto is null";
 						}
-
 						updateSql += " and gyscode = '" + gyscode + "'";
-						updateSql += " and goodgroup = '" + goodgroup + "'";
-						updateSql += " and kwdesc = '" + kwdesc + "'";
+						if("".equals(goodgroup)){
+							updateSql += " and goodgroup is null";
+						}else {
+							updateSql += " and goodgroup = '" + goodgroup + "'";
+						}
+						if("".equals(kwdesc)){
+							updateSql += " and kwdesc is null";
+						}else {
+							updateSql += " and kwdesc = '" + kwdesc + "'";
+						}
 						updateSql += " and mainid = " + mainid;
 						log.writeLog("更新语句:" + updateSql);
 						RecordSet rs3=new RecordSet();
 						rs3.execute(updateSql);
 					}
 				} else if ("1".equals(sfyg) && "".equals(trdh)) {
-					String lcbh = "7020" + inout + currdate1;
+					String lcbh = gsdm+ inout + currdate1;
 					// 调用存储过程自编号
 					log.writeLog("调用存储过程Create_Seq_Po");
 					rs1.executeProc("Create_Seq_Po", "");

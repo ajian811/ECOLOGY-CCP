@@ -1,0 +1,239 @@
+<script type="text/javascript">
+    /*
+    *  TODO
+     *  请在此处编写javascript代码
+     */
+
+    var sapupload = '<input type="button" onclick="sapUpLoad()" class="middle e8_btn_top_first" value="SAP数据上抛" style="width:200px"/>';
+    jQuery(".sapupload").children("td").children("div").append(sapupload);
+
+    function sapUpLoad() {
+        var submitdtlid0 = jQuery("#submitdtlid0").val();
+        var submitdtlid0s=submitdtlid0.split(",");
+        var mx0 = [];
+
+        if (submitdtlid0.length > 0) {
+            var ZNO="MX0";
+
+
+            for (var j = 0; j < submitdtlid0s.length; j++) {
+                var i=submitdtlid0s[j];
+                var js = {};
+                //js.MANDT=jQuery("#11281_"+i).val();//集团
+                js.EBELN = jQuery("#field11281_" + i).val(); //采购凭证号
+                js.EBELP = jQuery("#field11282_" + i).val(); //采购凭证的项目编号
+                js.LGORT=jQuery("#field13664_"+i).val();//存储位置
+                js.WERKS = jQuery("#field11284_" + i).val(); //工厂
+                js.LFIMG = jQuery("#field11286_" + i).val(); //以录入项单位表示的数量
+                js.CAR_NO = jQuery("#field11288_" + i).val(); //车号
+                js.BUDAT = jQuery("#field11287_" + i).val(); //凭证中的过帐日期
+                js.BLDAT = jQuery("#field11285_" + i).val(); //凭证中凭证的日期
+                //js.EWEI = jQuery("#field11289_" + i).val(); //重量单位
+                js.PACK = jQuery("#field11291_" + i).val(); //包装性质
+                js.BSART = jQuery("#field11290_" + i).val(); //订单类型（采购）
+                js.LSMNG = jQuery("#field11292_" + i).val(); //交货单的计量单位数量
+
+                js.MATNR = jQuery("#field11381_" + i).val(); //物料号
+
+                js.LFIMG = jQuery("#field11286_" + i).val(); //以录入项单位表示的数量
+                js.ERFME = jQuery("#field12581_" + i).val(); //条目单位
+                js.LSMNG = jQuery("#field11292_" + i).val(); //交货单的计量单位数量
+                js.LSMEH = jQuery("#field11289_" + i).val(); //交货单的计量单位
+
+                js.BEIZHU1 = jQuery("#field11384_" + i).val();
+                js.BEIZHU2 = jQuery("#field11385_" + i).val();
+                js.BEIZHU3 = jQuery("#field11386_" + i).val();
+
+                js.ZNO = ZNO; //批次确认单号
+
+                js.ZNO_ITEM = jQuery("#field11283_" + i).val(); //批次确认单号项目号
+
+                mx0.push(js);
+
+            }
+        }
+
+        var submitdtlid1 = jQuery("#submitdtlid1").val();
+        var submitdtlid1s=submitdtlid1.split(",");
+        // var ZNO=jQuery("#field11241").val();
+        var ZNO="MX1";
+        var mx1 = [];
+        if (submitdtlid1.length> 0) {
+
+
+            for (var j= 0; j< submitdtlid1s.length; j++) {
+                var i=submitdtlid1s[j];
+                var js = {};
+                //js.MANDT=jQuery("#11281_"+i).val();//集团
+                js.EBELN = jQuery("#field11301_" + i).val(); //采购凭证号
+                js.EBELP = jQuery("#field11303_" + i).val(); //采购凭证的项目编号
+                js.LGORT = jQuery("#field11304_" + i).val(); //存储位置
+                js.WERKS = jQuery("#field11306_" + i).val(); //工厂
+                js.LFIMG = jQuery("#field11308_" + i).val(); //以录入项单位表示的数量
+                js.CAR_NO = jQuery("#field11310_" + i).val(); //车号
+                js.BUDAT = jQuery("#field11315_" + i).val(); //凭证中的过帐日期
+                js.EWEI = jQuery("#field11312_" + i).val(); //重量单位
+                js.PACK = jQuery("#field11314_" + i).val(); //包装性质
+                js.BSART = jQuery("#field11316_" + i).val(); //订单类型（采购）
+
+                js.LSMNG = jQuery("#field12442_" + i).val(); //交货单的计量单位数量
+                js.LSMEH = jQuery("#field11312_" + i).val(); //交货单的计量单位
+                js.ERFME = jQuery("#field12582_" + i).val(); //条目单位
+                js.CHARG = jQuery("#field11305_" + i).val(); //批号
+
+                js.LICHA = jQuery("#field11307_" + i).val(); //供应商的批次
+                js.HSDAT = jQuery("#field11309_" + i).val(); //生产日期
+                js.VFDAT = jQuery("#field11311_" + i).val(); //货架寿命到期日
+                js.BLDAT = jQuery("#field11313_" + i).val(); //凭证中的凭证日期
+                js.ZNO = ZNO; //批次确认单号
+
+                js.ZNO_ITEM = jQuery("#field11302_" + i).val(); //批次确认单号项目号
+
+
+                js.MATNR = jQuery("#field11387_" + i).val(); //物料号
+
+
+
+                js.BEIZHU1 = jQuery("#field11390_" + i).val();
+                js.BEIZHU2 = jQuery("#field11391_" + i).val();
+                js.BEIZHU3 = jQuery("#field11392_" + i).val();
+                mx1.push(js);
+
+            }
+        }
+
+        if(mx0.length>0){
+            mx0=JSON.stringify(mx0);
+        }
+        if(mx1.length>0){
+            mx1=JSON.stringify(mx1);
+        }
+        console.log("mx0:"+mx0);
+        console.log("mx1:"+mx1);
+        var billid=getQueryString("billid");
+        console.log("billid:"+billid);
+        jQuery.ajax({
+            url : "/sapjsp/PO_PCQR.jsp",
+            data : {
+                "mx0" : mx0,
+                "mx1" : mx1,
+                "type" : "sapupload",
+                "billid":billid
+            },
+            type : "POST",
+            success : function(data) {
+                var newData=data.replace(/(^\s*)|(\s*$)/g, "");
+                // alert(newData);
+                var result=JSON.parse(newData);
+                console.log(result);
+                var backArrays=result.success;
+                var mx0counts=0;
+                var mx1counts=0;
+                for(var i=0;i<backArrays.length;i++){
+                    var backJsonObj=backArrays[i];
+                    var mx=backJsonObj.ZNO;
+                    var MBLNR=backJsonObj.MBLNR;
+                    var index=backJsonObj.ZNO_ITEM-1;
+                    if("MX1"==mx){
+                        // console.log("明细2回写")
+                       fillMX(13666,MBLNR,index);
+                        mx1counts++;
+                    }
+                    if("MX0"==mx){
+                        fillMX(13666,MBLNR,index);
+                        mx0counts++;
+                    }
+
+                }
+                var mssage="";
+                var mssageF0="";
+                var mssageF1="";
+                var totalC0=jQuery("#modesnum0").val();
+                var totalC1=jQuery("#modesnum1").val();
+
+                var failResults=result.failure;
+                var mx0Fcounts=0;
+                var mx1Fcounts=0;
+
+                if(totalC0>0){
+
+
+                    mssageF0="物料标识符为非X明细的上抛失败详情：";
+
+                }
+                if(totalC1>0){
+
+
+                    mssageF1="物料标识符为X明细的上抛失败详情：";
+
+                }
+
+                if (failResults.length>0){
+                    for (var i=0;i<failResults.length;i++){
+                        var failResult=failResults[i];
+                        console.log(failResult)
+                        var ZNO=failResult.ZNO;
+                        var ZNO_ITEM=failResult.ZNO_ITEM;
+                        var ZMESS=failResult.ZMESS;
+
+                        if(ZNO=="MX0"){
+                            mssageF0+="项目号："+ZNO_ITEM+",错误消息："+ZMESS+";";
+                            mx0Fcounts=mx0Fcounts+1;
+                        }
+                        if(ZNO=="MX1"){
+                            mssageF1+="项目号："+ZNO_ITEM+",错误消息："+ZMESS+";";
+                            mx1Fcounts=mx1Fcounts+1;
+                        }
+
+                    }
+                }
+
+                if(totalC0>0){
+
+                    mssage=mssage+"物料标识符为非X明细的上抛结果：成功"+mx0counts+"条,失败："+mx0Fcounts+"条";
+                    console.log("mx0:"+mssage);
+
+                }
+                if(totalC1>0){
+
+                    mssage=mssage+"物料标识符为X明细的上抛结果：成功"+mx1counts+"条,失败："+mx1Fcounts+"条";
+                    console.log("mx1:"+mssage);
+
+                }
+
+                mssage=mssage+mssageF0+mssageF1;
+                Dialog.alert(mssage);
+
+
+            }
+        });
+
+
+    }
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        var r = window.location.search.substr(1).match(reg);
+
+        if (r != null) {
+            console.log("获得requestid："+unescape(r[2]));
+            return unescape(r[2]);
+        }
+        return null;
+    }
+
+    function fillMX(fieldid, value,hang_number0) {
+        jQuery("#field" + fieldid + "_" + hang_number0).val(value); //input赋值
+        jQuery("#field" + fieldid + "_" + hang_number0 + "span").html(value); //span赋值
+
+    }
+</script>
+
+
+
+
+
+
+
+
+
+

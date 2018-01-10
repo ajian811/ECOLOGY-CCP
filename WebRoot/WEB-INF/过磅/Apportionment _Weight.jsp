@@ -279,12 +279,16 @@
 		}
 
 		boolean flag = false;
+		log.writeLog(list.toString());
+
 		for (int i = 0; i < list.size(); i++) {
 			/*
 			 *明细的实际分摊净重，计算公式
 			 *（计划理论净重/计划理论净重合计）*过磅总货物净重
 			 */
+			log.writeLog("jhlljz:"+jhlljz+",total:"+total+",zhwjz:"+zhwjz);
 			sjjz = mul(div(Double.parseDouble(list.get(i).get("jhlljz")), total), zhwjz);
+			log.writeLog("sjjz:"+sjjz);
 			String updateSql = "update " + dtname + " set " + fieldname + " = '" + df.format(sjjz)
 					+ "' where id = '" + list.get(i).get("dtid") + "'";
 			log.writeLog("更新明细sql: " + updateSql);

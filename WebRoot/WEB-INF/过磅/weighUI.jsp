@@ -66,7 +66,7 @@
 			//start store1     
 			store1 = new Ext.data.Store({
 				proxy : new Ext.data.HttpProxy({
-					url : '/weightJsp/gbcz.jsp?action=searchMX1'
+					url : '/weightJsp/gbcz2.jsp?action=searchMX1'
 				}),
 				reader : new Ext.data.JsonReader({
 					root : 'result',
@@ -87,7 +87,7 @@
 	
 			store2 = new Ext.data.Store({
 				proxy : new Ext.data.HttpProxy({
-					url : '/weightJsp/gbcz.jsp?action=searchMX2'
+					url : '/weightJsp/gbcz2.jsp?action=searchMX2'
 				}),
 				reader : new Ext.data.JsonReader({
 					root : 'result',
@@ -513,7 +513,7 @@
 			return status;
 		}
 		Ext.Ajax.request({
-			url : '/weightJsp/gbcz.jsp',
+			url : '/weightJsp/gbcz2.jsp',
 			params : {
 				action : "checkPlate1",
 				plate : plate,
@@ -596,7 +596,7 @@
 		//alert(plate);
 
 		Ext.Ajax.request({
-			url : '/weightJsp/gbcz.jsp',
+			url : '/weightJsp/gbcz2.jsp',
 			params : {
 				action : "searchJZ",
 				plate : plate,
@@ -657,7 +657,7 @@
 	
 		//alert(plate);
 		Ext.Ajax.request({
-			url : '/weightJsp/gbcz.jsp',
+			url : '/weightJsp/gbcz2.jsp',
 			params : {
 				action : "insertGB",
 				plate : plate,

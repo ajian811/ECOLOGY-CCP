@@ -99,6 +99,7 @@
             JCO.Table output = function.getTableParameterList().getTable("IT_ITEM_DOWN");
 
             for (int k = 0; k < output.getNumRows(); k++) {
+                output.setRow(k);
                 index++;
                 rs2.writeLog("index=" + index);
                 outcall += "![]";
@@ -165,6 +166,7 @@
                 outcall += Util.null2String(output.getString("ZWEIGHT")) + "|";//包材重量
                 outcall += Util.null2String(output.getString("SCHGT")) + "|";//包装性质
                 rs2.writeLog("SCHGT:"+ Util.null2String(output.getString("SCHGT")));
+                rs2.writeLog(outcall);
 
             }
             //}

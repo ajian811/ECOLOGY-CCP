@@ -69,6 +69,7 @@
         RecordSet rs1 = new RecordSet();
         RecordSet dtrs = new RecordSet();
         RecordSet uprs = new RecordSet();
+        Double jhyzlhj=0.00;//计划总重量
 
         List<Map<String, Double>> list = new ArrayList<Map<String, Double>>();
 
@@ -86,61 +87,68 @@
 
             //DecimalFormat df = new DecimalFormat("#");
 
-            String sql = "select * from formtable_main_45 where zxjhh = '" + zxjhh + "'";
+            Double zyf=0.00;//总运费
+
+            String sql = "select zyf,sfyg from formtable_main_45 where zxjhh = '" + zxjhh + "'";
             log.writeLog("查询主表Sql:" + sql);
             if (rs.execute(sql)) {
                 if (rs.next()) {
-                    jfms = Util.null2String(rs.getString("jfms"));//计费模式
-                    gbzl = rs.getDouble("gbzl") == -1.0 ? 0.00 : rs.getDouble("gbzl");//过磅重量
-                    jgd = rs.getDouble("jgd") == -1.0 ? 0.00 : rs.getDouble("jgd");//价格档（单价）
-                    lc = rs.getDouble("id") == -1.0 ? 0.00 : rs.getDouble("id");//里程
-                    tczyf = rs.getDouble("tczyf") == -1.0 ? 0.00 : rs.getDouble("tczyf");//同城费用
-                    flxzj = rs.getDouble("flxzj") == -1.0 ? 0.00 : rs.getDouble("flxzj");//辅线路费用
-                    sfyg = rs.getString("sfyg");//是否有柜
 
-                    if ("0".equals(jfms)) {//包车
-                        mainPrice = jgd;
-                    } else if ("1".equals(jfms)) {//配载
-                        mainPrice = mul(mul(lc, div(gbzl, 1000)), gbzl);
-                    } else if ("2".equals(jfms)) {
-                        //TODO
-                        String dtsql = "select sum(t2.sl)as d2sum, sum(t3.sl)as d3sum from formtable_main_45 t1";
-                        dtsql += " left join formtable_main_45_dt2 t2 on t1.id = t2.mainid";
-                        dtsql += " left join formtable_main_45_dt3 t3 on t1.id = t3.mainid";
-                        dtsql += " where t1.zxjhh = '" + zxjhh + "'";
-                        dtsql += " order by t2.id";
-                        log.writeLog("查询所有明细的log:" + dtsql);
-                        rs1.equals(dtsql);
-                        if (rs1.next()) {
-                            if ("1".equals(sfyg)) {
-                                cuont = rs1.getDouble("d2sum") == -1.0 ? 0.00 : rs1.getDouble("d2sum");
-                                mainPrice = mul(cuont, jgd);
-                            } else if ("0".equals(sfyg)) {
-                                cuont = rs1.getDouble("d3sum") == -1.0 ? 0.00 : rs1.getDouble("d3sum");
-                                mainPrice = mul(cuont, jgd);
-                            } else {
-                                mainPrice = 0.00;
-                            }
-                        }
+                      zyf=rs.getDouble("zyf");//总运费
+//                    jfms = Util.null2String(rs.getString("jfms"));//计费模式
+//                    gbzl = rs.getDouble("gbzl") == -1.0 ? 0.00 : rs.getDouble("gbzl");//过磅重量
+//                    jgd = rs.getDouble("jgd") == -1.0 ? 0.00 : rs.getDouble("jgd");//价格档（单价）
+//                    lc = rs.getDouble("id") == -1.0 ? 0.00 : rs.getDouble("id");//里程
+//                    tczyf = rs.getDouble("tczyf") == -1.0 ? 0.00 : rs.getDouble("tczyf");//同城费用
+//                    flxzj = rs.getDouble("flxzj") == -1.0 ? 0.00 : rs.getDouble("flxzj");//辅线路费用
+//                    flxzj = rs.getDouble("flxzj") == -1.0 ? 0.00 : rs.getDouble("flxzj");//辅线路费用
+                   sfyg = rs.getString("sfyg");//是否有柜
 
-                    } else if ("3".equals(jfms)) {
-                        //byweight（kg）
-                        mainPrice = mul(jgd, gbzl);
-                    } else if ("4".equals(jfms)) {
-                        mainPrice = div(mul(jgd, gbzl), 1000);
-                    } else if ("5".equals(jfms)) {
-                        //5 bytrip（km）
-                        mainPrice = mul(lc, mul(div(gbzl, 1000), jgd));
-                    } else {
-                        mainPrice = 0.00;
-                    }
+//                    if ("0".equals(jfms)) {//包车
+//                        mainPrice = jgd;
+//                    } else if ("1".equals(jfms)) {//配载
+////                        mainPrice = mul(mul(lc, div(gbzl, 1000)), gbzl);
+//                        mainPrice = mul(jgd,);
+//                    } else if ("2".equals(jfms)) {
+//                        //TODO
+//                        String dtsql = "select sum(t2.sl)as d2sum, sum(t3.sl)as d3sum from formtable_main_45 t1";
+//                        dtsql += " left join formtable_main_45_dt2 t2 on t1.id = t2.mainid";
+//                        dtsql += " left join formtable_main_45_dt3 t3 on t1.id = t3.mainid";
+//                        dtsql += " where t1.zxjhh = '" + zxjhh + "'";
+//                        dtsql += " order by t2.id";
+//                        log.writeLog("查询所有明细的log:" + dtsql);
+//                        rs1.equals(dtsql);
+//                        if (rs1.next()) {
+//                            if ("1".equals(sfyg)) {
+//                                cuont = rs1.getDouble("d2sum") == -1.0 ? 0.00 : rs1.getDouble("d2sum");
+//                                mainPrice = mul(cuont, jgd);
+//                            } else if ("0".equals(sfyg)) {
+//                                cuont = rs1.getDouble("d3sum") == -1.0 ? 0.00 : rs1.getDouble("d3sum");
+//                                mainPrice = mul(cuont, jgd);
+//                            } else {
+//                                mainPrice = 0.00;
+//                            }
+//                        }
+//
+//                    }
+//                    else if ("3".equals(jfms)) {
+//                        //byweight（kg）
+//                        mainPrice = mul(jgd, gbzl);
+//                    } else if ("4".equals(jfms)) {
+//                        mainPrice = div(mul(jgd, gbzl), 1000);
+//                    } else if ("5".equals(jfms)) {
+//                        //5 bytrip（km）
+//                        mainPrice = mul(lc, mul(div(gbzl, 1000), jgd));
+//                    } else {
+//                        mainPrice = 0.00;
+//                    }
                 }
             } else {
                 log.writeLog("数据库查询错误");
             }
 
             //总运费计算公式：总运费=一般运费+同城加价单价*同城个数+辅线路的所有运费
-            total = mainPrice + tczyf + flxzj;
+            total = zyf;
             log.writeLog("计算出的总运费:" + total);
             log.writeLog("sfyg:" + sfyg);
             double zqz = 0.00;//总权重
@@ -203,61 +211,76 @@
             log.writeLog("进入PO分摊运费");
             //DecimalFormat df = new DecimalFormat("#");
 
-            String sql = "select * from formtable_main_61 where zxjhh = '" + zxjhh + "'";
+            String sql = "select zyf,sfyg from formtable_main_61 where zxjhh = '" + zxjhh + "'";
+            Double zyf=0.00;
             log.writeLog("查询主表Sql:" + sql);
             if (rs.execute(sql)) {
                 if (rs.next()) {
-                    jfms = Util.null2String(rs.getString("jfms"));//计费模式
-                    gbzl = rs.getDouble("gbzl") == -1.0 ? 0.00 : rs.getDouble("gbzl");//过磅重量
-                    jgd = rs.getDouble("jgd") == -1.0 ? 0.00 : rs.getDouble("jgd");//价格档（单价）
-                    lc = rs.getDouble("lc") == -1.0 ? 0.00 : rs.getDouble("lc");//里程
-                    tczyf = rs.getDouble("tczyf") == -1.0 ? 0.00 : rs.getDouble("tczyf");//同城费用
-                    flxzj = rs.getDouble("flxzj") == -1.0 ? 0.00 : rs.getDouble("flxzj");//辅线路费用
+
+                      zyf=rs.getDouble("zyf");
+//                    jfms = Util.null2String(rs.getString("jfms"));//计费模式
+//                    gbzl = rs.getDouble("gbzl") == -1.0 ? 0.00 : rs.getDouble("gbzl");//过磅重量
+//                     jgd = rs.getDouble("jgd") == -1.0 ? 0.00 : rs.getDouble("jgd");//价格档（单价）
+//                    lc = rs.getDouble("lc") == -1.0 ? 0.00 : rs.getDouble("lc");//里程
+//                    tczyf = rs.getDouble("tczyf") == -1.0 ? 0.00 : rs.getDouble("tczyf");//同城费用
+//                    flxzj = rs.getDouble("flxzj") == -1.0 ? 0.00 : rs.getDouble("flxzj");//辅线路费用
+//                    jhyzlhj = rs.getDouble("jhyzlhj") == -1.0 ? 0.00 : rs.getDouble("jhyzlhj");//计划总重量
                     sfyg = rs.getString("sfyg");//是否有柜
+                    String id=Util.null2String(rs.getString("id"));
 
-                    if ("0".equals(jfms)) {//包车
-                        mainPrice = jgd;
-                    } else if ("1".equals(jfms)) {//配载
-                        mainPrice = mul(mul(lc, div(gbzl, 1000)), gbzl);
-                    } else if ("2".equals(jfms)) {
-                        //TODO
-                        String dtsql = "select sum(t2.sl)as d2sum, sum(t3.sl)as d3sum from formtable_main_61 t1";
-                        dtsql += " left join formtable_main_61_dt1 t2 on t1.id = t2.mainid";
-                        dtsql += " left join formtable_main_61_dt3 t3 on t1.id = t3.mainid";
-                        dtsql += " where t1.zxjhh = '" + zxjhh + "'";
-                        dtsql += " order by t2.id";
-                        log.writeLog("查询所有明细的log:" + dtsql);
-                        rs1.equals(dtsql);
-                        if (rs1.next()) {
-                            if ("1".equals(sfyg)) {
-                                cuont = rs1.getDouble("d2sum") == -1.0 ? 0.00 : rs1.getDouble("d2sum");
-                                mainPrice = mul(cuont, jgd);
-                            } else if ("0".equals(sfyg)) {
-                                cuont = rs1.getDouble("d3sum") == -1.0 ? 0.00 : rs1.getDouble("d3sum");
-                                mainPrice = mul(cuont, jgd);
-                            } else {
-                                mainPrice = 0.00;
-                            }
-                        }
+//                    String yfjgd=Util.null2String(rs.getString("yfjgd"));//运费价格档
+//                    Double jgd1=getJgdById(yfjgd);
 
-                    } else if ("3".equals(jfms)) {
-                        //byweight（kg）
-                        mainPrice = mul(jgd, gbzl);
-                    } else if ("4".equals(jfms)) {
-                        mainPrice = div(mul(jgd, gbzl), 1000);
-                    } else if ("5".equals(jfms)) {
-                        //5 bytrip（km）
-                        mainPrice = mul(lc, mul(div(gbzl, 1000), jgd));
-                    } else {
-                        mainPrice = 0.00;
-                    }
+                    //check价格档的价格是否变化,如果变化了则更新
+//                    updateJgd(jgd0,jgd1,id);
+
+
+
+
+//                    if ("0".equals(jfms)) {//包车
+//                        mainPrice = jgd;
+//                    } else if ("1".equals(jfms)) {//配载
+//                        mainPrice = mul(div(jhyzlhj,1000),jgd);
+//                    } else if ("2".equals(jfms)) {
+//                        //TODO
+//                        String dtsql = "select sum(t2.sl)as d2sum, sum(t3.sl)as d3sum from formtable_main_61 t1";
+//                        dtsql += " left join formtable_main_61_dt1 t2 on t1.id = t2.mainid";
+//                        dtsql += " left join formtable_main_61_dt3 t3 on t1.id = t3.mainid";
+//                        dtsql += " where t1.zxjhh = '" + zxjhh + "'";
+//                        dtsql += " order by t2.id";
+//                        log.writeLog("查询所有明细的log:" + dtsql);
+//                        rs1.equals(dtsql);
+//                        if (rs1.next()) {
+//                            if ("1".equals(sfyg)) {
+//                                cuont = rs1.getDouble("d2sum") == -1.0 ? 0.00 : rs1.getDouble("d2sum");
+//                                mainPrice = mul(cuont, jgd);
+//                            } else if ("0".equals(sfyg)) {
+//                                cuont = rs1.getDouble("d3sum") == -1.0 ? 0.00 : rs1.getDouble("d3sum");
+//                                mainPrice = mul(cuont, jgd);
+//                            } else {
+//                                mainPrice = 0.00;
+//                            }
+//                        }
+//
+//                    }
+//                    else if ("3".equals(jfms)) {
+//                        //byweight（kg）
+//                        mainPrice = mul(jgd, gbzl);
+//                    } else if ("4".equals(jfms)) {
+//                        mainPrice = div(mul(jgd, gbzl), 1000);
+//                    } else if ("5".equals(jfms)) {
+//                        //5 bytrip（km）
+//                        mainPrice = mul(lc, mul(div(gbzl, 1000), jgd));
+//                    } else {
+//                        mainPrice = 0.00;
+//                    }
                 }
             } else {
                 log.writeLog("数据库查询错误");
             }
 
             //总运费计算公式：总运费=一般运费+同城加价单价*同城个数+辅线路的所有运费
-            total = mainPrice + tczyf + flxzj;
+            total = zyf;
             log.writeLog("计算出的总运费:" + total);
             log.writeLog("sfyg:" + sfyg);
             double zqz = 0.00;//总权重
@@ -455,6 +478,32 @@
 
     return b1.divide(b2, 2, BigDecimal.ROUND_HALF_UP).doubleValue();
 }%>
+<%!public Double getJgdById(String id){
+    Double jgd=0.00;
+    RecordSet recordSet=new RecordSet();
+    String sql="select price from uf_yfjgwhd where id="+id;
+    recordSet.writeLog(sql);
+    recordSet.execute(sql);
+
+    if (recordSet.next()){
+        jgd=recordSet.getDouble("price");
+    }
+
+    return  jgd;
+}
+
+%>
+<%!public void updateJgd(Double oriJgd,Double curJgd,String id){
+    Boolean check=(oriJgd==curJgd);
+    if(!check){
+        RecordSet recordSet=new RecordSet();
+        String sql="update formtable_main_61 set jgd="+curJgd+" where id="+id;
+        recordSet.writeLog(sql);
+        recordSet.execute(sql);
+    }
+}
+
+%>
 
 
 

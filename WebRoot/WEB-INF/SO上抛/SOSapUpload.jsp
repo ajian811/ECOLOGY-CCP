@@ -33,7 +33,7 @@
 		String[] bills = billids.split(",");
 
 		for (int i = 0; i < bills.length; i++) {
-			sql = "SELECT SALEUNIT,DELIVERYNO,DELIVERYITEM,LFIMG,YCHL,(LFIMG-YCHL) as syl FROM uf_spghsr WHERE ID="
+			sql = "SELECT SAPUPLOAD,SALEUNIT,DELIVERYNO,DELIVERYITEM,LFIMG,YCHL,(LFIMG-YCHL) as syl FROM uf_spghsr WHERE ID="
 					+ bills[i];
 			bs.writeLog(sql);
 			rs.execute(sql);
@@ -103,7 +103,7 @@
 				
 				jsObject.put("ZPACK", ZPACK);
 				jsObject.put("ZDATE_1", ZDATE_1);
-				
+
 				LFIMG=Double.parseDouble(LFIMG2);
 				Double totalDouble2=0.00;//该项次的装卸计划运载总量
 				
@@ -134,15 +134,15 @@
 				} else {
 					//无柜及有柜情况下的sql 根据交运单号及项次查找装卸计划--sql  ,根据交运单号及项次查找理货申请--sql2
 					if (gs > 0) {
-						sql = "SELECT a.cp,a.sfgb,a.zxjhh,a.cysmc,a.requestid,b.jhyzl,a.gbrq FROM formtable_main_45 a,FORMTABLE_MAIN_45_DT2 b WHERE a.id=b.MAINID and b.JYDH='"
-								+ DELIVERYNO + "' and b.DDXC='" + DELIVERYITEM + "'";
-						sql2 = "SELECT b.sapph,b.BCZXSL FROM formtable_main_43 a,FORMTABLE_MAIN_43_DT1 b where a.id=b.MAINID and b.jydh='"
-								+ DELIVERYNO + "' and b.xc='"+DELIVERYITEM+"'";
+						sql = "SELECT a.cp,a.sfgb,a.zxjhh,a.cysmc,a.requestid,b.jhyzl,a.gbrq,b.sjftjz FROM formtable_main_45 a,FORMTABLE_MAIN_45_DT2 b WHERE a.id=b.MAINID and b.JYDH='"
+								+ DELIVERYNO + "' and b.DDXC='" + DELIVERYITEM + "' AND a.sfzf='0'";
+						sql2 = "SELECT b.sapph,b.BCZXSL,b.sapph FROM formtable_main_43 a,FORMTABLE_MAIN_43_DT1 b where a.id=b.MAINID and b.jydh='"
+								+ DELIVERYNO + "' and b.xc='"+DELIVERYITEM+"' AND a.sfzf='0'";
 					} else {
-						sql = "SELECT a.sfgb,a.zxjhh,a.requestid,b.jhyzl,a.cp,a.sfgb,a.gbrq FROM formtable_main_45 a,FORMTABLE_MAIN_45_DT3 b WHERE a.id=b.MAINID and b.JYDH='"
-								+ DELIVERYNO + "' and b.XC='" + DELIVERYITEM + "'";
-						sql2 = "SELECT b.sapph,b.BPCZXSL as BCZXSL FROM formtable_main_43 a,FORMTABLE_MAIN_43_DT2 b where a.id=b.MAINID and b.jydh='"
-								+ DELIVERYNO + "'";
+						sql = "SELECT a.sfgb,a.zxjhh,a.requestid,b.jhyzl,a.cp,a.sfgb,a.gbrq,b.sjftjz FROM formtable_main_45 a,FORMTABLE_MAIN_45_DT3 b WHERE a.id=b.MAINID and b.JYDH='"
+								+ DELIVERYNO + "' and b.XC='" + DELIVERYITEM + "' AND a.sfzf='0'";
+						sql2 = "SELECT a.zxjhh,b.sapph,b.BPCZXSL as BCZXSL,b.sapph FROM formtable_main_43 a,FORMTABLE_MAIN_43_DT2 b where a.id=b.MAINID and b.jydh='"
+								+ DELIVERYNO + "' AND a.sfzf='0'";
 					}
 					bs.writeLog(sql);
 					RecordSet rs3 = new RecordSet();
@@ -161,6 +161,8 @@
 						
 						jsObject.put("cysmc", cysmc);
 						jsObject.put("cp", cp);
+						jsObject.put("zxjhh",zxjhh);
+						jsObject.put("jz",Util.null2String(rs.getString("sjftjz")));
 						
 						//sql2+=" and b.bczxsl='"+jhyzl+"'";
 						/*如果是过磅的：要判断该装卸计划的所有产品已经全部过磅了，如果有部分还没有过磅的，则不计入实际装卸数量的合计值，并有提示“装卸计划XXXX,
@@ -214,22 +216,38 @@
 						//jhyzlTotal = 10.0;
 						
 						
-						bs.writeLog("获得单号："+DELIVERYNO+",批号："+DELIVERYITEM+"的数据：" + jsObject);
+						bs.writeLog("获得单号："+DELIVERYNO+",项次："+DELIVERYITEM+"的数据：" + jsObject);
 						//bs.writeLog("获得计划装卸量总量:" + jhyzlTotal);
 						jsArray2.add(jsObject);
 					}
 					rs.writeLog("获得jsArray2:"+jsArray2);
 					//查询批号
 					RecordSet rs4=new RecordSet();
+
 					bs.writeLog(sql2);
 					rs4.execute(sql2);
+
+
 					int jsarr=0;
+					int jsArrCounts=jsArray2.size();
+					JSONArray jsonArray=new JSONArray();
 					while (rs4.next()) {
-						JSONObject jsObject2=jsArray2.getJSONObject(jsarr);
-						jsObject2.put("sapph", Util.null2String(rs4.getString("sapph")));
-						jsObject2.put("jz", Util.null2String(rs4.getString("bczxsl")));
-						jsarr++;
+					    String zxjhh2=Util.null2String(rs4.getString("zxjhh"));
+					    JSONObject jsonObject=new JSONObject();
+						for (int j = 0; j < jsArray2.size(); j++) {
+							JSONObject jsonObject1=jsArray2.getJSONObject(j);
+
+							if(jsonObject1.get("zxjhh").equals(zxjhh2)){
+							    jsonObject=jsonObject1;
+							    bs.writeLog(jsonObject);
+							    break;
+							}
+						}
+						jsonObject.put("sapph", Util.null2String(rs4.getString("sapph")));
+						jsonObject.put("LFIMG2", Util.null2String(rs4.getString("bczxsl")));//
+						jsonArray.add(jsonObject);
 					}
+					jsArray2=jsonArray;
 					rs.writeLog("增加数据后的jsArray2:"+jsArray2);
 					for(int l=0;l<jsArray2.size();l++){
 						JSONObject jsObject2=jsArray2.getJSONObject(l);
@@ -273,40 +291,41 @@
 				function.getImportParameterList().setValue("UP", "FLAG");
 				JCO.Table table1 = function.getTableParameterList().getTable("IT_ITEM_I");
 				//测试数据
-				
+/*
 				JSONArray jsArray2=new JSONArray();
 				JSONObject jsonObject1=new JSONObject();
-				jsonObject1.put("DELIVERYNO", "0008000136");
+				jsonObject1.put("DELIVERYNO", "0008000138");
 				jsonObject1.put("DELIVERYITEM", "000010");
 				jsonObject1.put("GEWEI", "M01");
 				jsonObject1.put("sapph", "M17090703");
 				jsonObject1.put("jz", "880.000");
 				jsonObject1.put("ZPACK", "BULK");
 				jsonObject1.put("cp", "");
-				jsonObject1.put("LFIMG", "4.000");
+				jsonObject1.put("LFIMG", "3.000");
 				jsonObject1.put("ZDATE_1", "");
 				jsonObject1.put("ZDATE_2", "");
 				jsonObject1.put("ZHB", "");
 				jsonObject1.put("cysmc", "");
 				
 				JSONObject jsonObject2=new JSONObject();
-				jsonObject2.put("DELIVERYNO", "0008000136");
+				jsonObject2.put("DELIVERYNO", "0008000138");
 				jsonObject2.put("DELIVERYITEM", "000010");
 				jsonObject2.put("GEWEI", "M01");
 				jsonObject2.put("sapph", "M17070303");
 				jsonObject2.put("jz", "1300.000");
 				jsonObject2.put("ZPACK", "BULK");
 				jsonObject2.put("cp", "");
-				jsonObject2.put("LFIMG", "6.000");
+				jsonObject2.put("LFIMG", "5.000");
 				jsonObject2.put("ZDATE_1", "");
 				jsonObject2.put("ZDATE_2", "");
 				jsonObject2.put("ZHB", "");
 				jsonObject2.put("cysmc", "");
 				jsArray2.add(jsonObject1);
 				jsArray2.add(jsonObject2);
-				
-				for (int k = 0; k < jsArray2.size(); k++) {
-					JSONObject jsonObject = jsArray2.getJSONObject(k);
+*/
+
+				for (int k = 0; k < jsArray.size(); k++) {
+					JSONObject jsonObject = jsArray.getJSONObject(k);
 					table1.appendRow();
 					bs.writeLog("第"+(k+1)+"行开始录入值...");
 					rs.writeLog(jsonObject.toString());
@@ -314,7 +333,7 @@
 					table1.setValue(jsonObject.get("DELIVERYITEM"), "POSNR_VL");//项次
 					table1.setValue(jsonObject.get("cysmc"), "GARAGE_N");//车行
 					table1.setValue(jsonObject.get("cp"), "CAR_NO");//车号
-					table1.setValue(jsonObject.get("LFIMG"), "LFIMG");//实际已交货量（按销售单位）
+					table1.setValue(jsonObject.get("LFIMG2"), "LFIMG");//本次装卸数量
 					table1.setValue(jsonObject.get("GEWEI"), "GEWEI");//重量单位
 					table1.setValue(jsonObject.get("sapph"), "CHARG");//批号
 					table1.setValue(jsonObject.get("jz"), "NETWEI");//出货净重数量(地磅磅值)
@@ -329,8 +348,10 @@
 				bs.writeLog("插表完成，开始获取IT_HEAD_LOG...");
 				JCO.Table retable = function.getTableParameterList().getTable("IT_HEAD_LOG");
 				bs.writeLog("返回表行数：" + retable.getNumRows());
+				String result="";
 				if(retable.getNumRows()>0){
 				bs.writeLog("开始读取返回数据>>>>>>>>>>>>");
+
 				for (int j = 0; j < retable.getNumRows(); j++) {
 					retable.setRow(j);
 					bs.writeLog("MANDT返回：" + retable.getString("MANDT"));
@@ -338,17 +359,24 @@
 					bs.writeLog("POSNR_VL返回：" + retable.getString("POSNR_VL"));
 					bs.writeLog("ZMARK返回：" + retable.getString("ZMARK"));
 					bs.writeLog("ZMESS返回：" + retable.getString("ZMESS"));
+					if("S".equals(retable.getString("ZMARK"))){
+						result="SOUPLOAD SUCCESS!";
+					};
+					if("E".equals(retable.getString("ZMARK"))){
+						result="SOUPLOAD FAILED!";
+					};
 				}
 				bs.writeLog("数据读取结束<<<<<<<<<<<<<");
 				if(sapconnection!=null){
 					JCO.releaseClient(sapconnection);
 				}
 				}
+				updateSapUploadStatusByBills(bills);
+				out.write(result);
 			}
 		
 
 	} catch (Exception e) {
-		out.write("fail" + e);
 		e.printStackTrace();
 		bs.writeLog("报错了！错误详情：" + e);
 		out.write("报错了！错误详情：" + e);
@@ -379,5 +407,18 @@
 		}
 		return b3;
 	}%>
+<%!public void updateSapUploadStatusByBills(String[] bills){
+    RecordSet recordSet=new RecordSet();
 
+	for (int i = 0; i < bills.length; i++) {
+	    String bill=bills[i];
+	    String sql="update uf_spghsr set sapupload=1 where id="+bill;
+	    recordSet.writeLog(sql);
+	    recordSet.execute(sql);
+
+
+	}
+}
+
+%>
 

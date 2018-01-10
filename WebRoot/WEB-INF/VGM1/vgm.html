@@ -4,37 +4,121 @@
      *  TODO
      *  请在此处编写javascript代码
      */
+    var button1 = '&nbsp&nbsp&nbsp<input name="zh" class="e8_btn_top middle" value="查询" _hasinit="true" style="max-width:';
+    button1 += '100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="查询" type="button" onclick="searchMX()">';
+    var button2 = '&nbsp&nbsp&nbsp<input name="zh" class="e8_btn_top middle" value="清空明细" _hasinit="true" style="max-width:';
+    button2 += '100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="情空明细" type="button" onclick="delMX()">';
+    jQuery(".detail0_0_1").append(button1);
+    //jQuery(".detail0_0_2").append(button2);
+    var hang_number0;
+    function searchMX() {
+        var shipping = jQuery("#field10883").val(); //shipping
+        var ksrq = jQuery("#field10881").val(); //开始日期
+        var jsrq = jQuery("#field10882").val(); //结束日期
+        var lx = jQuery("#field13485").val(); //类型
+
+        console.log("shipping:" + shipping + ",类型：" + lx);
+        if (lx == "0") {
+            delRowFunJM(0);
+            jQuery.ajax({
+                url: "/sapjsp/VGM1.jsp",
+                data: {
+                    "shipping": shipping,
+                    "lx": lx
+                },
+                type: "POST",
+                dataType: "json",
+                success: function(responseJSON) {
+                    if (responseJSON) {
+                        console.log(JSON.stringify(responseJSON));
+                        jQuery.each(responseJSON, function(i, item) {
+                            addRow0(0);
+                            hang_number0 = parseInt(jQuery("#indexnum0").val()) - 1;
+                            fieldidvalue(13486, item.shipping); //Shipping
+                            fieldidvalue(11102, item.code); //柜号
+                            fieldidvalue(13487, item.cabtype); //柜型
+                            //fieldidvalue(11101, item.id); //柜ID
+                            fieldidvalue(10884, item.gbrq); //过磅日期
+                            fieldidvalue(10886, item.jz); //净重
+                            //jQuery("#field10886_" + hang_number0).val(item.jz); //input赋值
+
+                        });
+                    }
+                }
+            });
+            calSum(0);
+        }
+        if (lx == "1") {
+            delRowFunJM(1);
+            jQuery.ajax({
+                url: "/sapjsp/VGM1.jsp",
+                data: {
+                    "shipping": shipping,
+                    "ksrq": ksrq,
+                    "jsrq": jsrq,
+                    "lx": lx
+                },
+                type: "POST",
+                dataType: "json",
+                success: function(responseJSON) {
+                    if (responseJSON) {
+                        console.log(JSON.stringify(responseJSON));
+                        jQuery.each(responseJSON, function(i, item) {
+                            addRow1(1);
+                            hang_number0 = parseInt(jQuery("#indexnum1").val()) - 1;
+
+                            fieldidvalue1(13492, item.SJYSRQ); //日期
+                            fieldidvalue1(13493, item.YGSHIPNO); //Shipping
+                            fieldidvalue1(13494, item.ghcx); //柜号
+                            fieldidvalue1(13495, item.CRZ); //入重
+                            fieldidvalue1(13496, item.ccz); //出重
+                            fieldidvalue1(13497, item.cp); //车牌
+                            //fieldidvalue(10888, item.jz); //Chassis Type
+                            //fieldidvalue(13488, item.jz); //Chassis No
+                            //fieldidvalue(13500, item.jz); //Chassis Weight/kg
+                        });
+                    }
+                }
+            });
+            calSum(1);
+        }
+    }
+
+    function fieldidvalue(fieldid, value) { /*赋值*/
+        jQuery("#field" + fieldid + "_" + hang_number0).val(value); //input赋值
+        jQuery("#field" + fieldid + "_" + hang_number0 + "span").html(value); //span赋值
+    }
+
+    function fieldidvalue1(fieldid, value) { /*赋值*/
+        jQuery("#field" + fieldid + "_" + hang_number0).val(value); //input赋值
+        jQuery("#field" + fieldid + "_" + hang_number0 + "span").html(value); //span赋值
+    }
+
+    function delMX() {
+        //alert("清空明细");
+        delRowFunJM(0);
+        delRowFunJM(1);
+
+    }
 
     jQuery(document).ready(function() {
         jQuery(".vgm1").hide();
         jQuery(".vgm2").hide();
         jQuery("#field13485").bindPropertyChange(function() {
+            delMX();
             hiddenVGM();
         })
-        jQuery("#field10883").bindPropertyChange(function() {
-            delRowFunJM(0);
-        })
-        jQuery("#indexnum0").bindPropertyChange(function() {
-            calSum(0);
-        })
-        jQuery("#indexnum1").bindPropertyChange(function() {
-            calSum(1);
-        })
-
     })
 
     function hiddenVGM() {
         var lx = jQuery("#field13485").val(); //类型
         if (lx == 0) {
             jQuery(".vgm2").hide();
-            delRowFunJM(1);
             jQuery(".vgm1").show();
         } else {
             jQuery(".vgm1").hide();
-            delRowFunJM(0);
             jQuery(".vgm2").show();
         }
     }
 </script>
 <script type="text/javascript" src="/sapjsp/util.js"></script>
-

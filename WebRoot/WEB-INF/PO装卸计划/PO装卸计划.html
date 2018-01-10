@@ -22,8 +22,18 @@
         } else {
             $(".hideFee").show();
         }
-        //如果有运费 必须辅助路线明细行数>0
+
         checkCustomize = function() {
+            var sfzf = jQuery("#field11761  option:selected").val(); //是否作废
+            console.log("是否作废：" + sfzf);
+            if (sfzf == "1") {
+                return true;
+            }
+            return checkYF() && checkSl();
+
+        }
+        //如果有运费 必须辅助路线明细行数>0
+        function checkYF() {
             var i = $("#field9685").val();
             if (i == '1') {
                 var k = $("#nodesnum2").val();
@@ -32,12 +42,128 @@
                     return false;
                 }
                 return true;
-
             }
             return true;
-
-
         }
+        //判断运载量是否过量
+        function checkSl() {
+            var sfyg = jQuery("#field10642").val();
+            var submitdtlid;
+            if (sfyg == "0") {
+                return checkWgSl();
+            }
+            if (sfyg == "1") {
+                return checkYgSl();
+            }
+
+            return true;
+        }
+
+        function checkWgSl() {
+            var submitdtlid2 = jQuery("#submitdtlid1").val().split(",");
+            var jnArr = [];
+            var result = false;
+            for (var i = 0; i < submitdtlid2.length; i++) {
+                var plannum = parseFloat(jQuery("#field10709_" + submitdtlid2[i]).val()); //计划装卸量
+                var totalnum = parseFloat(jQuery("#field11903_" + submitdtlid2[i]).val()); //总量
+                var shipNum = parseFloat(jQuery("#field10710_" + submitdtlid2[i]).val()); //已运载量
+                var pono = jQuery("#field10702_" + submitdtlid2[i]).val(); //po单号
+                var poitem = jQuery("#field10703_" + submitdtlid2[i]).val(); //po项次
+                console.log("plannum:" + plannum + ",totalnum:" + totalnum);
+                if (plannum > totalnum - shipNum) {
+                    alert("PO单号:" + pono + "项次：" + poitem + "计划装卸数量超过了剩余量");
+                    return false;
+                };
+
+
+                var jn = {
+                    "pono": pono,
+                    "poitem": poitem,
+                    "plannum": plannum.toString()
+                }
+                jnArr.push(jn);
+            }
+            console.log(jnArr);
+            jQuery.ajax({
+                url: "/sapjsp/PO_zxjh.jsp",
+                data: {
+                    "dtdata": JSON.stringify(jnArr),
+                    "type": "checkCount"
+                },
+                type: "POST",
+                async: false,
+                dateType: "json",
+                success: function(data) {
+                    var datatext = data.replace(/(^\s*)|(\s*$)/g, "");
+                    if (datatext) {
+                        if (datatext == "success") {
+                            console.log(datatext);
+                            result = true;
+                        } else {
+                            Dialog.alert(datatext);
+                        }
+
+
+                    }
+                }
+            });
+
+            return result;
+        }
+
+        //校验有柜数量
+        function checkYgSl() {
+            var submitdtlid2 = jQuery("#submitdtlid2").val().split(",");
+            var jnArr = [];
+            var result = false;
+            for (var i = 0; i < submitdtlid2.length; i++) {
+                var plannum = parseFloat(jQuery("#field9343_" + submitdtlid2[i]).val()); //计划装卸量
+                var totalnum = parseFloat(jQuery("#field8149_" + submitdtlid2[i]).val()); //总量
+                var shipNum = parseFloat(jQuery("#field9344_" + submitdtlid2[i]).val()); //已运载量
+
+                console.log("plannum:" + plannum + ",totalnum:" + totalnum);
+                if (plannum > totalnum - shipNum) {
+                    alert("计划装卸数量超过了剩余量");
+                    return false;
+                };
+
+                var pono = jQuery("#field10663_" + submitdtlid2[i]).val(); //po单号
+                var poitem = jQuery("#field10664_" + submitdtlid2[i]).val(); //po项次
+                var jn = {
+                    "pono": pono,
+                    "poitem": poitem,
+                    "plannum": plannum.toString()
+                }
+                jnArr.push(jn);
+            }
+            console.log(jnArr);
+            jQuery.ajax({
+                url: "/sapjsp/PO_zxjh.jsp",
+                data: {
+                    "dtdata": JSON.stringify(jnArr),
+                    "type": "checkCount"
+                },
+                type: "POST",
+                async: false,
+                dateType: "json",
+                success: function(data) {
+                    var datatext = data.replace(/(^\s*)|(\s*$)/g, "");
+                    if (datatext) {
+                        if (datatext == "success") {
+                            console.log("数据更新成功");
+                            result = true;
+                        } else {
+                            Dialog.alert(datatext);
+                        }
+
+
+                    }
+                }
+            });
+
+            return result;
+        }
+
 
 
         var html = "<input type='button' value='生成辅线路' class='middle e8_btn_top_first' id='accquire' />";
@@ -275,7 +401,7 @@
                             var totalPrice = parseFloat(item.index) * parseFloat(item.tcdj);
                             jQuery("#field11826_" + hang_number).val(totalPrice); //同城总价
 
-                            jQuery("#field11821_" + hang_number + "span").html(item.sort); //城市点顺序
+                            //jQuery("#field11821_" + hang_number + "span").html(item.sort); //城市点顺序
                             jQuery("#field11827_" + hang_number + "span").html(item.midCity); //城市点id
                             //jQuery("#field11422_" + hang_number + "span").val(item.sort); //
                             jQuery("#field11823_" + hang_number + "span").html(item.price); //辅线路价格
@@ -295,6 +421,49 @@
             }
         })
     }
+    jQuery(document).ready(function() {
+        var v_eco_importblmain = '<input class="e8_btn_top" onclick="v_eco_cx()" type="button" value="Inquire" title="Inquire" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;position: relative; left:20px;">';
+        jQuery("#v_eco_importblmain").append(v_eco_importblmain);
+
+    });
+
+    function v_eco_cx() {
+        window.open("/formmode/search/CustomSearchBySimple.jsp?customid=782");
+    }
+
+
+
+    jQuery(document).ready(function() {
+        jQuery("#field9698").bindPropertyChange(function() { //价格档
+            zjg();
+        })
+        jQuery("#field9686").bindPropertyChange(function() { //计费模式
+            zjg();
+        })
+        jQuery("#field11941").bindPropertyChange(function() { //同城总运费
+            zjg();
+        })
+        jQuery("#field11942").bindPropertyChange(function() { //辅路线总价
+            zjg();
+        })
+    })
+
+    function zjg() {
+        var jfms = parseFloat(jQuery("#field9686").val());
+        var jgd = parseFloat(jQuery("#field9698").val());
+        var tczf = parseFloat(jQuery("#field11941").val());
+        var fxl = parseFloat(jQuery("#field11942").val());
+        var zyf = 0;
+        var zjz = parseFloat(jQuery("#field13675").val()); //总净重
+        var jhyzljh = parseFloat(jQuery("#field13678").val()); //计划运载量合计
+        if (jfms == 0) { //包车
+            zyf = jgd + tczf + fxl;
+        } else if (jfms == 1) { //计重
+            zyf = jgd * zjz / 1000 + tczf + fxl;
+        } else { //2计件
+            zyf = jgd * jhyzljh + tczf + fxl;
+        }
+        jQuery("#field9709").val(zyf.toFixed(2));
+    }
 </script>
 <script type="text/javascript" src="/sapjsp/util.js"></script>
-

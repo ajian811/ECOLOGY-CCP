@@ -12,7 +12,7 @@ import weaver.soa.workflow.request.RequestInfo;
 import weaver.workflow.workflow.WorkflowComInfo;
 
 public class Z_CCP_SO_ZXJH_ZF extends BaseBean implements Action {
-
+	@Override
 	public String execute(RequestInfo requestInfo) {
 		RecordSet rs = new RecordSet();
 		writeLog("进入Z_CCP_SO_ZXJH_ZF,requestid:" + requestInfo.getRequestid());
@@ -105,25 +105,26 @@ public class Z_CCP_SO_ZXJH_ZF extends BaseBean implements Action {
 				sql="select gbh from formtable_main_45_DT1 where mainid="+id;
 				rs.writeLog(sql);
 				rs.execute(sql);
+
 				String gbh="";
-				if(rs.next()){
-					gbh=Util.null2String(rs.getString("gbh"));
-				}
-				if(!gbh.equals("")){
-					sql = "SELECT b.id FROM UF_GHLR a,UF_GHLR_DT1 b where a.id=b.MAINID and a.SHIPPING='" + shipno
-							+ "' and b.code='" + gbh + "'";
-					RecordSet rs2 = new RecordSet();
-					rs2.writeLog(sql);
-					rs2.execute(sql);
-					String ghid = "";
-					if (rs2.next()) {
-						ghid = Util.null2String(rs2.getString("id"));
+				while (rs.next()) {
+					gbh = Util.null2String(rs.getString("gbh"));
+
+					if (!gbh.equals("")) {
+						sql = "SELECT b.id FROM UF_GHLR a,UF_GHLR_DT1 b where a.id=b.MAINID and a.SHIPPING='" + shipno
+								+ "' and b.code='" + gbh + "'";
+						RecordSet rs2 = new RecordSet();
+						rs2.writeLog(sql);
+						rs2.execute(sql);
+						String ghid = "";
+						if (rs2.next()) {
+							ghid = Util.null2String(rs2.getString("id"));
+						}
+						sql = "update UF_GHLR_DT1 set fqh=null where id=" + ghid;
+						rs2.writeLog(sql);
+						rs2.execute(sql);
 					}
-					sql = "update UF_GHLR_DT1 set fqh=null where id=" + ghid;
-					rs2.writeLog(sql);
-					rs2.execute(sql);
 				}
-				
 			}
 			// 无柜情况
 			if (sfyg.equals("0")) {
@@ -159,12 +160,21 @@ public class Z_CCP_SO_ZXJH_ZF extends BaseBean implements Action {
 						jsonObject.put("bczxsl", bczxsl);
 						jsonArray.add(jsonObject);
 					} else {
+						Boolean ifcz=false;
 						for (int i = 0; i < jsonArray.size(); i++) {
 							JSONObject jsonObject = jsonArray.getJSONObject(i);
 							if (jydh.equals(jsonObject.get("jydh")) && xc.equals(jsonObject.get("xc"))) {
 								Double total = calCulate(bczxsl, jsonObject.get("bczxsl").toString(), "add");
 								jsonObject.put("bczxsl", total.toString());
+								ifcz=true;
 							}
+						}
+						if (!ifcz){
+							JSONObject jsonObject = new JSONObject();
+							jsonObject.put("jydh", jydh);
+							jsonObject.put("xc", xc);
+							jsonObject.put("bczxsl", bczxsl);
+							jsonArray.add(jsonObject);
 						}
 					}
 

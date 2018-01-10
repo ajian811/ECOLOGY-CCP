@@ -152,12 +152,21 @@ public class Z_CPP_SO_LHSQ_ZF extends BaseBean implements Action {
 						jsonObject.put("bczxsl", bczxsl);
 						jsonArray.add(jsonObject);
 					} else {
+						Boolean ifcz=false;
 						for (int i = 0; i < jsonArray.size(); i++) {
 							JSONObject jsonObject = jsonArray.getJSONObject(i);
 							if (jydh.equals(jsonObject.get("jydh")) && xc.equals(jsonObject.get("xc"))) {
 								Double total = calCulate(bczxsl, jsonObject.get("bczxsl").toString(), "add");
 								jsonObject.put("bczxsl", total.toString());
+								ifcz=true;
 							}
+						}
+						if (!ifcz){
+							JSONObject jsonObject = new JSONObject();
+							jsonObject.put("jydh", jydh);
+							jsonObject.put("xc", xc);
+							jsonObject.put("bczxsl", bczxsl);
+							jsonArray.add(jsonObject);
 						}
 					}
 

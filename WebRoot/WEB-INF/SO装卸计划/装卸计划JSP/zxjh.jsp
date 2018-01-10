@@ -23,22 +23,22 @@
 		rs.writeLog("获得的数组为：" + strs.toString() + ",类型为：" + type);
 		StringBuffer sql = new StringBuffer();
 		sql.append("SELECT c.gh,c.ph,c.sl,d.* from ")
-				.append(" (SELECT a.gh gh,b.jydh jydh,b.xc xc,b.ph ph,b.bczxsl sl")
+				.append(" (SELECT a.gh gh,b.jydh jydh,b.xc xc,b.sapph ph,b.bczxsl sl")
 				.append(" from formtable_main_43 a,formtable_main_43_dt1 b where a.SFZF='0'and a.id=b.mainid");
-                if(strs.length>1){
-                        sql.append(" and a.gh in (");
-                    for (int i = 0; i <strs.length ; i++) {
-                        sql.append("'"+strs[i]+"'");
-                        if(i!=strs.length-1){
-                            sql.append(",");
-                        }else{
-                            sql.append(")");
-                        }
-                    }
-                }else{
-                    sql.append(" and a.gh='"+strs[0]+"'");
-                }
-				sql.append(") c,uf_spghsr d where c.xc=d.DELIVERYITEM and c.JYDH=d.DELIVERYNO");
+		if(strs.length>1){
+			sql.append(" and a.gh in (");
+			for (int i = 0; i <strs.length ; i++) {
+				sql.append("'"+strs[i]+"'");
+				if(i!=strs.length-1){
+					sql.append(",");
+				}else{
+					sql.append(")");
+				}
+			}
+		}else{
+			sql.append(" and a.gh='"+strs[0]+"'");
+		}
+		sql.append(") c,uf_spghsr d where c.xc=d.DELIVERYITEM and c.JYDH=d.DELIVERYNO");
 
 		//out.print(sql);
 		rs.executeSql(sql.toString());
@@ -54,7 +54,7 @@
 			map.put("cp", rs.getString("PROCATEGORY"));//产品
 
 			map.put("SALEORDER", Util.null2String(rs.getString("SALEORDER")));//销售订单
-			map.put("ORDERITEM", Util.null2String(rs.getString("ORDERITEM")));//销售订单项次
+
 			map.put("STOCKNO", Util.null2String(rs.getString("STOCKNO")));//物料号码
 			map.put("STOCKDESC", Util.null2String(rs.getString("STOCKDESC")));//物料描述
 			map.put("LOCATION", Util.null2String(rs.getString("LOCATION")));//库存位置
@@ -72,10 +72,21 @@
 			map.put("SOLDTOADDR", Util.null2String(rs.getString("SOLDTOADDR")));//售达方地址
 			map.put("ZWEIGHT", Util.null2String(rs.getString("ZWEIGHT")));//包材重量
 			map.put("NTGEW", Util.null2String(rs.getString("NTGEW")));//净重量
+//			map.put("NTGEW", Util.null2String(rs.getString("lljz")));//净重量
 			map.put("LOCATION", Util.null2String(rs.getString("LOCATION")));//库位代码
 			map.put("PACK", Util.null2String(rs.getString("PACK")));//包装性质
-			map.put("SHIPTOADDR", Util.null2String(rs.getString("SHIPTOADDR")));//送达方
+			map.put("SHIPTOADDR", Util.null2String(rs.getString("SHIPTOADDR")));//送达方地址
 			map.put("CLOSEDATE",Util.null2String(rs.getString("CLOSEDATE")));//预计结关日期
+
+			map.put("ORDERITEM", Util.null2String(rs.getString("ORDERITEM")));//销售订单项次
+			map.put("AUART",Util.null2String(rs.getString("AUART")));//销售订单类型
+			map.put("SPART",Util.null2String(rs.getString("SPART")));//产品组
+			map.put("LGOBE",Util.null2String(rs.getString("LGOBE")));//库位地址
+			map.put("REMARK1",Util.null2String(rs.getString("REMARK1")));//单位描述
+			map.put("VKAUS",Util.null2String(rs.getString("VKAUS")));//包装性质
+			map.put("KUNNR",Util.null2String(rs.getString("KUNNR")));//运达方简码
+			map.put("KUNAG",Util.null2String(rs.getString("KUNAG")));//售达方简码
+
 
 
 			jsonArr.add(map);
@@ -120,7 +131,18 @@
 			map.put("SOLDTOADDR", Util.null2String(rs.getString("SOLDTOADDR")));//售达方地址
 			map.put("ZWEIGHT", Util.null2String(rs.getString("ZWEIGHT")));//包材重量
 			map.put("NTGEW", Util.null2String(rs.getString("NTGEW")));//净数量
+//			map.put("NTGEW", Util.null2String(rs.getString("lljz")));//净数量
 			map.put("CLOSEDATE",Util.null2String(rs.getString("CLOSEDATE")));//预计结关日期
+
+			map.put("ORDERITEM", Util.null2String(rs.getString("ORDERITEM")));//销售订单项次
+			map.put("AUART",Util.null2String(rs.getString("AUART")));//销售订单类型
+			map.put("SPART",Util.null2String(rs.getString("SPART")));//产品组
+			map.put("LGOBE",Util.null2String(rs.getString("LGOBE")));//库位地址
+			map.put("REMARK1",Util.null2String(rs.getString("REMARK1")));//单位描述
+			map.put("VKAUS",Util.null2String(rs.getString("VKAUS")));//包装性质
+			map.put("KUNNR",Util.null2String(rs.getString("KUNNR")));//运达方简码
+			map.put("KUNAG",Util.null2String(rs.getString("KUNAG")));//售达方简码
+
 			jsonArr.add(map);
 		}
 

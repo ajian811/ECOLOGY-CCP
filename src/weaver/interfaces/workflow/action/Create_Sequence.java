@@ -47,6 +47,7 @@ public class Create_Sequence extends BaseBean implements Action {
 			String trdh = "";// 提入单号
 			String crzt = "";// 出入状态
 			String sfzf = "";// 是否作废
+			String gsdm="";//公司代码
 
 			if (isbill == 0) {
 				tablename = "workflow_form";// 老表单的主表单名字
@@ -64,7 +65,7 @@ public class Create_Sequence extends BaseBean implements Action {
 			while (rs.next()){
 				currentnodetype=Util.null2String(rs.getString("currentnodetype"));
 			}
-
+			writeLog("获得当前节点类型id："+currentnodetype);
 			String selectSql = "select t1.*,t2.trdh from " + tablename + " t1 ";
 			selectSql += " left join " + tablename + "_dt2 t2 on t1.id = t2.mainid";
 			selectSql += " where t1.requestid= '" + requestid + "'";
@@ -79,6 +80,8 @@ public class Create_Sequence extends BaseBean implements Action {
 				trdh = rs2.getString("trdh");
 				crzt = rs2.getString("crzt");
 				sfzf = rs2.getString("sfzf");
+				gsdm = rs2.getString("gsdm");
+
 
 				if (!"".equals(crzt)) {
 					if ("0".equals(crzt)) {
@@ -102,7 +105,7 @@ public class Create_Sequence extends BaseBean implements Action {
 					log.writeLog("查询明细3的sql:" + sql);
 					rs.execute(sql);
 					while (rs.next()) {
-						String lcbh = "1010" + crzt + currdate1;
+						String lcbh = gsdm + crzt + currdate1;
 						// String id = rs.getString("id");// 获取明细表id
 						String shipno = rs.getString("shipno");// 获取shippingno
 						// 调用存储过程自编号
@@ -121,7 +124,7 @@ public class Create_Sequence extends BaseBean implements Action {
 					if(!"0".equals(currentnodetype)){
 						return  SUCCESS;
 					}
-					String lcbh = "1010" + crzt + currdate1;
+					String lcbh = gsdm + crzt + currdate1;
 					// 调用存储过程自编号
 					log.writeLog("调用存储过程fn_no_make");
 					rs1.executeProc("fn_no_make", "");

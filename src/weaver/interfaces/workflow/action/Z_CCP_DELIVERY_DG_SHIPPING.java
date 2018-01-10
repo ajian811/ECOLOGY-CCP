@@ -9,9 +9,9 @@ import com.weaver.integration.datesource.SAPInterationDateSourceImpl;
 import com.weaver.integration.log.LogInfo;
 
 import weaver.conn.RecordSet;
+import weaver.formmode.setup.ModeRightInfo;
 import weaver.general.BaseBean;
 import weaver.general.Util;
-import weaver.hrm.resource.ResourceComInfo;
 import weaver.soa.workflow.request.RequestInfo;
 import weaver.workflow.workflow.WorkflowComInfo;
 
@@ -21,14 +21,15 @@ import weaver.workflow.workflow.WorkflowComInfo;
  * @date 2017-11-10
  */
 public class Z_CCP_DELIVERY_DG_SHIPPING extends BaseBean implements Action {
+	private int userid=0;
 	// shipping柜号输入接口
+	@Override
 	public String execute(RequestInfo request) {
 		BaseBean log = new BaseBean();
 
 		log.writeLog("调用Z_CCP_DELIVERY_DG_SHIPPING开始");
 		JCO.Client sapconnection = null;
 		try {
-			ResourceComInfo resourceComInfo = new ResourceComInfo();
 			// 获取输入参数
 			WorkflowComInfo workflowComInfo = new WorkflowComInfo();
 			int requestid = Util.getIntValue(request.getRequestid());
@@ -40,6 +41,9 @@ public class Z_CCP_DELIVERY_DG_SHIPPING extends BaseBean implements Action {
 			RecordSet rs = new RecordSet();
 			RecordSet rs1 = new RecordSet();
 			RecordSet rs3 = new RecordSet();
+
+			userid=request.getRequestManager().getUser().getUID();//获取用户id
+
 			if (isbill == 0) {
 				tablename = "workflow_form";// 老表单的主表单名字
 			} else {
@@ -289,8 +293,9 @@ public class Z_CCP_DELIVERY_DG_SHIPPING extends BaseBean implements Action {
 			String sources = "";
 			if (!workflowId.equals("")) {
 				rs1.executeSql("select SAPSource from workflow_base where id=" + workflowId);
-				if (rs1.next())
+				if (rs1.next()) {
 					sources = rs1.getString(1);
+				}
 			}
 			log.writeLog("sources=" + sources);
 
@@ -532,7 +537,8 @@ public class Z_CCP_DELIVERY_DG_SHIPPING extends BaseBean implements Action {
 
 							buffer.append("insert into UF_SPGHSR");
 							buffer.append(
-									"(REQUESTID,SHIPADVSTATUS,SHIPADVICENO,ETD,ETA,EREQUESTID,DELIVERYNO,DELIVERYITEM,SALEORDER,ORDERITEM,STOCKNO,STOCKDESC,LOCATION,SHIPNUM,SALEUNIT,SHIPTO,SHIPTOADDR,REALSHIPNUM,COSTCENTER,REMARK,PROCATEGORY,LCEN,SHIPM,SPECNEED,MATERDES,CUSORDNO,ORDERADVICENO,SOLDTO,SOLDTOADDR,AUART,BSTNK,KUNAG,KUNNR,TEL_NUMBER,LGOBE,MAKTX,LFIMG,MSEHT,BRGEW,WERKS,KDMAT,VKAUS,WADAT,SPECS,CHARG,PACK,AESKD,VSTEL,LPRIO,SDABW,NTGEW,SGTXT,TKNUM,EXTI1,SIGNI,TNDR_TRKID,ADD01,ADD02,ADD03,TEXT1,NAME1,BSTKD,KOSTK,FERTH,SPART,ORMNG,ZGMZBH,ZADDFLAG,ZYSZBH,ZMENGE1,ZMENGE2,ZMEINS1,ZMEINS2,ZMATNR,ZKUNNR,ZKUNNRTXT,ZDATELOW1,ZDATEHIGH1,ZDATELOW2,ZDATEHIGH2,ZCARS,ZYUP,UEBTO,UEBTK,UNTTO,ZCHARG,ZDEL,COMCODE,CONTAINTYPE,CONTAINQUAN,ZWEIGHT,CLOSEDATE,FORMMODEID,MODEDATACREATER,REMARK1,REMARK2,REMARK3) values");
+									"(REQUESTID,SHIPADVSTATUS,SHIPADVICENO,ETD,ETA,EREQUESTID,DELIVERYNO,DELIVERYITEM,SALEORDER,ORDERITEM,STOCKNO,STOCKDESC,LOCATION,SHIPNUM,SALEUNIT,SHIPTO,SHIPTOADDR,REALSHIPNUM,COSTCENTER,REMARK,PROCATEGORY,LCEN,SHIPM,SPECNEED,MATERDES,CUSORDNO,ORDERADVICENO,SOLDTO,SOLDTOADDR,AUART,BSTNK,KUNAG,KUNNR,TEL_NUMBER,LGOBE,MAKTX,LFIMG,MSEHT,BRGEW,WERKS,KDMAT,VKAUS,WADAT,SPECS,CHARG,PACK,AESKD,VSTEL,LPRIO,SDABW,NTGEW,SGTXT,TKNUM,EXTI1,SIGNI,TNDR_TRKID,ADD01,ADD02,ADD03,TEXT1,NAME1,BSTKD,KOSTK,FERTH,SPART,ORMNG,ZGMZBH,ZADDFLAG,ZYSZBH,ZMENGE1,ZMENGE2,ZMEINS1,ZMEINS2,ZMATNR,ZKUNNR,ZKUNNRTXT,ZDATELOW1,ZDATEHIGH1,ZDATELOW2,ZDATEHIGH2,ZCARS,ZYUP,UEBTO,UEBTK,UNTTO,ZCHARG,ZDEL,COMCODE,CONTAINTYPE,CONTAINQUAN,ZWEIGHT,CLOSEDATE,FORMMODEID,MODEDATACREATER,REMARK1,REMARK2,REMARK3" +
+											",modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values");
 							buffer.append("('").append(requestid).append("',");
 							buffer.append("'").append(SHIPADVSTATUS).append("',");
 							buffer.append("'").append(SHIPADVICENO).append("',");
@@ -625,14 +631,37 @@ public class Z_CCP_DELIVERY_DG_SHIPPING extends BaseBean implements Action {
 							buffer.append("'").append(CONTAINQUAN).append("',");
 							buffer.append("'").append(ZWEIGHT).append("',");
 							buffer.append("'").append(CLOSEDATE).append("',");
-							buffer.append("'").append("421").append("',");
-							buffer.append("'").append("1").append("',");
+							buffer.append("'").append(421).append("',");
+							buffer.append("'").append(userid).append("',");
 							buffer.append("'").append(REMARK1).append("',");
 							buffer.append("'").append(REMARK2).append("',");
-							buffer.append("'").append(REMARK3).append("')");
+							buffer.append("'").append(REMARK3).append("',");
+
+							buffer.append("'").append("0").append("',");
+							Date d1=new Date();
+							SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+							SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
+							buffer.append("'").append(dateFormat.format(d1)).append("',");
+							buffer.append("'").append(dateFormat1.format(d1)).append("',");
+							String str1 = UUID.randomUUID().toString();
+							buffer.append("'").append(str1).append("')");
+
 							log.writeLog("插入建模表的sql:" + buffer.toString());
 							rs2.executeSql(buffer.toString());
 
+							String sql="select id from UF_SPGHSR where modeuuid='"+str1+"'";
+							log.writeLog(sql);
+							rs2.execute(sql);
+							String id="";
+							if(rs2.next()){
+								id=Util.null2String(rs2.getString("id"));
+							}
+							ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
+							localModeRightInfo1.setNewRight(true);
+							localModeRightInfo1.editModeDataShare(userid, 421, Integer.parseInt(id));
+
+
+/*
 							StringBuffer sb = new StringBuffer();// 插入权限表
 							sb.append("insert into MODEDATASHARE_421");
 							sb.append("(SOURCEID,TYPE,CONTENT,SECLEVEL,SHARELEVEL) values");
@@ -644,6 +673,7 @@ public class Z_CCP_DELIVERY_DG_SHIPPING extends BaseBean implements Action {
 							sb.append("'").append("3").append("')");
 							log.writeLog("插入权限执行的sql:" + sb.toString());
 							rs1.executeSql(sb.toString());// 先插入主表
+							*/
 						}
 						if ("1".equals(lx)) {
 							StringBuffer buffer = new StringBuffer();

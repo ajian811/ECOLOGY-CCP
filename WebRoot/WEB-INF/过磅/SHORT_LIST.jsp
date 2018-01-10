@@ -23,9 +23,11 @@
 <%@page import="net.sf.json.JSONObject"%>
 <%@page import="java.io.PrintWriter"%>
 <%@page import="net.sf.json.JSONArray"%>
+<%@ include file="/systeminfo/init_wev8.jsp" %><!--引入系统页面，用于判断是否登录，以及获取user对象-->
 
 <%@page
         import="com.weaver.integration.datesource.SAPInterationDateSourceImpl"%>
+<%@ page import="weaver.formmode.setup.ModeRightInfo" %>
 
 <%
     /**
@@ -33,10 +35,13 @@
      * @author jisuqiang
      * @date 2017-12-08
      */
+    int userid=user.getUID();
+
+
     String config_wf = "CCP_ZGD";// 暂估单
     BaseBean log = new BaseBean();
     log.writeLog("调用SHORT_LIST.jsp开始");
-
+    log.writeLog("获得uid："+userid);
     try {
         String zxjhh = request.getParameter("zxjhh");//装卸计划号
         String lx = request.getParameter("lx");//类型 0 so 1 po
@@ -291,7 +296,8 @@
         if (list.size() > 0 && mainMap.size() > 0) {
             StringBuffer buffer = new StringBuffer();
             buffer.append(
-                    "Insert into UF_ZGFY (REQUESTID,feename,djtitle,djstatus,zxplanno,comcode,comname,hbkpyz,pztype,currency,carno,dw,notaxamt,amount,zgfylx,credate,cysname,cyscode,creditpsn,creditdate,remark,djbh,djlx,fylx,cx,sz,FORMMODEID,hl) values (");
+                    "Insert into UF_ZGFY (REQUESTID,feename,djtitle,djstatus,zxplanno,comcode,comname,hbkpyz,pztype,currency,carno,dw,notaxamt,amount,zgfylx,credate,cysname,cyscode,creditpsn,creditdate,remark,djbh,djlx,fylx,cx,sz,FORMMODEID,hl," +
+                            "MODEDATACREATER,modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values (");
             buffer.append("'").append(mainMap.get("requestid")).append("',");//费用名称
             buffer.append("'").append(mainMap.get("feename")).append("',");//费用名称
             buffer.append("'").append(mainMap.get("djtitle")).append("',");//单据抬头
@@ -319,12 +325,25 @@
             buffer.append("'").append(mainMap.get("cx")).append("',");//车型
             buffer.append("'").append(mainMap.get("sz")).append("',");//税则
             buffer.append("'").append("721").append("',");
-            buffer.append("'").append(mainMap.get("hl")).append("')");//汇率、
+            buffer.append("'").append(mainMap.get("hl")).append("',");//汇率、
+
+            buffer.append("'").append(userid).append("',");
+
+            buffer.append("'").append("0").append("',");
+            Date d1=new Date();
+            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
+            buffer.append("'").append(dateFormat.format(d1)).append("',");
+            buffer.append("'").append(dateFormat1.format(d1)).append("',");
+            String str1 = UUID.randomUUID().toString();
+            buffer.append("'").append(str1).append("')");
+
             log.writeLog("插入建模主表的sql:" + buffer.toString());
 
             if (inrs.executeSql(buffer.toString())) {
-                String sql = "select id from UF_ZGFY where djbh = '" + mainMap.get("djbh") + "'";
 
+                String sql = "select id from UF_ZGFY where djbh = '" + mainMap.get("djbh") + "'";
+                /*
                 StringBuffer sb = new StringBuffer();// 插入权限表
                 sb.append("insert into MODEDATASHARE_721");
                 sb.append("(SOURCEID,TYPE,CONTENT,SECLEVEL,SHARELEVEL) values");
@@ -336,6 +355,18 @@
                 sb.append("'").append("3").append("')");
                 log.writeLog("插入权限执行的sql:" + sb.toString());
                 rs1.executeSql(sb.toString());
+                */
+                String sqlx="select id from UF_ZGFY where modeuuid='"+str1+"'";
+                log.writeLog(sqlx);
+                rs1.execute(sqlx);
+                String id0="";
+                if(rs1.next()){
+                    id0=Util.null2String(rs1.getString("id"));
+                }
+                ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
+                localModeRightInfo1.setNewRight(true);
+                localModeRightInfo1.editModeDataShare(userid, 721, Integer.parseInt(id0));
+
 
                 if (rs.execute(sql)) {
                     if (rs.next()) {

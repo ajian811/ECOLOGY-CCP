@@ -339,7 +339,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 		if (mainMap.size() > 0) {
 			StringBuffer buffer = new StringBuffer();
 			buffer.append(
-					"Insert into UF_ZGFY (REQUESTID,lgbh,feename,djtitle,djstatus,zxplanno,comcode,comname,hbkpyz,pztype,currency,carno,dw,notaxamt,amount,zgfylx,credate,cysname,cyscode,creditpsn,creditdate,remark,djbh,djlx,fylx,cx,sz,FORMMODEID,hl" +
+					"Insert into UF_ZGFY (REQUESTID,lgbh,feename,djtitle,djstatus,zxplanno,comcode,comname,hbkpyz,pztype,currency,carno,dw,notaxamt,amount,zgfylx,credate,cysname,cyscode,creditpsn,creditdate,remark,djbh,djlx,fylx,cx,sz,FORMMODEID,hl," +
 							"MODEDATACREATER,modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values (");
 			buffer.append("'").append(mainMap.get("requestid")).append("',");// 流程Id
 			buffer.append("'").append(mainMap.get("lcbh")).append("',");// 理柜编号
@@ -387,7 +387,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 				String sql = "select id from UF_ZGFY where djbh = '" + mainMap.get("djbh") + "'";
 
 
-				String sqlx="select id from UF_TRDPLDY where modeuuid='"+str1+"'";
+				String sqlx="select id from UF_ZGFY where modeuuid='"+str1+"'";
 				log.writeLog(sqlx);
 				rs1.execute(sqlx);
 				String id="";
@@ -396,7 +396,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 				}
 				ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
 				localModeRightInfo1.setNewRight(true);
-				localModeRightInfo1.editModeDataShare(userid, 381, Integer.parseInt(id));
+				localModeRightInfo1.editModeDataShare(userid, 721, Integer.parseInt(id));
 
 				/*
 				StringBuffer sb = new StringBuffer();// 插入权限表
