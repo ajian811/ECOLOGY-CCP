@@ -36,7 +36,12 @@
 				}
 			}
 		}else{
-			sql.append(" and a.gh='"+strs[0]+"'");
+		    if("GLDU 9779232".equals(strs[0])){
+				sql.append(" and a.gh='"+strs[0]+" '");
+
+			}else {
+				sql.append(" and a.gh='" + strs[0] + "'");
+			}
 		}
 		sql.append(") c,uf_spghsr d where c.xc=d.DELIVERYITEM and c.JYDH=d.DELIVERYNO");
 

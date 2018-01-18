@@ -59,7 +59,8 @@
         String xc="";
         String lcid="";
         String tmdw="";
-        sql.append("SELECT DISTINCT b.jydh,b.ddxc,a.lcid from UF_TRDPLDY a,UF_TRDPLDY_DT1 b where a.id=b.MAINID and a.TRDH='")
+        String sl="";
+        sql.append("SELECT DISTINCT b.jydh,b.ddxc,a.lcid,b.sl from UF_TRDPLDY a,UF_TRDPLDY_DT1 b where a.id=b.MAINID and a.TRDH='")
                 .append(trdh+"'");
 //out.print(sql);
         rs.executeSql(sql.toString());
@@ -74,10 +75,12 @@
             dh=Util.null2String(rs.getString("jydh"));
             xc=Util.null2String(rs.getString("ddxc"));
             lcid=Util.null2String(rs.getString("lcid"));
+            sl=Util.null2String(rs.getString("sl"));
 
             jsonObject.put("dh",dh);
             jsonObject.put("xc",xc);
             jsonObject.put("lcid",lcid);
+            jsonObject.put("sl",sl);
             jsonArray.add(jsonObject);
         }
         String LSMNG="";
@@ -107,6 +110,8 @@
             JSONObject jsonObject=jsonArray.getJSONObject(i);
             dh=jsonObject.getString("dh");
             xc=jsonObject.getString("xc");
+            sl=jsonObject.getString("sl");
+
 
             StringBuffer sql2 = new StringBuffer();
             sql2.append("select * from uf_jmclxq where PONO='" + dh + "' AND" + " POITEM='" + xc + "'");
@@ -135,7 +140,7 @@
                 map.put("LSMEH", LSMEH);//计量单位
                 map.put("cp", cp);//车牌
 
-                map.put("ychl",Util.null2String(rs.getString("ychl")));//已出货量
+                map.put("ychl",Util.null2String(sl));//已出货量
 
 
                 if (!bs.equals("X")) {

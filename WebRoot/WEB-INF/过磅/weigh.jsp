@@ -921,6 +921,8 @@
     //磅值清零
     function reset() {
         $("#endweight").html("0");
+        $("#carno1").html("");
+
         //$("#plate").val("");
     }
     //有柜无柜控制填写
@@ -1215,6 +1217,13 @@
 
     jQuery(document).ready(function() {/*对字段进行监听*/
         OpenPort();
+        // jQuery("#plate").change(function () {
+        //     jQuery("#carno1").val("");
+        //
+        // })
+        jQuery('#plate').bind('input propertychange', function() {
+            jQuery("#carno1").val("");
+        });
     })
 
 	function weighprint() {
@@ -1226,6 +1235,9 @@
 		var records=store1.data;
 		var zxjhh=records.get(1).get("planNo");
 		var trdh=records.get(1).get("trdh");
+		if (trdh.length==0){
+		    trdh=records.get(0).get("trdh");
+		}
 		url="/ReportServer?reportlet=ecoapp/dmlo/so/WeightingSheet.cpt&loadno="+zxjhh+"&ladno="+trdh;
 			//aodno装卸计划号+ladno提入单号""
 
