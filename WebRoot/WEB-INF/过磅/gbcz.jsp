@@ -14,7 +14,6 @@
 <%@ page import="weaver.general.BaseBean" %>
 
 
-
 <%
 	BaseBean bs=new BaseBean();
 	String action = request.getParameter("action");
@@ -31,10 +30,10 @@
 			rs.writeLog("取得的数据为 提入单号为:" + trdh + ",车牌号为：" + carno+",计重类型为:"+weighType);
 			String sql="";
 			if(weighType.equals("weighkg")){
-				sql="SELECT * FROM UF_GBJL WHERE CP='"+carno+"' AND TRDH is NULL  ORDER BY GBRQ DESC,GBSJ DESC";
+				sql="SELECT * FROM UF_GBJL WHERE CP='"+carno+"' AND ZXJHH is NULL and sfzf='0' ORDER BY id DESC";
 			}else{
 				String zxjhh=getZxjhhByTrdh(trdh);
-				sql="select * from uf_gbjl where zxjhh='"+zxjhh+"'";
+				sql="select * from uf_gbjl where zxjhh='"+zxjhh+"' and sfzf='0' order by id desc";
 			}
 			rs.writeLog(sql);
 			rs.executeSql(sql);
@@ -101,7 +100,9 @@
 			String carno = Util.null2String(request.getParameter("carno"));//车牌
 			String weighType=Util.null2String(request.getParameter("weighType"));//计重类型
 			String ggh=Util.null2String(request.getParameter("ggh"));//柜罐号
-			rs.writeLog("取得的数据为 提入单号为:" + trdh + ",车牌号为：" + carno + ",计重重量为：" + jzzl+",计重类型为："+weighType);
+			String unloadingHead=Util.null2String(request.getParameter("unloadingHead"));//卸车头
+			rs.writeLog("取得的数据为 提入单号为:" + trdh + ",车牌号为：" + carno + ",计重重量为：" + jzzl+",计重类型为："+weighType
+			+",卸车头："+unloadingHead);
 
 			JSONObject jsonObject = new JSONObject();
 			String message = "";
@@ -170,20 +171,38 @@
 						rs.writeLog("查询到提入单的装卸计划号：" + zxjhh);
 						String cp = Util.null2String(rs.getString("cp"));
 
-						String sql0 = "select id from UF_GBJL where zxjhh='" + zxjhh + "'";
+						String sql0 = "select id from UF_GBJL where zxjhh='" + zxjhh + "' and sfzf='0'";
 						rs.writeLog(sql0);
 						rs.execute(sql0);
 
 						int count = rs.getCounts();
+						Boolean check=false;
 
-						if (count == 0) {
-							rs.writeLog("装卸计划尚未计重");
+						if("unloadingHead".equals(unloadingHead)){
+							check=true;
+						}
+						if ((count == 0||(count==2))) {
+						    if (count==2){
+						         Boolean check0=checkUnloadingHead(zxjhh);
+						         if(!check0){
+						             message="该车辆非卸车头！";
+									 jsonObject = addJsonJZ(message);
+									 out.write(jsonObject.toString());
+									 return;
+								 }
+
+							}else {
+
+								rs.writeLog("装卸计划尚未计重");
+
+							}
+							Boolean check1=checkUnloadingHeadJZ(check,count);
 							if (cp == null || cp.equals("") || !cp.equals(carno)) {
 								String sql2 = "UPDATE "+formname+" set cp='" + carno + "' where REQUESTID="
 										+ reqid;
 								rs.writeLog(sql2);
 								rs.executeSql(sql2);
-								message += "车牌已更新<br/>";
+								message += "车牌已更新\\n";
 
 							}
 							Date date = new Date();
@@ -192,13 +211,21 @@
 							String gbrq = currentDate.substring(0, 10);
 							String gbsj = currentDate.substring(11, 16);
 							String sql3 = "insert into UF_GBJL (ZXJHH,CP,SHIPPING,GBRQ,GBSJ,RZ,CZ," +
-									"FORMMODEID,MODEDATACREATER,modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values (";
+									"FORMMODEID,MODEDATACREATER,modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid";
+							if(check){
+							    sql3+=",unloadingHead";
+							}
+							sql3+=") values (";
 							sql3 += "'" + zxjhh + "',";
 							sql3 += "'" + carno + "',";
 							sql3 += "'" + shipping + "',";
 							sql3 += "'" + gbrq + "',";
 							sql3 += "'" + gbsj + "',";
-							sql3 += "'" + jzzl + "',";
+							if (check1){
+							    sql3+="null,";
+							}else {
+								sql3 += "'" + jzzl + "',";
+							}
 							sql3 += "'" + jzzl + "',";
 
 							sql3+="'841',";
@@ -210,10 +237,15 @@
 							sql3+="'"+dateFormat.format(d1)+"',";
 							sql3+="'"+dateFormat1.format(d1)+"',";
 							String str1 = UUID.randomUUID().toString();
-							sql3+="'"+str1+"')";
+							sql3+="'"+str1+"'";
+							if(check){
+								sql3+=",'1')";
+							}else {
+							    sql3+=")";
+							}
 
 							rs.writeLog(sql3);
-							rs.executeSql(sql3);
+							rs.execute(sql3);
 
 							sql="select id from UF_GBJL where modeuuid='"+str1+"'";
 							rs.writeLog(sql);
@@ -232,6 +264,7 @@
 							out.write(jsonObject.toString());
 							return;
 						} else {
+
 
 							message += "该提入单所属装卸计划已经计重过，无需重复计重！";
 							jsonObject = addJsonJZ(message);
@@ -269,46 +302,43 @@
 			//空柜情况
 			if(weighType.equals("weighkg")){
 
-				String sql1="SELECT GBRQ,GBSJ,RZ FROM UF_GBJL WHERE CP='"+carno+"' ORDER BY GBRQ DESC,GBSJ DESC";
+				String sql1="SELECT id,RZ FROM UF_GBJL WHERE CP='"+carno+"' AND ZXJHH IS NULL and sfzf='0' ORDER BY id DESC";
 				rs.writeLog(sql1);
 				rs.execute(sql1);
-				String lastgbrq="";
-				String lastgbsj="";
+				String id="";
 				String rz="";
-				while(rs.next()){
+				if (rs.next()){
 
-					lastgbrq=Util.null2String(rs.getString("GBRQ"));
-					lastgbsj=Util.null2String(rs.getString("GBSJ"));
+					id=Util.null2String(rs.getString("id"));
+
 					rz=Util.null2String(rs.getString("RZ"));
-					break;
 				}
 
 				String jz=Double.toString(calculateJZ(rz, jzzl));
-				if(!lastgbrq.equals("")&&!lastgbsj.equals("")){
-					String sql2="UPDATE UF_GBJL SET CZ='"+jzzl+"',JZ='"+jz+"' WHERE GBRQ='"+lastgbrq+"' AND GBSJ='"+lastgbsj+"'";
-					sql2+=" AND CP='"+carno+"'";
+				if(!"".equals(id)){
+					String sql2="UPDATE UF_GBJL SET CZ='"+jzzl+"',JZ='"+jz+"' WHERE id="+id;
 					rs.writeLog(sql2);
 					rs.execute(sql2);
 					message+="空柜过磅更新成功";
 
-					Date date = new Date();
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-					String currentDate = sdf.format(date);
-					String gbrq = currentDate.substring(0, 10);
-					String gbsj = currentDate.substring(11, 16);
-					String sql = "INSERT INTO UF_GBJL (CP,GBRQ,GBSJ,CZ,GH," +
-							") VALUES (";
-
-					sql += "'" + carno + "',";
-					sql += "'" + gbrq + "',";
-					sql += "'" + gbsj + "',";
-					sql += "'" + jzzl + "',";
-					sql += "'" + ggh+ "')";
-					rs.writeLog(sql);
-					rs.executeSql(sql);
-					message += "空柜计重插入成功";
+//					Date date = new Date();
+//					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+//					String currentDate = sdf.format(date);
+//					String gbrq = currentDate.substring(0, 10);
+//					String gbsj = currentDate.substring(11, 16);
+//					String sql = "INSERT INTO UF_GBJL (CP,GBRQ,GBSJ,CZ,GH," +
+//							") VALUES (";
+//
+//					sql += "'" + carno + "',";
+//					sql += "'" + gbrq + "',";
+//					sql += "'" + gbsj + "',";
+//					sql += "'" + jzzl + "',";
+//					sql += "'" + ggh+ "')";
+//					rs.writeLog(sql);
+//					rs.executeSql(sql);
+//					message += "空柜计重插入成功";
 				}else{
-					message+="查询时间和日期为空!";
+					message+="查询id为空!";
 				}
 				jsonObject = addJsonJZ(message);
 				out.write(jsonObject.toString());
@@ -340,8 +370,8 @@
 			rs.writeLog(sql0);
 			rs.execute(sql0);
 			totalBillCounts=rs.getCounts();
-			rs.writeLog("totalBillCounts:"+totalBillCounts);
-			String sql = "select id from uf_gbjl where zxjhh='" + zxjhh + "'";
+			rs.writeLog("该装卸计划的提入单数量:"+totalBillCounts);
+			String sql = "select id from uf_gbjl where zxjhh='" + zxjhh + "' and sfzf='0'";
 			rs.writeLog(sql);
 			rs.executeSql(sql);
 			int count = rs.getCounts();
@@ -352,25 +382,71 @@
 				out.write(jsonObject.toString());
 				return;
 			}
-			String sql2 = "select id from uf_gbjl where trdh='" + trdh + "'";
+			String sql2 = "select id from uf_gbjl where trdh='" + trdh + "' and sfzf='0'";
 			rs.writeLog("执行sql2：" + sql2);
 			rs.executeSql(sql2);
-			if (rs.getCounts() > 0) {
+			int counts=rs.getCounts();
+
+			//当之前的数量为
+			Boolean check=false;//判断是否为卸车头
+			Boolean check1=false;//判断，如果是卸车头，是否需要录入入重和提入单号
+			String lastCz="";
+			check=checkUnloadingHead(zxjhh);
+			check1=checkUnloadingHead1(counts,check);
+			Boolean check2=false;//当 为卸车头，并且过磅记录数量小于等于3
+			if(check&&(count<3)){
+			    check2=true;
+			}
+
+			if (counts > 0) {
 				rs.writeLog("提入单已过磅");
 				message = "该提入单已经过磅过了！不能重复过磅";
 				jsonObject = addJsonJZ(message);
 				out.write(jsonObject.toString());
 				return;
 			}
-			String lastCz="";
-			String sql3="select cz from uf_gbjl where zxjhh='"+zxjhh+"' ORDER BY gbrq desc,gbsj desc";
-			rs.writeLog(sql3);
-			rs.execute(sql3);
-			while(rs.next()){
-				lastCz=Util.null2String(rs.getString("cz"));
-				break;
+			if (check&&(count==2)){
+				rs.writeLog("卸车头，重新入厂请先计重！");
+				message = "卸车头，重新入厂请先计重！";
+				jsonObject = addJsonJZ(message);
+				out.write(jsonObject.toString());
+				return;
+
+
 			}
-			rs.writeLog("获得的上一次的出重值为："+lastCz);
+
+			if (counts==0) {
+
+				if (check && (count == 3)) {
+					Double lastCz0 = 0.00;
+					String sql4 = "select cz from uf_gbjl where zxjhh='" + zxjhh + "' and sfzf='0' ORDER BY id desc";
+					rs.writeLog(sql4);
+					rs.execute(sql4);
+					int i = 0;
+					Double cz0 = 0.00;
+					while (rs.next()) {
+						cz0 = rs.getDouble("cz");
+						if (i == 0 || i == 2) {
+							lastCz0 = calculateAdd(lastCz0, cz0);
+						}
+						if (i == 1) {
+							lastCz0 = calculateSub(lastCz0, cz0);
+						}
+						i++;
+					}
+					lastCz = lastCz0.toString();
+
+				} else {
+
+					String sql3 = "select cz from uf_gbjl where zxjhh='" + zxjhh + "' and sfzf='0' ORDER BY id desc";
+					rs.writeLog(sql3);
+					rs.execute(sql3);
+					if (rs.next()) {
+						lastCz = Util.null2String(rs.getString("cz"));
+					}
+					rs.writeLog("获得的上一次的出重值为：" + lastCz);
+				}
+			}
 			String jz=Double.toString(calculateJZ(lastCz, jzzl));
 
 			rs.writeLog("计算出的净重为："+jz);
@@ -386,11 +462,22 @@
 			sql4 += "'" + shipping + "',";
 			sql4 += "'" + gbrq + "',";
 			sql4 += "'" + gbsj + "',";
-			sql4 += "'" + null2Double(lastCz) + "',";
+			if (check2){
+			    sql4+="null,";
+			}else {
+				sql4 += "'" + null2Double(lastCz) + "',";
+			}
 			sql4 += "'" + null2Double(jzzl) + "',";
-			sql4 += "'" + jz + "',";
-			sql4 += "'" + trdh + "',";
-
+			if (check2){
+			    sql4+="null,";
+			}else {
+				sql4 += "'" + jz + "',";
+			}
+			if (check2){
+			    sql4+="null,";
+			}else {
+				sql4 += "'" + trdh + "',";
+			}
 			sql4+="'841',";
 			sql4+="'1',";
 			sql4+="'0',";
@@ -417,11 +504,17 @@
 			localModeRightInfo1.setNewRight(true);
 			localModeRightInfo1.editModeDataShare(1, 841, Integer.parseInt(id));
 
+			//如果是卸车头，并且不是第四次的话，则不进行已过磅的提入单数量判断
+			if (check&&(count==1)){
+			    rs.writeLog("check:"+check+",count:"+count);
+			    return;
+			}
 			//最后查询目前的已过磅的提入单数量是否等于总数
-			sql0="SELECT ID FROM UF_GBJL WHERE ZXJHH='"+ zxjhh + "'";
+			sql0="SELECT ID FROM UF_GBJL WHERE ZXJHH='"+ zxjhh + "' and sfzf='0' and trdh is not null";
+			rs.writeLog("最后查询"+zxjhh+"提入单总数量:"+totalBillCounts);
 			rs.writeLog("最后查询目前的已过磅的提入单数量sql："+sql0);
 			rs.execute(sql0);
-			nowBillCounts=rs.getCounts()-1;
+			nowBillCounts=rs.getCounts();
 			rs.writeLog("nowBillCounts:"+nowBillCounts);
 			//如果已过磅的提入单数量是否等于总数,则需要更新装卸计划表重
 			String rz="";
@@ -429,7 +522,7 @@
 			String gbrq0="";
 			String gbsj0="";
 			if(totalBillCounts==nowBillCounts){
-				sql0="SELECT MIN(CZ) RZ,MAX(CZ) CZ FROM UF_GBJL WHERE ZXJHH='"+zxjhh+"'";
+				sql0="SELECT MIN(RZ) RZ,MAX(CZ) CZ FROM UF_GBJL WHERE ZXJHH='"+zxjhh+"' and sfzf='0'";
 				rs.writeLog("查询装卸计划在过磅记录中的最大值与最小值sql："+sql0);
 				rs.execute(sql0);
 				while(rs.next()){
@@ -437,7 +530,7 @@
 					cz=rs.getString("CZ");
 				}
 				rs.writeLog("获得rz："+rz+",cz:"+cz);
-				sql0="SELECT GBRQ,GBSJ FROM UF_GBJL WHERE ZXJHH='"+zxjhh+"' ORDER BY GBRQ DESC,GBSJ DESC";
+				sql0="SELECT GBRQ,GBSJ FROM UF_GBJL WHERE ZXJHH='"+zxjhh+"' and sfzf='0' ORDER BY GBRQ DESC,GBSJ DESC";
 				rs.writeLog("查询装卸计划在过磅记录中的最大日期时间："+sql0);
 				rs.execute(sql0);
 				while(rs.next()){
@@ -582,6 +675,47 @@
 			return;
 
 		}
+		//虚拟删除
+		if("deleteweigh".equals(action)){
+		    rs.writeLog("进入deleteweigh");
+		    String message="";
+		    //如果已经称过入重 但是尚未过磅，则可以删除入重记录，否则提示不能删除
+			String plate=request.getParameter("plate");
+			String reason=request.getParameter("reason");
+
+			rs.writeLog("获得提入单号："+plate+",获得删除原因："+reason);
+			String sql="";
+			String zxjhh="";
+			sql="select DISTINCT zxjhh from UF_TRDPLDY where trdh='"+plate+"'";
+			rs.writeLog(sql);
+			rs.execute(sql);
+			if (rs.next()){
+			    zxjhh=Util.null2String(rs.getString("zxjhh"));
+			}
+
+			sql="SELECT COUNT(*) AS COUNT FROM UF_GBJL WHERE ZXJHH='"+zxjhh+"' and sfzf='0'";
+			rs.writeLog(sql);
+			rs.execute(sql);
+			int count=0;
+			if (rs.next()){
+			    count=rs.getInt("count");
+			}
+			if (count!=1){
+			    message="unable";
+			}else{
+			    sql="update UF_GBJL set sfzf='1',deleteReason='"+reason+"' where zxjhh='"+zxjhh+"'";
+			    rs.writeLog(sql);
+			    rs.execute(sql);
+			    message="success";
+			}
+			JSONObject jsonObject=addJsonJZ(message);
+
+			rs.writeLog(jsonObject.toString());
+			out.write(jsonObject.toString());
+			return;
+
+
+		}
 
 		objectresult.put("result", jsonArr);
 		//PrintWriter pw = response.getWriter();
@@ -641,15 +775,7 @@
 	jsonobj.put("ptStatus", ptStatus);
 	return jsonobj;
 }%>
-<%!public RecordSet getGBZJ(String planNo) {
-	RecordSet rs = new RecordSet();
-	String sql = "select * from uf_gbjl where 1=1";
-	if (planNo != null) {
-		sql += "and zxjhh = " + planNo;
-	}
-	rs.executeSql(sql);
-	return rs;
-}%>
+
 <%!public String getFormNameByLx(String lx){
     String formname="";
 	if("0".equals(lx)){
@@ -736,5 +862,67 @@
     return formname;
 }
 
+
+%>
+<%!public  Boolean checkUnloadingHead(String zxjhh){
+    Boolean result=false;
+    RecordSet recordSet=new RecordSet();
+	String unloadingHead="";
+	String sql="";
+    sql="select unloadingHead from uf_gbjl where zxjhh='"+zxjhh+"' order by id asc";
+    recordSet.writeLog(sql);
+    recordSet.execute(sql);
+    if (recordSet.next()){
+		unloadingHead=Util.null2String(recordSet.getString("unloadingHead"));
+
+	}
+	if ("1".equals(unloadingHead)){
+        result=true;
+	}
+    return result;
+}
+
+%>
+<%!public Boolean checkUnloadingHeadJZ(Boolean check,int count){
+    RecordSet recordSet=new RecordSet();
+    recordSet.writeLog("check:"+check+",count:"+count);
+    Boolean result=false;
+	if (check){
+	    if(count!=3){
+	        result=true;
+		}
+	}
+	return result;
+
+}
+
+%>
+<%!public Double calculateAdd(Double jz0,Double cz0){
+    Double result=0.00;
+	BigDecimal b1=new BigDecimal(jz0);
+	BigDecimal b2=new BigDecimal(cz0);
+	result=b1.add(b2).doubleValue();
+    return result;
+}
+
+%>
+<%!
+	private Boolean checkUnloadingHead1(int counts, Boolean check) {
+	    Boolean result=false;
+	    if (check){
+	        if (counts!=3){
+	            result=true;
+			}
+		}
+	    return  result;
+	}
+
+	public Double calculateSub(Double jz0, Double cz0){
+	Double result=0.00;
+	BigDecimal b1=new BigDecimal(jz0);
+	BigDecimal b2=new BigDecimal(cz0);
+	result=b1.subtract(b2).doubleValue();
+	return result;
+}
 
 %>

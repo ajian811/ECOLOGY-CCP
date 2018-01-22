@@ -10,6 +10,7 @@
 <%@page import="net.sf.json.JSONObject"%>
 <%@page import="java.io.PrintWriter"%>
 <%@page import="net.sf.json.JSONArray"%>
+<%@ page import="weaver.conn.EncodingUtils" %>
 <%
 	String[] strs;
 	String type = request.getParameter("type");
@@ -104,10 +105,12 @@
 		sql.append("SELECT * FROM UF_SPGHSR WHERE 1=1");
 
 		for (int i = 0; i < strs.length; i++) {
-			if (i == 0)
+			if (i == 0) {
 				sql.append(" and SHIPADVICENO='").append(strs[i] + "'");
-			else
+			}
+			else {
 				sql.append(" or SHIPADVICENO='").append(strs[i] + "'");
+			}
 		}
 		rs.executeSql(sql.toString());
 		rs.writeLog("装卸计划无柜执行sql：" + sql.toString());
@@ -213,6 +216,7 @@
 	//有柜---校验封签号
 	if (type.equals("updateFqh")) {
 		try {
+		    request.setCharacterEncoding("UTF-8");
 			String mxdata = request.getParameter("dtdata");
 			String shipno = request.getParameter("shipno");
 			rs.writeLog("进入updateFqh");
@@ -228,7 +232,12 @@
 			rs.writeLog("获得shipno:" + shipno);
 			for (int i = 0; i < jsonArray.size(); i++) {
 				JSONObject jsObject = jsonArray.getJSONObject(i);
-				String gh = jsObject.getString("gh");
+				String gh1 = jsObject.getString("gh");
+//				String gh2=new String(gh1.getBytes("ISO-8859-1"),"GB2312");
+				byte bytes[] = {(byte) 0xC2,(byte) 0xA0};
+				String UTFSpace = new String(bytes,"utf-8");
+				String gh= gh1.replaceAll(UTFSpace, " ");
+				rs.writeLog("gh:"+gh);
 				String fqh = jsObject.getString("fqh");
 				sql = "SELECT a.SHIPPING,b.code,b.fqh,b.id FROM UF_GHLR a,UF_GHLR_DT1 b where a.id=b.MAINID and a.SHIPPING='"
 						+ shipno + "' and b.code='" + gh + "'";

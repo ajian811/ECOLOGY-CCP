@@ -56,6 +56,7 @@
 <script type="text/javascript">
     Ext.LoadMask.prototype.msg = ''; //加载中,请稍后...
     var weighType;
+    var unloadingHead;
     var store1;
     var store2;
     var sm1;
@@ -483,6 +484,10 @@
 							   onclick="checkweigh(this)" /><span style="font-size:18px"><%=SystemEnv.getHtmlLabelName(-11277,user.getLanguage())%></span></td><!--空柜（罐）-->
 				</tr>
 				<tr>
+					<td><input id="unloadingHead" type="checkbox"
+							   onclick="checkUnloadingHead(this)" /><span style="font-size:18px"><%=SystemEnv.getHtmlLabelName(-11348,user.getLanguage())%></span></td><!-卸车头-->
+				</tr>
+				<tr>
 					<td><input class="button blue"
 							   style='background-color:#0095cd;padding:6px 0 25px 0' id="inweigh" type="button"
 							   value="<%=SystemEnv.getHtmlLabelName(-11278,user.getLanguage())%>" onclick="inweigh();" /></td><!--计重-->
@@ -666,7 +671,8 @@
                 carno : carno,
                 weight : weight,
                 ggh : ggh,
-                weighType : weighType
+                weighType : weighType,
+				unloadingHead:unloadingHead
                 //配置传到后台的参数
             },
             success : function(response) { //success中用response接受后台的数据
@@ -939,11 +945,28 @@
             $("#plate").val("");
             $("#plate").attr("disabled", true);
             $("#ggh").attr("disabled", false);
+            $("#unloadingHead").attr("disabled", true);
         } else {
             $("#ggh").val("");
             $("#plate").attr("disabled", false);
             $("#ggh").attr("disabled", true);
+            $("#unloadingHead").attr("disabled", false);
         }
+    }
+    //卸车头
+	function  checkUnloadingHead(obj) {
+        if (unloadingHead == obj.id) {
+            obj.checked = false;
+            unloadingHead = "";
+            $("#weighkg").attr("disabled", false);
+        } else {
+            obj.checked = true;
+            unloadingHead = obj.id;
+            $("#weighkg").attr("disabled",true);
+
+        }
+		console.log(unloadingHead);
+		
     }
     //取磅值
     function getWeight() {
@@ -979,23 +1002,27 @@
                     win.hide();
                     try {
                         Ext.Ajax.request({
-                            url : '/ServiceAction/com.eweaver.app.weight.servlet.Uf_lo_pandAction',
+                            url : '/weightJsp/gbcz.jsp',
                             params : {
                                 action : "deleteweigh",
                                 plate : $("#plate").val(),
                                 reason : $("#reason").val()
                             },
                             success : function(response) { //success中用response接受后台的数据
-                                //var we = response.responseText;
-                                if ("unable" == response.responseText) {
+                                var responseText = response.responseText;
+								var jsonmessage=JSON.parse(responseText);
+								console.log(jsonmessage);
+								var message=jsonmessage.message;
+
+                                if ("unable" == message) {
                                     alert("<%=SystemEnv.getHtmlLabelName(-11304,user.getLanguage())%>");//删除失败，已过磅或提单不存在！
                                 } else {
-                                    onSearch2();
-                                    var sql1 = 'update uf_lo_ladingmain set ifstatus = \'40288098276fc2120127704884290211\'  where ladingno =\'' + pla + '\'';
-                                    //alert(sql1);
-                                    DataService.executeSql(sql1, {
-                                        callback : function(data) {}
-                                    });
+                                    onSearch1();
+                                    // var sql1 = 'update uf_lo_ladingmain set ifstatus = \'40288098276fc2120127704884290211\'  where ladingno =\'' + pla + '\'';
+                                    // //alert(sql1);
+                                    // DataService.executeSql(sql1, {
+                                    //     callback : function(data) {}
+                                    // });
                                 }
                             },
                             failure : function() {
@@ -1217,10 +1244,16 @@
 
     jQuery(document).ready(function() {/*对字段进行监听*/
         OpenPort();
-        jQuery("#plate").change(function () {
+        jQuery('#plate').bind('input propertychange', function() {
             jQuery("#carno1").val("");
+        });
 
-        })
+        // jQuery('#ggh').bind('input propertychange', function() {
+        //     var s = jQuery("#ggh").val();
+        //     var a = s.replace(/[！|!|@|$|%|^|&|"|\\|/|?|>|<| | ｜　]/g, "");
+        //     jQuery("#ggh").val(a);
+        // });
+
     })
 
     function weighprint() {
