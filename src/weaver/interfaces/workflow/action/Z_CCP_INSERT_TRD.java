@@ -100,15 +100,9 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 				sfzf = Util.null2String(rs.getString("sfzf"));// 是否作废
 			}
 				log.writeLog("是否有柜:" + sfyg);
-				if ("1".equals(sfzf)) {
-					return SUCCESS;
-				}
 
 				String unitdesc="";
 					if ("0".equals(sfyg)) {
-					if("0".equals(currentnodetype)){
-						return SUCCESS;
-					}
 						String sql = "select t2.TRDH from " + tablename + " t1 ";
 						sql += " left join " + tablename + "_dt3 t2 on t1.id = t2.mainid";
 						sql += " where t1.requestid= '" + requestid + "'";
@@ -188,13 +182,14 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 
 								pono = Util.null2String(rs.getString("jydh"));// 交运单号
 								poitem = Util.null2String(rs.getString("xc"));// 订单项次
-								wlh = Util.null2String(rs.getString("wlh"));// 物料号码
-								wlname = Util.null2String(rs.getString("wlname"));// 物料描述
+								wlh = Util.null2String(rs.getString("wlhm"));// 物料号码
+								wlname = Util.null2String(rs.getString("wlms"));// 物料描述
 								sdfmc = Util.null2String(rs.getString("sdfmc"));// 送达方名称
 								unitdesc = Util.null2String(rs.getString("dwms"));// 单位描述
+								ph = Util.null2String(rs.getString("ph"));// 批号
 
 
-								String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,shipping,jydh,ddxc,wlhm,wlms,bzfs,sl) values ";
+								String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,shipping,jydh,ddxc,wlhm,wlms,ph,bzfs,sl) values ";
 								insertSql += "(" + id + ",";
 								insertSql += "'" + cp + "',";
 								insertSql += "'" + shipping + "',";
@@ -202,6 +197,7 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 								insertSql += "'" + poitem + "',";
 								insertSql += "'" + wlh + "',";
 								insertSql += "'" + wlname + "',";
+								insertSql += "'" + ph + "',";
 								insertSql += "'" + unitdesc + "',";
 								insertSql += "'" + sl + "')";
 								log.writeLog("插入建模明细执行的sql :" + insertSql);
@@ -210,9 +206,9 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 							Boolean result=updateKhmc(sdfmc,str1);
 						}
 					} else {
-						String selectSql = " select t2.jydh as d2jydh,t2.ddxc as d2ddxc,t2.sdfmc,t2.wlhm as d2wlhm,t2.wlms as d2wlms,t2.cp as d2cp,t2.trdh as d2trdh,t2.jhyzl as d2jhyzl,t2.gbm as d2gbm,t2.ph as d2ph,t2.dwms as dwms,t1.* from "
+						String selectSql = " select t2.jydh as d2jydh,t2.xc as d2ddxc,t2.sdfmc,t2.wlhm as d2wlhm,t2.wlms as d2wlms,t2.cp as d2cp,t2.trdh as d2trdh,t2.jhyzl as d2jhyzl,t2.gbm as d2gbm,t2.ph as d2ph,t2.dwms as dwms,t2.shipno,t1.* from "
 								+ tablename + " t1";
-						selectSql += " left join " + tablename + "_dt2  t2 on t1.id = t2.mainid";
+						selectSql += " left join " + tablename + "_dt3  t2 on t1.id = t2.mainid";
 						selectSql += " where t1.requestid= " + requestid;
 						log.writeLog("查询流程表单的sql:" + selectSql);
 						rs1.execute(selectSql);
@@ -232,7 +228,7 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 							wlname = Util.null2String(rs1.getString("d2wlms"));// 物料描述
 							ph = Util.null2String(rs1.getString("d2ph"));// 批号
 							bzxz = Util.null2String(rs1.getString("d2bzxz"));// 包装性质
-							shipno = Util.null2String(rs1.getString("ygshipno"));// shipno
+							shipno = Util.null2String(rs1.getString("shipno"));// shipno
 							sdfmc = Util.null2String(rs1.getString("sdfmc"));// 送达方名称
 							unitdesc = Util.null2String(rs1.getString("dwms"));// 单位描述
 
@@ -260,9 +256,6 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 
 
 				if ("1".equals(sfyg)) {
-					if (!"0".equals(currentnodetype)) {
-						return SUCCESS;
-					}
 					StringBuffer buffer = new StringBuffer();
 					buffer.append("insert into UF_TRDPLDY");
 					buffer.append(

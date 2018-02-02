@@ -127,78 +127,78 @@ public class Z_CCP_SO_ZXJH_ZF extends BaseBean implements Action {
 				}
 			}
 			// 无柜情况
-			if (sfyg.equals("0")) {
-				//根据装卸计划查询理货清单是否作废,如果没有作废，则该为作废
-				sql="select sfzf,lcbh from formtable_main_43 where zxjhh='"+zxjhh+"'";
-				rs.writeLog(sql);
-				rs.execute(sql);
-				String lcbh2="";
-				if(rs.next()){
-					sfzf=Util.null2String(rs.getString("sfzf"));
-					lcbh2=Util.null2String(rs.getString("lcbh2"));
-				}
-				if(sfzf.equals("0")){
-					message = "报错：装卸计划号" + zxjhh + "的关联理货申请" + lcbh2 + "尚未作废,请先作废";
-					requestInfo.getRequestManager().setMessagecontent(message);
-					return "0";
-				}
-				
-				//
-				sql="select jhyzl,jydh,xc from FORMTABLE_MAIN_45_DT3 where mainid="+id+"";
-				
-				rs.writeLog(sql);
-				rs.execute(sql);
-				JSONArray jsonArray = new JSONArray();
-				while (rs.next()) {
-					String jydh = Util.null2String(rs.getString("jydh"));
-					String xc = Util.null2String(rs.getString("xc"));
-					String bczxsl = Util.null2String(rs.getString("jhyzl"));
-					if (jsonArray.size() == 0) {
-						JSONObject jsonObject = new JSONObject();
-						jsonObject.put("jydh", jydh);
-						jsonObject.put("xc", xc);
-						jsonObject.put("bczxsl", bczxsl);
-						jsonArray.add(jsonObject);
-					} else {
-						Boolean ifcz=false;
-						for (int i = 0; i < jsonArray.size(); i++) {
-							JSONObject jsonObject = jsonArray.getJSONObject(i);
-							if (jydh.equals(jsonObject.get("jydh")) && xc.equals(jsonObject.get("xc"))) {
-								Double total = calCulate(bczxsl, jsonObject.get("bczxsl").toString(), "add");
-								jsonObject.put("bczxsl", total.toString());
-								ifcz=true;
-							}
-						}
-						if (!ifcz){
-							JSONObject jsonObject = new JSONObject();
-							jsonObject.put("jydh", jydh);
-							jsonObject.put("xc", xc);
-							jsonObject.put("bczxsl", bczxsl);
-							jsonArray.add(jsonObject);
-						}
-					}
-
-				}
-				writeLog("获得单号项次总装卸数量：" + jsonArray.toString());
-				// 获得批号项次数量的json数组更新同步表
-				for (int i = 0; i < jsonArray.size(); i++) {
-					JSONObject jsonObject = jsonArray.getJSONObject(i);
-					String jydh = jsonObject.getString("jydh");
-					String xc = jsonObject.getString("xc");
-					String bczxsl = jsonObject.getString("bczxsl");
-					sql = "select YCHL FROM UF_SPGHSR where DELIVERYNO='" + jydh + "' and DELIVERYITEM='" + xc + "'";
-					rs.writeLog(sql);
-					rs.execute(sql);
-					String ychl = "";
-					if (rs.next()) {
-						ychl = Util.null2String(rs.getString("ychl"));
-					}
-					Double newcyl = calCulate(ychl, bczxsl, "sub");
-					sql = "update UF_SPGHSR set ychl='" + newcyl + "' where DELIVERYNO='" + jydh + "' and DELIVERYITEM='" + xc + "'";
-					rs.writeLog(sql);
-					rs.execute(sql);
-				}
-			}
+			//if (sfyg.equals("0")) {
+			//	//根据装卸计划查询理货清单是否作废,如果没有作废，则该为作废
+			//	sql="select sfzf,lcbh from formtable_main_43 where zxjhh='"+zxjhh+"'";
+			//	rs.writeLog(sql);
+			//	rs.execute(sql);
+			//	String lcbh2="";
+			//	if(rs.next()){
+			//		sfzf=Util.null2String(rs.getString("sfzf"));
+			//		lcbh2=Util.null2String(rs.getString("lcbh2"));
+			//	}
+			//	if(sfzf.equals("0")){
+			//		message = "报错：装卸计划号" + zxjhh + "的关联理货申请" + lcbh2 + "尚未作废,请先作废";
+			//		requestInfo.getRequestManager().setMessagecontent(message);
+			//		return "0";
+			//	}
+			//
+			//	//
+			//	sql="select jhyzl,jydh,xc from FORMTABLE_MAIN_45_DT3 where mainid="+id+"";
+			//
+			//	rs.writeLog(sql);
+			//	rs.execute(sql);
+			//	JSONArray jsonArray = new JSONArray();
+			//	while (rs.next()) {
+			//		String jydh = Util.null2String(rs.getString("jydh"));
+			//		String xc = Util.null2String(rs.getString("xc"));
+			//		String bczxsl = Util.null2String(rs.getString("jhyzl"));
+			//		if (jsonArray.size() == 0) {
+			//			JSONObject jsonObject = new JSONObject();
+			//			jsonObject.put("jydh", jydh);
+			//			jsonObject.put("xc", xc);
+			//			jsonObject.put("bczxsl", bczxsl);
+			//			jsonArray.add(jsonObject);
+			//		} else {
+			//			Boolean ifcz=false;
+			//			for (int i = 0; i < jsonArray.size(); i++) {
+			//				JSONObject jsonObject = jsonArray.getJSONObject(i);
+			//				if (jydh.equals(jsonObject.get("jydh")) && xc.equals(jsonObject.get("xc"))) {
+			//					Double total = calCulate(bczxsl, jsonObject.get("bczxsl").toString(), "add");
+			//					jsonObject.put("bczxsl", total.toString());
+			//					ifcz=true;
+			//				}
+			//			}
+			//			if (!ifcz){
+			//				JSONObject jsonObject = new JSONObject();
+			//				jsonObject.put("jydh", jydh);
+			//				jsonObject.put("xc", xc);
+			//				jsonObject.put("bczxsl", bczxsl);
+			//				jsonArray.add(jsonObject);
+			//			}
+			//		}
+            //
+			//	}
+			//	writeLog("获得单号项次总装卸数量：" + jsonArray.toString());
+			//	// 获得批号项次数量的json数组更新同步表
+			//	for (int i = 0; i < jsonArray.size(); i++) {
+			//		JSONObject jsonObject = jsonArray.getJSONObject(i);
+			//		String jydh = jsonObject.getString("jydh");
+			//		String xc = jsonObject.getString("xc");
+			//		String bczxsl = jsonObject.getString("bczxsl");
+			//		sql = "select YCHL FROM UF_SPGHSR where DELIVERYNO='" + jydh + "' and DELIVERYITEM='" + xc + "'";
+			//		rs.writeLog(sql);
+			//		rs.execute(sql);
+			//		String ychl = "";
+			//		if (rs.next()) {
+			//			ychl = Util.null2String(rs.getString("ychl"));
+			//		}
+			//		Double newcyl = calCulate(ychl, bczxsl, "sub");
+			//		sql = "update UF_SPGHSR set ychl='" + newcyl + "' where DELIVERYNO='" + jydh + "' and DELIVERYITEM='" + xc + "'";
+			//		rs.writeLog(sql);
+			//		rs.execute(sql);
+			//	}
+			//}
 
 		} catch (Exception e){
 			e.printStackTrace();

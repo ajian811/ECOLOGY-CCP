@@ -1,0 +1,80 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+     *  TODO
+     *  请在此处编写javascript代码
+     */
+
+    var zfclickbutton = '<input type="button" onclick="zfclick()" class="middle e8_btn_top_first" value="点击作废" style="width:200px"/>';
+    jQuery(".zfclickbutton").children("td").children("div").append(zfclickbutton);
+    function zfclick(){
+        var requestid=getQueryString("requestid");
+        jQuery.ajax({
+            url: "/sapjsp/SOZxjhJM.jsp",
+            type:"POST",
+            data:{
+                action:"zf",
+                requestid:requestid
+            },
+            success:function (data) {
+                if(data){
+                    alert(data);
+                }
+            }
+
+        });
+
+    }
+
+    jQuery(document).ready(function() {
+        var sfyg = jQuery("#field8087").val();
+        if (sfyg.length > 0) {
+            if (sfyg == 0) {
+                jQuery(".wg").show();
+                jQuery(".yg").hide();
+            } else {
+                jQuery(".yg").show();
+                jQuery(".wg").hide();
+            }
+        }else{
+            jQuery(".yg").hide();
+            jQuery(".wg").hide();
+        }
+
+
+
+    });
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        var r = window.location.search.substr(1).match(reg);
+
+        if (r != null) {
+            console.log("获得requestid："+unescape(r[2]));
+            return unescape(r[2]);
+        }
+        return null;
+    }
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

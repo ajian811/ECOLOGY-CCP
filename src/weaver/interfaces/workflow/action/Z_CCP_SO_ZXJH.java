@@ -39,33 +39,32 @@ public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 					tablename = Util.null2String(rs.getString("tablename"));
 				}
 			}
-			sql = "select id,sfyg,ygshipno,sfzf from " + tablename + " where requestid=" + requestid;
+			sql = "select sfyg,id from " + tablename + " where requestid=" + requestid;
 			rs.writeLog(sql);
 			rs.execute(sql);
 			if (rs.next()) {
-				String sfyg = Util.null2String(rs.getString("sfyg"));
 				RecordSet rs1 = new RecordSet();
 				String id = Util.null2String(rs.getString("id"));
-				String sfzf=Util.null2String(rs.getString("sfzf"));
-				//如果作废则直接返回
-				if(sfzf.equals("1")){
-					return Action.SUCCESS;
-				}
-				
-				// 有柜情况
-				if (sfyg.equals("1")) {
-					if(!"0".equals(currentnodetype)){
-						return SUCCESS;
-					}
-					String shipno = Util.null2String(rs.getString("ygshipno"));
-					sql = "select gbh,fqh from " + tablename + "_dt1 where mainid=" + id;
+				String sfyg = Util.null2String(rs.getString("sfyg"));
+
+                String detailTableName="";
+                if ("0".equals(sfyg)){
+                    detailTableName="UF_GHLR_dt2";
+                }
+                if ("1".equals(sfyg)){
+                    detailTableName="UF_GHLR_dt1";
+                }
+
+				// 根据明细表1中的柜号及shipping、封签号去更新柜号录入明细中的封签号，注意柜号录入表，有柜时更新明细，无柜为明细2
+					sql = "select gbh,fqh,shipping from " + tablename + "_dt1 where mainid=" + id;
 					rs1.writeLog(sql);
 					rs1.execute(sql);
 					while (rs1.next()) {
 						String gh = Util.null2String(rs1.getString("gbh"));
 						String fqh = Util.null2String(rs1.getString("fqh"));
+						String shipno = Util.null2String(rs1.getString("shipping"));
 
-						sql = "SELECT b.id FROM UF_GHLR a,UF_GHLR_DT1 b where a.id=b.MAINID and a.SHIPPING='" + shipno
+						sql = "SELECT b.id FROM UF_GHLR a,"+detailTableName+" b where a.id=b.MAINID and a.SHIPPING='" + shipno
 								+ "' and b.code='" + gh + "'";
 						RecordSet rs2 = new RecordSet();
 						rs2.writeLog(sql);
@@ -74,40 +73,12 @@ public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 						if (rs2.next()) {
 							ghid = Util.null2String(rs2.getString("id"));
 						}
-						sql = "update UF_GHLR_DT1 set fqh='" + fqh + "' where id=" + ghid;
+						sql = "update "+detailTableName+" set fqh='" + fqh + "' where id=" + ghid;
 						rs2.writeLog(sql);
 						rs2.execute(sql);
 					}
-				}
-				// 无柜情况
-				if (sfyg.equals("0")) {
-					if("0".equals(currentnodetype)){
-						return  SUCCESS;
-					}
-					sql = "select jydh,xc,jhyzl from " + tablename + "_dt3 where mainid=" + id;
-					rs.writeLog(sql);
-					rs.execute(sql);
-					while (rs.next()) {
-						RecordSet rs3 = new RecordSet();
-						String sono = Util.null2String(rs.getString("jydh"));
-						String soitem = Util.null2String(rs.getString("xc"));
-						String jhyzl = Util.null2String(rs.getString("jhyzl"));
-						sql = "select ychl from uf_spghsr where DELIVERYNO='" + sono + "' and DELIVERYITEM='"
-								+ soitem + "'";
-						rs3.writeLog(sql);
-						rs3.execute(sql);
-						String ychl = "";
-						if (rs3.next()) {
-							ychl = Util.null2String(rs3.getString("ychl"));
-						}
-						Double insertSL2 = calCulate(jhyzl, ychl, "add");
-						sql = "UPDATE uf_spghsr SET ychl='" + insertSL2 + "' WHERE DELIVERYNO='" + sono
-								+ "' and DELIVERYITEM='" + soitem + "'";
-						rs3.writeLog(sql);
-						rs3.execute(sql);
-					}
 
-				}
+
 			}
 			return Action.SUCCESS;
 		} catch (Exception e) {

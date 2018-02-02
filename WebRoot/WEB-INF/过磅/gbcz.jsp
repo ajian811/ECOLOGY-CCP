@@ -12,6 +12,7 @@
 <%@ page import="java.util.*" %>
 <%@ page import="weaver.formmode.setup.ModeRightInfo" %>
 <%@ page import="weaver.general.BaseBean" %>
+<%@ page import="javax.transaction.Transaction" %>
 
 
 <%
@@ -29,7 +30,7 @@
 			String weighType=request.getParameter("weighType");//计重类型
 			rs.writeLog("取得的数据为 提入单号为:" + trdh + ",车牌号为：" + carno+",计重类型为:"+weighType);
 			String sql="";
-			if(weighType.equals("weighkg")){
+			if("weighkg".equals(weighType)){
 				sql="SELECT * FROM UF_GBJL WHERE CP='"+carno+"' AND ZXJHH is NULL and sfzf='0' ORDER BY id DESC";
 			}else{
 				String zxjhh=getZxjhhByTrdh(trdh);
@@ -107,7 +108,7 @@
 			JSONObject jsonObject = new JSONObject();
 			String message = "";
 			//计重空柜情况
-			if(weighType.equals("weighkg")){
+			if("weighkg".equals(weighType)){
 				Date date = new Date();
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 				String currentDate = sdf.format(date);
@@ -151,12 +152,12 @@
 				String sfdy = Util.null2String(rs.getString("sfdy"));
 				String lx=Util.null2String(rs.getString("lx"));
 				String shipping=getShippingByRequestid(reqid,lx);
-				if (sfdy.equals("0")) {
+				if ("0".equals(sfdy)) {
 					message += "提入单没有打印";
 					jsonObject = addJsonJZ(message);
 					out.write(jsonObject.toString());
 					return;
-				} else if (sfdy.equals("1")) {
+				} else if ("1".equals(sfdy)) {
 					rs.writeLog("查询提入单已打印");
 					String formname="";
 					formname=getFormNameByLx(lx);
@@ -197,7 +198,7 @@
 
 							}
 							Boolean check1=checkUnloadingHeadJZ(check,count);
-							if (cp == null || cp.equals("") || !cp.equals(carno)) {
+							if (cp == null || "".equals(cp) || !cp.equals(carno)) {
 								String sql2 = "UPDATE "+formname+" set cp='" + carno + "' where REQUESTID="
 										+ reqid;
 								rs.writeLog(sql2);
@@ -266,7 +267,7 @@
 						} else {
 
 
-							message += "该提入单所属装卸计划已经计重过，无需重复计重！";
+							message += "该提入单所属装卸计划已经计重过，无需重复计重！\\n";
 							jsonObject = addJsonJZ(message);
 							out.write(jsonObject.toString());
 							return;
@@ -300,7 +301,7 @@
 			JSONObject jsonObject = new JSONObject();
 			String message = "";
 			//空柜情况
-			if(weighType.equals("weighkg")){
+			if("weighkg".equals(weighType)){
 
 				String sql1="SELECT id,RZ FROM UF_GBJL WHERE CP='"+carno+"' AND ZXJHH IS NULL and sfzf='0' ORDER BY id DESC";
 				rs.writeLog(sql1);
@@ -319,7 +320,7 @@
 					String sql2="UPDATE UF_GBJL SET CZ='"+jzzl+"',JZ='"+jz+"' WHERE id="+id;
 					rs.writeLog(sql2);
 					rs.execute(sql2);
-					message+="空柜过磅更新成功";
+					message+="空柜过磅更新成功\\n";
 
 //					Date date = new Date();
 //					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -338,7 +339,7 @@
 //					rs.executeSql(sql);
 //					message += "空柜计重插入成功";
 				}else{
-					message+="查询id为空!";
+					message+="查询id为空!\\n";
 				}
 				jsonObject = addJsonJZ(message);
 				out.write(jsonObject.toString());
@@ -491,7 +492,7 @@
 
 			rs.writeLog("插入sql4:" + sql4);
 			rs.executeSql(sql4);
-			message += "过磅插入成功";
+			message += "过磅插入成功\\n";
 
 			sql="select id from UF_GBJL where modeuuid='"+str1+"'";
 			rs.writeLog(sql);
@@ -538,18 +539,31 @@
 					gbsj0=rs.getString("GBSJ");
 				}
 				rs.writeLog("获得gbrq："+gbrq0+",gbsj:"+gbsj0);
-				message+="更新装卸计划表成功";
+				message+="更新装卸计划表成功\\n";
 
-				if(rz.equals("")||cz.equals("")||gbrq0.equals("")||gbsj0.equals("")){
-					message+="查询数据有误";
+				if("".equals(rz) || "".equals(cz) || "".equals(gbrq0) || "".equals(gbsj0)){
+					message+="查询数据有误\\n";
 				}else{
 					Double gbzl=0.00;
 					gbzl=calculateJZ(rz, cz);
+					//回写装卸计划流程
 					sql0="UPDATE "+formname+" SET SFGB='1',GBRQ='"+gbrq+"',GBSJ='"+gbsj+"',"	;
 					sql0+="CRZ='"+rz+"',CCZ='"+cz+"',GBZL='"+gbzl+"',sjysrq='"+gbrq+"' WHERE ZXJHH='"+zxjhh+"'";
 					rs.writeLog("更新装卸计划sql："+sql0);
 					rs.execute(sql0);
-					message+="--更新装卸计划成功";
+					message+="更新装卸计划流程成功\\n";
+
+					/**如果是SO过磅 --LX==0，在回写装卸计划的同时，还要回写装卸计划建模表
+					 * 回写装卸计划建模--与装卸计划流程同一张表，只是建模数据requestid is null
+					 *
+					 */
+					if ("0".equals(lx)) {
+						sql0 = "UPDATE " + formname + " SET SFGB='1',GBRQ='" + gbrq + "',GBSJ='" + gbsj + "',";
+						sql0 += "CRZ='" + rz + "',CCZ='" + cz + "',GBZL='" + gbzl + "',sjysrq='" + gbrq + "' WHERE ZXJHH='" + zxjhh + "' and requestid is null";
+						rs.writeLog("更新装卸计划sql：" + sql0);
+						rs.execute(sql0);
+						message += "更新装卸计划建模成功";
+					}
 				}
 				request.setAttribute("message", message);
 				request.getRequestDispatcher("/weightJsp/Apportionment _Weight.jsp?zxjhh="+zxjhh+"&lx="+lx)
@@ -593,14 +607,14 @@
 				String lx = Util.null2String(rs.getString("lx"));
 				String formname=getFormNameByLx(lx);
 
-				if (lcid.equals("")) {
+				if ("".equals(lcid)) {
 					message = "提入单打印表中流程编号为空";
 					jsonObject = addJson(message, newcp, trdStatus, ptStatus);
 					out.write(jsonObject.toString());
 					return;
 				}
 				trdStatus = "1";
-				if (!sfdy.equals("1")) {
+				if (!"1".equals(sfdy)) {
 					message = "提入单尚未打印";
 					jsonObject = addJson(message, newcp, trdStatus, ptStatus);
 					out.write(jsonObject.toString());
@@ -613,8 +627,8 @@
 				rs.execute(sql2);
 				while (rs.next()) {
 					String cp = rs.getString("cp");
-					if (cp.equals("")) {
-						if (carno.equals("")) {
+					if ("".equals(cp)) {
+						if ("".equals(carno)) {
 							message = "装卸计划表中车牌为空";
 
 							jsonObject = addJson(message, newcp, trdStatus, ptStatus);
@@ -622,7 +636,7 @@
 							out.write(jsonObject.toString());
 							return;
 						}
-						if (!carno.equals("")) {
+						if (!"".equals(carno)) {
 							String sql3 = "update "+formname+" set cp='" + carno + "' where requestid='"
 									+ lcid + "'";
 							rs.writeLog(sql3);
@@ -634,8 +648,8 @@
 							return;
 						}
 					}
-					if (!cp.equals("")) {
-						if (carno.equals("")) {
+					if (!"".equals(cp)) {
+						if ("".equals(carno)) {
 							newcp = cp;
 							message = "提入单可以查到装卸计划的车牌";
 							jsonObject = addJson(message, newcp, trdStatus, ptStatus);
@@ -643,7 +657,7 @@
 							out.write(jsonObject.toString());
 							return;
 						}
-						if (!carno.equals("")) {
+						if (!"".equals(carno)) {
 							if (carno.equals(cp)) {
 								message = "输入的车牌与装卸计划表的一致";
 								jsonObject = addJson(message, newcp, trdStatus, ptStatus);
@@ -738,11 +752,11 @@
 
 <%!public Double calculateJZ(String rz,String cz){
 	Util.getDoubleValue("0.00");
-	if(rz.equals("")||rz==null){
+	if("".equals(rz) ||rz==null){
 
 		rz="0.00";
 	}
-	if(cz.equals("")||rz==null){
+	if("".equals(cz) ||rz==null){
 
 		cz="0.00";
 	}
@@ -755,7 +769,7 @@
 
 <%!public String null2Double(String str){
 	String d1="0.00";
-	if(str.equals("")||str==null){
+	if("".equals(str) ||str==null){
 		return d1;
 	}
 	return str;

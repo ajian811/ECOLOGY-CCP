@@ -67,3 +67,5 @@ src/weaver/workflow/
 !/classbean/
 /Test/
 Test/
+/WebRoot/WEB-INF/CustomSearchBySimpleIframe1.jsp
+/WebRoot/WEB-INF/cwshyddy.jsp
