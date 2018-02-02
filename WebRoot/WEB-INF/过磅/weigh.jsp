@@ -1251,7 +1251,8 @@
         OpenPort();
         jQuery('#plate').bind('input propertychange', function() {
             jQuery("#carno1").val("");
-            jQuery("#unloadingHead").checked=false;
+            jQuery("#unloadingHead").attr("checked",false);
+            console.log(jQuery("#unloadingHead").val());
         });
 
         // jQuery('#ggh').bind('input propertychange', function() {
