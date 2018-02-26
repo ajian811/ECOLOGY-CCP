@@ -169,7 +169,7 @@
             //}
             if (total>0){
                 String lcflag="0";//流程
-                String jmFlag="";//建模
+                String jmFlag="1";//建模
                 list=getYfList(lcflag,zxjhh,total,sfyg);
                 list2=getYfList(jmFlag,zxjhh,total,sfyg);
             }else {
