@@ -83,27 +83,46 @@ public class Create_Sequence extends BaseBean implements Action {
 			}
 
 				String updateSql = "";
+			/**提入单生成规则
+			 * 装卸计划按shipping+送达方简码、城市点、产品组进行分组，有几组生成几个提入单
+			 */
+			if ("".equals(trdh)) {
+					String sqlstr="SELECT DISTINCT SHIPNO,SDF,SDCS,CPZ FROM FORMTABLE_MAIN_45_DT3 where mainid='"+mainid+"'";
+					rs2.writeLog(sqlstr);
+					rs2.execute(sqlstr);
+					String shipno="";//shipping号
+					String SDF="";//送达方
+					String SDCS="";//送达城市
+					String CPZ="";//产品组
 
-				if ("".equals(trdh)) {
 
-					String lcbh = gsdm + crzt + currdate1;
-					// 调用存储过程自编号
-					log.writeLog("调用存储过程fn_no_make");
-					rs1.executeProc("fn_no_make", "");
-					rs1.next();
-					lcbh += formatString(rs1.getInt(1));
-					if (!"".equals(mainid)) {
-						updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where mainid = '" + mainid
-								+ "'";
+					while (rs2.next()) {
+						shipno=Util.null2String(rs2.getString("shipno"));
+						SDF=Util.null2String(rs2.getString("sdf"));
+						SDCS=Util.null2String(rs2.getString("sdcs"));
+						CPZ=Util.null2String(rs2.getString("cpz"));
+
+
+						String lcbh = gsdm + crzt + currdate1;
+						// 调用存储过程自编号
+						log.writeLog("调用存储过程fn_no_make");
+						rs1.executeProc("fn_no_make", "");
+						rs1.next();
+						lcbh += formatString(rs1.getInt(1));
+						if (!"".equals(mainid)) {
+							updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where mainid = '" + mainid
+									+ "' and shipno='"+shipno+"' and sdf='"+SDF+"' and sdcs='"+SDCS+"' and cpz='"+CPZ+"'";
+							log.writeLog("更新语句:" + updateSql);
+							rs2.executeSql(updateSql);
+						}
+						//String mainid2=getMaid(requestid);
+						//updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where mainid = '" + mainid2
+						//		+ "'";
+
 						log.writeLog("更新语句:" + updateSql);
 						rs2.executeSql(updateSql);
-					}
-					String mainid2=getMaid(requestid);
-					updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where mainid = '" + mainid2
-							+ "'";
 
-					log.writeLog("更新语句:" + updateSql);
-					rs2.executeSql(updateSql);
+					}
 				}
 
 		} catch (Exception e) {

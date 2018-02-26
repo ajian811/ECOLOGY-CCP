@@ -285,6 +285,29 @@
 		}
 
 		//过磅操作插入记录
+		/**
+		 * 过磅逻辑
+		 * 1、无柜情况
+		 * 		1)业务逻辑
+		 * 			过磅时只输入车牌，记录磅值
+		 * 		2)代码逻辑
+		 * 			a、carno--车牌为条件，在过磅记录表查询 装卸计划不为空，不作废 ，最近 的一条数据--获得 id，及rz-入重
+		 * 			b、根据查询到的rz 及磅值--jzzl 计算得出净重--jz（公式为jz=jzzl-rz）
+		 * 			c、更新 id号为id值的 过磅记录表 cz（=jzzl） 及jz（=jz）
+		 * 2、有柜情况
+		 * 		1）业务逻辑
+		 * 			a、四次过磅：（这里只考虑只装柜一次情况，多次装柜的，前面四次的过磅为按照四次过磅逻辑，后面按照非四次过磅逻辑）
+		 * 				四次过磅是指：
+		 * 					#第一次过磅：车辆进入厂后
+		 * 					#第二次过磅：因为装货需要比较久的时间等原因，先将车身卸下来留在厂里等待装货，车头出厂
+		 * 					#第三次过磅：待装货完成后，车头返厂
+		 * 					#第四次过磅：装货完成后出厂
+		 * 			b、非四次过磅：
+		 * 				第一计算重量，
+		 *
+		 * 		2）代码逻辑
+		 *
+		 */
 		if ("insertGB".equals(action)) {
 		    String formname="";
 			rs.writeLog("insertGB");
@@ -386,7 +409,7 @@
 			String sql2 = "select id from uf_gbjl where trdh='" + trdh + "' and sfzf='0'";
 			rs.writeLog("执行sql2：" + sql2);
 			rs.executeSql(sql2);
-			int counts=rs.getCounts();
+			int counts=rs.getCounts();//提入单已过磅的数量
 
 			//当之前的数量为
 			Boolean check=false;//判断是否为卸车头
@@ -557,13 +580,13 @@
 					 * 回写装卸计划建模--与装卸计划流程同一张表，只是建模数据requestid is null
 					 *
 					 */
-					if ("0".equals(lx)) {
-						sql0 = "UPDATE " + formname + " SET SFGB='1',GBRQ='" + gbrq + "',GBSJ='" + gbsj + "',";
-						sql0 += "CRZ='" + rz + "',CCZ='" + cz + "',GBZL='" + gbzl + "',sjysrq='" + gbrq + "' WHERE ZXJHH='" + zxjhh + "' and requestid is null";
-						rs.writeLog("更新装卸计划sql：" + sql0);
-						rs.execute(sql0);
-						message += "更新装卸计划建模成功";
-					}
+					//if ("0".equals(lx)) {
+					//	sql0 = "UPDATE " + formname + " SET SFGB='1',GBRQ='" + gbrq + "',GBSJ='" + gbsj + "',";
+					//	sql0 += "CRZ='" + rz + "',CCZ='" + cz + "',GBZL='" + gbzl + "',sjysrq='" + gbrq + "' WHERE ZXJHH='" + zxjhh + "' and requestid is null";
+					//	rs.writeLog("更新装卸计划sql：" + sql0);
+					//	rs.execute(sql0);
+					//	message += "更新装卸计划建模成功";
+					//}
 				}
 				request.setAttribute("message", message);
 				request.getRequestDispatcher("/weightJsp/Apportionment _Weight.jsp?zxjhh="+zxjhh+"&lx="+lx)

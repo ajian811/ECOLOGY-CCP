@@ -406,10 +406,15 @@
 
 			</div>
 			<!--改变磅值-->
+
+
 			<div style="margin-top:1.5%">
-					<%=SystemEnv.getHtmlLabelName(-11315,user.getLanguage())%>
-					<input id='inputWeigh' onchange='changeWeigh(this)'></input>
-				</div>
+				<%=SystemEnv.getHtmlLabelName(-11315,user.getLanguage())%>
+				<input id='inputWeigh' onchange='changeWeigh(this)'></input>
+			</div>
+
+
+
 		</div>
 	</div>
 	<div id="footer" style="width: 100%;height:90px">
@@ -672,7 +677,7 @@
                 weight : weight,
                 ggh : ggh,
                 weighType : weighType,
-				unloadingHead:unloadingHead
+                unloadingHead:unloadingHead
                 //配置传到后台的参数
             },
             success : function(response) { //success中用response接受后台的数据
@@ -954,7 +959,7 @@
         }
     }
     //卸车头
-	function  checkUnloadingHead(obj) {
+    function  checkUnloadingHead(obj) {
         if (unloadingHead == obj.id) {
             obj.checked = false;
             unloadingHead = "";
@@ -965,8 +970,8 @@
             $("#weighkg").attr("disabled",true);
 
         }
-		console.log(unloadingHead);
-		
+        console.log(unloadingHead);
+
     }
     //取磅值
     function getWeight() {
@@ -1010,9 +1015,9 @@
                             },
                             success : function(response) { //success中用response接受后台的数据
                                 var responseText = response.responseText;
-								var jsonmessage=JSON.parse(responseText);
-								console.log(jsonmessage);
-								var message=jsonmessage.message;
+                                var jsonmessage=JSON.parse(responseText);
+                                console.log(jsonmessage);
+                                var message=jsonmessage.message;
 
                                 if ("unable" == message) {
                                     alert("<%=SystemEnv.getHtmlLabelName(-11304,user.getLanguage())%>");//删除失败，已过磅或提单不存在！
@@ -1246,6 +1251,12 @@
         OpenPort();
         jQuery('#plate').bind('input propertychange', function() {
             jQuery("#carno1").val("");
+
+            if (unloadingHead=="unloadingHead") {
+                // jQuery("#unloadingHead").click();
+                jQuery("#unloadingHead").next("span").click()
+
+            }
         });
 
         // jQuery('#ggh').bind('input propertychange', function() {

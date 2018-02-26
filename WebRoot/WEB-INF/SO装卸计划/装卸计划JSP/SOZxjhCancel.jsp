@@ -97,7 +97,7 @@
                     rs.execute(sql);
 
                     String gbh = "";
-                    if (rs.next()) {
+                    while (rs.next()) {
                         gbh = Util.null2String(rs.getString("gbh"));
                         String shipno=Util.null2String(rs.getString("shipping"));
 

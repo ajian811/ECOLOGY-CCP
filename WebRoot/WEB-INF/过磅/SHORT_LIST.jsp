@@ -230,7 +230,7 @@
                 if (!"".equals(sfyg) && "0".equals(sfyg)) {
                     dtname = "formtable_main_45_dt3";
                 } else if (!"".equals(sfyg) && "1".equals(sfyg)) {
-                    dtname = "formtable_main_45_dt2";
+                    dtname = "formtable_main_45_dt3";
                 } else {
                     log.writeLog("是否有柜值为空，执行错误返回");
                     return;
