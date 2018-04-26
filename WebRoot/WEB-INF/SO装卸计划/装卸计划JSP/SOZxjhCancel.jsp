@@ -60,25 +60,26 @@
 
                         if (DJSTATUS.equals("2") || DJSTATUS.equals("1") || DJSTATUS.equals("3")) {
                             message = "报错：装卸计划号" + zxjhh + "的关联运费暂估单" + djbh + "已上抛SAP,请先作废该运费暂估单";
+                            JSONObject jsonObject=getMessageJson(message);
+                            out.write(jsonObject.toString());
+                            rs2.writeLog(jsonObject.toString());
+                            return;
                         }
-                        JSONObject jsonObject=getMessageJson(message);
-                        out.write(jsonObject.toString());
-                        rs2.writeLog(jsonObject.toString());
-                        return;
+
                     }
-                    sql = "select DJSTATUS,djbh from uf_zgfy where zxplanno='" + zxjhh + "'";
-                    rs.writeLog(sql);
-                    rs.execute(sql);
-                    while (rs.next()) {
-                        DJSTATUS = Util.null2String(rs.getString("DJSTATUS"));
-                        djbh = Util.null2String(rs.getString("djbh"));
-                        RecordSet rs2 = new RecordSet();
-                        if (DJSTATUS.equals("0")) {
-                            sql = "update uf_zgfy set DJSTATUS='4' where zxplanno='" + zxjhh + "'";
-                            rs2.writeLog(sql);
-                            rs2.execute(sql);
-                        }
-                    }
+                    //sql = "select DJSTATUS,djbh from uf_zgfy where zxplanno='" + zxjhh + "'";
+                    //rs.writeLog(sql);
+                    //rs.execute(sql);
+                    //while (rs.next()) {
+                    //    DJSTATUS = Util.null2String(rs.getString("DJSTATUS"));
+                    //    djbh = Util.null2String(rs.getString("djbh"));
+                    //    RecordSet rs2 = new RecordSet();
+                    //    if (DJSTATUS.equals("0")) {
+                    //        sql = "update uf_zgfy set DJSTATUS='4' where zxplanno='" + zxjhh + "'";
+                    //        rs2.writeLog(sql);
+                    //        rs2.execute(sql);
+                    //    }
+                    //}
 
 
                 }

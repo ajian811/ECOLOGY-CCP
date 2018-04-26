@@ -11,15 +11,16 @@
         var submitdtlid0 = jQuery("#submitdtlid0").val();
         var submitdtlid0s=submitdtlid0.split(",");
         var mx0 = [];
-
+        var ZNO=jQuery("#field11241").val();
         if (submitdtlid0.length > 0) {
-            var ZNO="MX0";
+            //var ZNO="MX0";
 
 
             for (var j = 0; j < submitdtlid0s.length; j++) {
                 var i=submitdtlid0s[j];
                 var js = {};
                 //js.MANDT=jQuery("#11281_"+i).val();//集团
+                js.mxtype = "MX0";
                 js.EBELN = jQuery("#field11281_" + i).val(); //采购凭证号
                 js.EBELP = jQuery("#field11282_" + i).val(); //采购凭证的项目编号
                 js.LGORT=jQuery("#field13664_"+i).val();//存储位置
@@ -56,7 +57,7 @@
         var submitdtlid1 = jQuery("#submitdtlid1").val();
         var submitdtlid1s=submitdtlid1.split(",");
         // var ZNO=jQuery("#field11241").val();
-        var ZNO="MX1";
+        //var ZNO="MX1";
         var mx1 = [];
         if (submitdtlid1.length> 0) {
 
@@ -65,6 +66,7 @@
                 var i=submitdtlid1s[j];
                 var js = {};
                 //js.MANDT=jQuery("#11281_"+i).val();//集团
+                js.mxtype = "MX1";
                 js.EBELN = jQuery("#field11301_" + i).val(); //采购凭证号
                 js.EBELP = jQuery("#field11303_" + i).val(); //采购凭证的项目编号
                 js.LGORT = jQuery("#field11304_" + i).val(); //存储位置
@@ -131,18 +133,19 @@
                 var mx1counts=0;
                 for(var i=0;i<backArrays.length;i++){
                     var backJsonObj=backArrays[i];
-                    var mx=backJsonObj.ZNO;
+                    var mx=backJsonObj.mxtype;
                     var MBLNR=backJsonObj.MBLNR;
                     var index=backJsonObj.ZNO_ITEM-1;
                     if("MX1"==mx){
                         // console.log("明细2回写")
-                       fillMX(13666,MBLNR,index);
+                        fillMX(13666,MBLNR,index);
                         mx1counts++;
                     }
                     if("MX0"==mx){
-                        fillMX(13666,MBLNR,index);
+                        fillMX(13665,MBLNR,index);
                         mx0counts++;
                     }
+                    var msgSuccess=""
 
                 }
                 var mssage="";
@@ -155,24 +158,25 @@
                 var mx0Fcounts=0;
                 var mx1Fcounts=0;
 
-                if(totalC0>0){
 
-
-                    mssageF0="物料标识符为非X明细的上抛失败详情：";
-
-                }
-                if(totalC1>0){
-
-
-                    mssageF1="物料标识符为X明细的上抛失败详情：";
-
-                }
 
                 if (failResults.length>0){
+                    if(totalC0>0){
+
+
+                        mssageF0="物料标识符为非X明细的上抛失败详情：";
+
+                    }
+                    if(totalC1>0){
+
+
+                        mssageF1="物料标识符为X明细的上抛失败详情：";
+
+                    }
                     for (var i=0;i<failResults.length;i++){
                         var failResult=failResults[i];
                         console.log(failResult)
-                        var ZNO=failResult.ZNO;
+                        var ZNO=failResult.mxtype;
                         var ZNO_ITEM=failResult.ZNO_ITEM;
                         var ZMESS=failResult.ZMESS;
 
@@ -227,13 +231,4 @@
 
     }
 </script>
-
-
-
-
-
-
-
-
-
 

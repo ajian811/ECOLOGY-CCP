@@ -7,6 +7,8 @@ import weaver.general.Util;
 import weaver.soa.workflow.request.RequestInfo;
 import weaver.workflow.workflow.WorkflowComInfo;
 
+import javax.persistence.Id;
+
 public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 
 	@Override
@@ -26,7 +28,7 @@ public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 			String tablename = "";
 			String currentnodetype = "";
 			String sql0="SELECT currentnodetype FROM workflow_requestbase where REQUESTID="+requestid;
-			rs.writeLog(sql0);
+			writeLog(sql0);
 			rs.execute(sql0);
 			while (rs.next()){
 				currentnodetype=Util.null2String(rs.getString("currentnodetype"));
@@ -40,7 +42,7 @@ public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 				}
 			}
 			sql = "select sfyg,id from " + tablename + " where requestid=" + requestid;
-			rs.writeLog(sql);
+			writeLog(sql);
 			rs.execute(sql);
 			if (rs.next()) {
 				RecordSet rs1 = new RecordSet();
@@ -77,14 +79,32 @@ public class Z_CCP_SO_ZXJH extends BaseBean implements Action {
 						rs2.writeLog(sql);
 						rs2.execute(sql);
 					}
+					//将明细1中的实际柜号值回写给理货申请建模
+				sql="select SJGH,lhsqid from FORMTABLE_MAIN_45_DT1 where mainid="+ id;
+					writeLog(sql);
+					rs.execute(sql);
+					String sjgh="";//是柜重
+					String lhsqid="";//理货申请id
+					if (rs.next()){
+						sjgh=Util.null2String(rs.getString("sjgh"));
+						lhsqid=Util.null2String(rs.getString("sjgh"));
+						if (!"".equals(sjgh)&&!"".equals(lhsqid)){
+							RecordSet recordSet=new RecordSet();
+							sql="update uf_solhsq set ACTCONTAINER='"+sjgh+"' where id="+lhsqid ;
+							writeLog(sql);
+							rs.execute(sql);
+						}
+					}
+
 
 
 			}
+
 			return Action.SUCCESS;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			rs.writeLog("fail--" + e);
+			writeLog("fail--" + e);
 			requestInfo.getRequestManager().setMessagecontent("数据更新失败，请联系系统管理员！");
 			return Action.FAILURE_AND_CONTINUE;
 		}

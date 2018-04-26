@@ -114,7 +114,7 @@
 		}
 
 		StringBuffer sql2=new StringBuffer();
-		sql2.append("select SHIPPING,GH from uf_solhsq where 1=1");
+		sql2.append("select id,SHIPPING,GH,ACTCONTAINER from uf_solhsq where 1=1");
 		if(strs.length>0){
 			if (strs.length==1) {
 				sql2.append(" and id=" + strs[0]);
@@ -140,13 +140,16 @@
 		while (rs.next()){
 			String shipno=Util.null2String(rs.getString("shipping"));
 			String gh=Util.null2String(rs.getString("gh"));
+			String ACTCONTAINER=Util.null2String(rs.getString("ACTCONTAINER"));
+			String lhsqid=Util.null2String(rs.getString("id"));
 
             String xh=getXH(shipno,gh,"1");
             JSONObject jsonObject1=new JSONObject();
 			jsonObject1.put("shipping",shipno);
 			jsonObject1.put("gh",gh);
-			jsonObject1.put("gh2",gh);
+			jsonObject1.put("gh2",ACTCONTAINER);
 			jsonObject1.put("xh",xh);
+			jsonObject1.put("lhsqid",lhsqid);
 			jsonArr2.add(jsonObject1);
 		}
 
@@ -230,7 +233,7 @@
 		}
 
 		StringBuffer sql2=new StringBuffer();
-		sql2.append("select DISTINCT wgshipping,xngh from uf_solhsq where 1=1");
+		sql2.append("select DISTINCT id,wgshipping,xngh,ACTCONTAINER from uf_solhsq where 1=1");
 		if(strs.length>0){
 			if (strs.length==1) {
 				sql2.append(" and id=" + strs[0]);
@@ -256,13 +259,16 @@
 		while (rs.next()){
 			String shipno=Util.null2String(rs.getString("wgshipping"));
 			String gh=Util.null2String(rs.getString("xngh"));
+			String ACTCONTAINER=Util.null2String(rs.getString("ACTCONTAINER"));
+			String lhsqid=Util.null2String(rs.getString("id"));
             String xh=getXH(shipno,gh,"0");
 
 			JSONObject jsonObject1=new JSONObject();
 			jsonObject1.put("shipping",shipno);
 			jsonObject1.put("gh",gh);
-			jsonObject1.put("gh2",gh);
+			jsonObject1.put("gh2",ACTCONTAINER);
 			jsonObject1.put("xh",xh);
+			jsonObject1.put("lhsqid",lhsqid);
 			jsonArr2.add(jsonObject1);
 		}
 	}

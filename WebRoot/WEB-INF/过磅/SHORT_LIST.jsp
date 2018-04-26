@@ -1,33 +1,23 @@
-<%@page import="javax.servlet.jsp.tagext.TryCatchFinally"%>
 <%@page import="java.math.BigDecimal"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@page import="java.util.*"%>
-<%@page import="com.weaver.integration.log.LogInfo"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
-<%@page import="java.sql.Statement"%>
 <%@page import="weaver.general.StaticObj"%>
 <%@page import="weaver.interfaces.datasource.DataSource"%>
 <%@page import="java.sql.Connection"%>
-<%@page import="weaver.general.Util"%>>
+<%@page import="weaver.general.Util"%>
 <%@page import="weaver.conn.RecordSet"%>
-<%@page import="com.weaver.integration.log.LogInfo"%>
-<%@page import="com.sap.mw.jco.IFunctionTemplate"%>
-<%@page import="weaver.general.BaseBean"%>
-<%@page import="com.sap.mw.jco.JCO"%>
-<%@page import="java.text.DecimalFormat"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.Date"%>
 <%@page import="weaver.file.Prop"%>
 <%@page import="net.sf.json.JSONObject"%>
-<%@page import="java.io.PrintWriter"%>
-<%@page import="net.sf.json.JSONArray"%>
-<%@ include file="/systeminfo/init_wev8.jsp" %><!--引入系统页面，用于判断是否登录，以及获取user对象-->
+<jsp:useBean id="log" class="weaver.general.BaseBean" scope="page" ></jsp:useBean>
 
-<%@page
-        import="com.weaver.integration.datesource.SAPInterationDateSourceImpl"%>
+<%@ include file="/systeminfo/init_wev8.jsp" %><!--引入系统页面，用于判断是否登录，以及获取user对象-->
 <%@ page import="weaver.formmode.setup.ModeRightInfo" %>
+<%@ page import="weaver.general.BaseBean" %>
 
 <%
     /**
@@ -39,12 +29,12 @@
 
 
     String config_wf = "CCP_ZGD";// 暂估单
-    BaseBean log = new BaseBean();
     log.writeLog("调用SHORT_LIST.jsp开始");
     log.writeLog("获得uid："+userid);
     try {
         String zxjhh = request.getParameter("zxjhh");//装卸计划号
         String lx = request.getParameter("lx");//类型 0 so 1 po
+        String type=request.getParameter("type");//type 1--需要进行费用重算
         if ("".equals(zxjhh) || "".equals(lx)) {
             log.writeLog("装卸计划号为空，或者类型为空");
             return;
@@ -64,7 +54,12 @@
             //po
             tablename = "formtable_main_61";
             djlx = "1";
-        } else {
+        }else if ("2".equals(lx)) {
+            //po
+            tablename = "uf_fsapzxjh";
+            djlx = "2";
+        }
+        else {
             log.writeLog("分配错误");
             return;
         }
@@ -75,13 +70,30 @@
         RecordSet dtrs = new RecordSet();
         RecordSet inrs = new RecordSet();
         RecordSet ckrs = new RecordSet();
+        JSONObject jsonObject = new JSONObject();
+
+        String currentdate="";
+        String currentdate1="";
+        String currentdate0="";
 
         Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String currentdate = format.format(date);//当前日期
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+
+        SimpleDateFormat format2=new SimpleDateFormat("yyyy-MM-dd");
+
+
+            currentdate0 = format2.format(date);//当前日期
+
+            currentdate = format.format(date);//当前日期
+
+
 
         SimpleDateFormat format1 = new SimpleDateFormat("yyyyMMdd");
-        String currentdate1 = format1.format(date);//当前日期
+
+            currentdate1=format1.format(date);
+
+            //currentdate0 = format1.format(date);//当前日期
+
         //主表数据
         String sfyg = "";//是否有柜
         String id = "";//主表id
@@ -91,7 +103,25 @@
         String jmid = "";//建模主表id
         String feename = "1";//费用名称
         String djstatus = "0";//单据状态   已审核/已上传/已对账/已清账/已作废
-        String djtitle = currentdate + "运费";//单据抬头
+
+        String djttlx="";
+        String shipno="";
+
+        //SO情况的单据抬头文本需要去eweaver数据源查询
+        if ("0".equals(lx)) {
+            //根据类型及装卸计划号获取明细的第一个shipno
+            shipno = getShipNO(zxjhh);
+            //根据shipno连接eweaer数据源获取抬头文本
+            if (!"".equals(shipno)) {
+                djttlx = getDjttlx(shipno);
+            }
+        } else{
+            //其他情况的抬头文本固定为"Transport Fee"
+            djttlx="Transport Fee";
+        }
+
+        String djtitle =djttlx+" "+ currentdate;//单据抬头
+
         String zxplanno = zxjhh;//装卸计划单号
         String comname = "";//公司名称
         String comcode = "";//公司代码
@@ -103,7 +133,7 @@
         String notaxamt = "";//未税金额    明细合计
         String amount = "";//暂估金额
         String zgfylx = "1";//暂估费用类型   异常费用/正常费用
-        String credate = currentdate;//创建日期
+        String credate = currentdate0;//创建日期
         String cysname = "";//承运商名称
         String cyscode = "";//承运商代码
         String creditpsn = "";//制单人
@@ -111,7 +141,7 @@
         String djbh = "";//单据编号    公司代码+FYZG+201701+3流水
 
         String hl = "1";//汇率   默认为1
-        String creditdate = currentdate;//凭证日期
+        String creditdate = currentdate0;//凭证日期
         String fylx = "1";//费用类型   1运费2吊柜费3装柜劳务费4柜费
         String cx = "";//车型
         String sz = "1";//税则 默认为1
@@ -125,15 +155,18 @@
         String costcenter = "";//成本中心
         String pono = "";//订单号
         String orderitem = "";//订单行项目
-        String itemtext = "";//项目文本
+        String itemtext = djtitle;//项目文本
         String wlh = "";//物料号
         String zl = "";//分摊重量
         String khdz = "";//客户地址
 
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         Map<String, String> mainMap = new HashMap<String, String>();
-        if ("0".equals(lx) || "1".equals(lx)) {
+        if ("0".equals(lx) || "1".equals(lx)||"2".equals(lx)) {
             String sql = "select * from " + tablename + " where zxjhh = '" + zxjhh + "'";
+            if("0".equals(lx)){
+                sql+=" and requestid is null";
+            }
             log.writeLog("查询主表Sql:" + sql);
             if (rs.execute(sql)) {
                 if (rs.next()) {
@@ -244,6 +277,10 @@
                     log.writeLog("是否有柜值为空，执行错误返回");
                     return;
                 }
+            }else if ("2".equals(lx)) {
+
+                    dtname = "uf_fsapzxjh_dt1";
+
             }
 
             String dtsql = "select * from " + dtname + " where mainid = '" + id + "'";
@@ -256,14 +293,17 @@
                             .null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".fee")));//分摊费用
                     costcenter = Util
                             .null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".costcenter")));//成本中心
-                    pono = Util.null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".no")));//订单号
-                    orderitem = Util
-                            .null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".item")));//订单行项目
-                    wlh = Util.null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".wlh")));//物料号
+                    if (!"2".equals(lx)) {
+                        pono = Util.null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".no")));//订单号
+                        orderitem = Util
+                                .null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".item")));//订单行项目
+                        wlh = Util.null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".wlh")));//物料号
+                    }
                     zl = Util.null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".ftzl")));//重量
                     khdz = Util
                             .null2String(dtrs.getString(Prop.getPropValue(config_wf, dtname + ".shiptoaddr")));//客户地址
-                    itemtext = "";//TODO 项目文本
+                    //itemtext = "";
+
 
                     dtnotaxamt = dtnotaxamt == "" ? "0.00" : dtnotaxamt;
                     sum = sum + Double.parseDouble(dtnotaxamt);
@@ -294,6 +334,66 @@
         double total = 0.00;
         boolean flag = false;
         if (list.size() > 0 && mainMap.size() > 0) {
+            /**
+             * 如果已生成有效暂估单，则进行更新
+             */
+            String sql="SELECT id,ZXPLANNO FROM UF_ZGFY WHERE DJSTATUS!='4' and ZXPLANNO='"+zxjhh+"'";
+            rs.writeLog(">>>sql>>>"+sql+"<<<");
+            rs.execute(sql);
+            String billid="";
+            if (rs.next()){
+                billid=Util.null2String(rs.getString("id"));
+            }
+            if(!"".equals(billid)) {
+                StringBuffer buffer0 = new StringBuffer();
+                buffer0.append(
+                        "update  UF_ZGFY set ");
+                buffer0.append("REQUESTID='").append(mainMap.get("requestid")).append("',");//费用名称
+                buffer0.append("feename='").append(mainMap.get("feename")).append("',");//费用名称
+                buffer0.append("djtitle='").append(mainMap.get("djtitle")).append("',");//单据抬头
+                buffer0.append("djstatus='").append(mainMap.get("djstatus")).append("',");//单据状态
+                buffer0.append("zxplanno='").append(mainMap.get("zxplanno")).append("',");//装卸计划单号
+                buffer0.append("comcode='").append(mainMap.get("comcode")).append("',");//公司名称
+                buffer0.append("comname='").append(mainMap.get("comname")).append("',");//公司代码
+                buffer0.append("hbkpyz='").append(mainMap.get("hbkpyz")).append("',");//合并开票原则
+                buffer0.append("pztype='").append(mainMap.get("pztype")).append("',");//凭证类型
+                buffer0.append("currency='").append(mainMap.get("currency")).append("',");//货币码
+                buffer0.append("carno='").append(mainMap.get("carno")).append("',");//车牌号码
+                buffer0.append("dw='").append(mainMap.get("dw")).append("',");//吨位
+                buffer0.append("notaxamt='").append(sum).append("',");//未税金额
+                buffer0.append("amount='").append(mainMap.get("amount")).append("',");//暂估金额
+                buffer0.append("zgfylx='").append(mainMap.get("zgfylx")).append("',");//暂估费用类型
+                buffer0.append("credate='").append(mainMap.get("credate")).append("',");//创建日期
+                buffer0.append("cysname='").append(mainMap.get("cysname")).append("',");//承运商名称
+                buffer0.append("cyscode='").append(mainMap.get("cyscode")).append("',");//承运商代码
+                buffer0.append("creditpsn='").append(mainMap.get("creditpsn")).append("',");//制单人
+                buffer0.append("creditdate='").append(mainMap.get("creditdate")).append("',");//凭证日期
+                buffer0.append("remark='").append(mainMap.get("remark")).append("',");//备注
+                buffer0.append("djbh='").append(mainMap.get("djbh")).append("',");//单据编号
+                buffer0.append("djlx='").append(mainMap.get("djlx")).append("',");//单据类型
+                buffer0.append("fylx='").append(mainMap.get("fylx")).append("',");//费用类型
+                buffer0.append("cx='").append(mainMap.get("cx")).append("',");//车型
+                buffer0.append("sz='").append(mainMap.get("sz")).append("',");//税则
+                buffer0.append("FORMMODEID='").append("721").append("',");
+                buffer0.append("hl='").append(mainMap.get("hl")).append("'");//汇率、
+                buffer0.append(" where id="+billid);
+
+
+                log.writeLog("更新建模主表的sql:" + buffer0.toString());
+
+                inrs.executeSql(buffer0.toString());
+                jsonObject.put("message", "暂估单已存在，UPDATESUCCESS");
+                log.writeLog(jsonObject.toString());
+                //out.print(jsonObject.toString());
+                out.clear();
+                out.write(jsonObject.toString());
+                //System.out.println(jo.toString());
+               out.flush();
+               out.close();
+                return;
+            }
+
+
             StringBuffer buffer = new StringBuffer();
             buffer.append(
                     "Insert into UF_ZGFY (REQUESTID,feename,djtitle,djstatus,zxplanno,comcode,comname,hbkpyz,pztype,currency,carno,dw,notaxamt,amount,zgfylx,credate,cysname,cyscode,creditpsn,creditdate,remark,djbh,djlx,fylx,cx,sz,FORMMODEID,hl," +
@@ -341,8 +441,7 @@
             log.writeLog("插入建模主表的sql:" + buffer.toString());
 
             if (inrs.executeSql(buffer.toString())) {
-
-                String sql = "select id from UF_ZGFY where djbh = '" + mainMap.get("djbh") + "'";
+                sql = "select id from UF_ZGFY where djbh = '" + mainMap.get("djbh") + "'";
                 /*
                 StringBuffer sb = new StringBuffer();// 插入权限表
                 sb.append("insert into MODEDATASHARE_721");
@@ -366,6 +465,8 @@
                 ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
                 localModeRightInfo1.setNewRight(true);
                 localModeRightInfo1.editModeDataShare(userid, 721, Integer.parseInt(id0));
+
+
 
 
                 if (rs.execute(sql)) {
@@ -423,9 +524,15 @@
             log.writeLog("没有获取数据，插入失败");
             return;
         }
+        //如果类型为1 需要跳转到REFRESH_ZGD.jsp 进行运费分摊
+        if("1".equals(type)){
+            String billids=jmid;
+            request.getRequestDispatcher("/weightJsp/REFRESH_ZGD.jsp?billids=" + billids ).forward(request,response);
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", "过磅通过！分摊重量、分摊运费");
+        }
+
+        jsonObject.put("message", "SUCCESS");
+
         log.writeLog(jsonObject.toString());
         //out.print(jsonObject.toString());
         response.getWriter().write(jsonObject.toString());
@@ -465,7 +572,55 @@
 
     return b1.divide(b2, 2, BigDecimal.ROUND_HALF_UP).doubleValue();
 }%>
-<%!public String formatString(int input) {
+<%!
+    private String getShipNO(String zxjhh) {
+        String sql="";
+        String shipno="";
+        sql="SELECT t2.SHIPPING FROM formtable_main_45 T1,FORMTABLE_MAIN_45_DT1 T2 WHERE t1.id=T2.mainid and T1.REQUESTID is null and t1.zxjhh='"+zxjhh+"'";
+        RecordSet recordSet=new RecordSet();
+        recordSet.writeLog(sql);
+        recordSet.execute(sql);
+        if (recordSet.next()){
+            shipno= recordSet.getString("shipping");
+        }
+        return shipno;
+    }
+
+    private String getDjttlx(String shipno) {
+
+        String djttlx="";
+        Connection conn=null;
+        DataSource ds= (DataSource) StaticObj.getServiceByFullname(("datasource.eweaverFormalOA"),DataSource.class);
+        String sql="select a.expno,a.fxchannel,a.isvalid from uf_dmsd_expboxmain a where " +
+                "a.isvalid='40288098276fc2120127704884290210' and exists(select 1 from requestbase where id=a.requestid and isdelete=0)"+
+                " and a.expno='"+shipno+"'";
+        BaseBean log=new BaseBean();
+        log.writeLog(sql);
+       log.writeLog(ds);
+        try{
+           conn= ds.getConnection();
+            ResultSet rs=conn.createStatement().executeQuery(sql);
+            while (rs.next()){
+                djttlx=rs.getString("fxchannel");
+            }
+
+        }catch (SQLException e){
+            e.printStackTrace();
+
+        }finally {
+            if (conn!=null){
+                try {
+                    conn.close();
+                }catch (SQLException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return djttlx;
+    }
+
+    public String formatString(int input) {
     String result;
     // 大于1000时直接转换成字符串返回
     if (input > 1000) {

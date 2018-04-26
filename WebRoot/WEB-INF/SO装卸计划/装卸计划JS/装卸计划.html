@@ -33,10 +33,43 @@
 
         checkCustomize = function() {
             var sfzf = jQuery("#field13403 option:selected").val();
+            var sfyf = jQuery("#field8088").val();
+            var fxlrow = jQuery("#nodesnum3").val();
+            var zyf = jQuery("#field8121").val();
             if (sfzf == "1") {
                 return true;
             }
-            return checkALL();
+            /*
+            * 是否有运费=YES的情况，如总运费=0 、 没有辅路线明细、明细中的成本中心为空，
+            * 则不允许提交的校验
+            *
+            * */
+            if (sfyf == 1) {
+                if(fxlrow <= 0) {
+                    alert("有运费时，辅线路明细不能为空！");
+                    return false;
+                }
+                if(!(zyf>0)){
+                    alert("有运费时，总运费需大于0！");
+                    return false;
+                }
+                var submitdtlid2=jQuery("#submitdtlid2").val();
+                if(submitdtlid2.length>0){
+                    var submitdtlid2s=submitdtlid2.split(",");
+                    for(var i=0;i<submitdtlid2s.length;i++){
+                        var index=submitdtlid2s[i];
+                        var cbzx=jQuery("#field9360_"+index).val();
+                        if(cbzx.length==0){
+                            alert("有运费时，产品明细的成本中心不能为空！");
+                            return false;
+                        }
+                    }
+                }
+
+            }
+
+                return checkALL();
+
         }
 
 
@@ -81,7 +114,10 @@
         //是否有运费联动
         jQuery("#field8088").bindPropertyChange(function() {
             var sfyyf = jQuery("#field8088").val();
-            EliminateFieldVal();
+            var sffz = jQuery("#field13439").val();
+            if (sffz == -1) {
+                EliminateFieldVal();
+            }
             if (sfyyf.length > 0) {
                 console.log(sfyyf);
                 if (sfyyf == 1) {
@@ -160,54 +196,7 @@
                     if (responseJSON) {
                         console.log(JSON.stringify(responseJSON));
                         jQuery.each(responseJSON.arr1, function(i, item) {
-                            // addRow1(1);
-                            // hang_number0 = parseInt(jQuery("#indexnum1").val()) - 1;
-                            // fillMX(8143, item.gh); //柜号
-                            // fillMX(8144, item.cp); //产品
-                            // fillMX(8145, item.sl); //数量
-                            // fillMX(13646,item.ph);//批号
-                            //
-                            // fillMX(9310, item.sl); //本次装卸数量
-                            // fillMX(9301, item.jydh); //交运单号
-                            // fillMX(9302, item.xc); //项次
-                            //
-                            // fillMX(9306, item.SALEORDER); //销售订单号
-                            // fillMX(9305, item.ORDERITEM); //销售订单项次
-                            // fillMX(9304, item.AUART); //销售订单类型
-                            // fillMX(9307, item.SPART);//产品组
-                            // fillMX(9308, item.STOCKNO); //物料号码
-                            // fillMX(9309, item.STOCKDESC); //物料描述
-                            // fillMX(9311, item.REALSHIPNUM); //已运载量
-                            // // fillMX(9312, item.);//剩余运载量
-                            // fillMX(11961, item.SALEUNIT); //单位代码
-                            // fillMX(9316, item.LGOBE); //库位代码
-                            // fillMX(9315, item.REMARK1);//单位描述
-                            // fillMX(9314, item.LOCATION); //库存地址
-                            // fillMX(9317, item.VKAUS); //包装性质
-                            // fillMX(9318, item.SHIPTOADDR); //送达方
-                            // fillMX(9319, item.SHIPTO); //送达方名称
-                            // fillMX(9318, item.KUNNR); //送达方简码
-                            //
-                            // // fillMX(9320, item.);//送达地址描述
-                            // //  fillMX(9321, item.);//送达城市点
-                            // fillMX(9322, item.KUNAG); //售达方
-                            // fillMX(9323, item.SOLDTO); //售达方名称
-                            // // fillMX(9324, item.);//是否固废
-                            // // fillMX(9325, item.);//危险品标识
-                            // // fillMX(9326, item.);//合并开票原则
-                            // fillMX(9327, item.COSTCENTER); //成本中心
-                            // // fillMX(9328, item.);//供应商代码
-                            // // fillMX(9329, item.);//供应商名称
-                            // fillMX(10841, item.NTGEW); //净重
-                            // fillMX(10821, item.ZWEIGHT); //包材料重量
-                            // var closedate=item.CLOSEDATE;
-                            // var gjrq=jQuery("#field13475").val();
-                            // console.log("获得关节日期："+gjrq);
-                            // if(closedate.length>0) {
-                            //     if(gjrq.length==0||gjrq<closedate) {
-                            //         jQuery("#field13475").val(closedate);
-                            //     }
-                            // }
+
                             addRow2(2);
                             hang_number0 = parseInt(jQuery("#indexnum2").val()) - 1;
                             // if (jgrq = '' || jgrq > item.CLOSEDATE) {
@@ -239,13 +228,25 @@
 
                             fillMX(10822, item.ZWEIGHT); //包装重量
                             fillMX(10921, item.NTGEW); //净重
+                            if (item.VKAUS == 'Z01') { //9350
+                                var bczz = item.ZWEIGHT;
+                            } else {
+                                var bczz = item.ZWEIGHT * item.sl;
+                            }
+
+                            fillMX(13663, bczz); //包材总重量
+                            var bccpjz;
+                            bccpjz=item.NTGEW / item.LFIMG * item.sl;
+                            fillMX(13674, bccpjz); //本次产品数量
+                            jQuery("#field10822_" + hang_number0).trigger("change");
 
                             fillMX(9348, item.REMARK1); //单位描述
                             fillMX(9343, item.sl); //计划装卸量
                             fillMX(13883, item.gbm); //柜编码
                             fillMX(13884, item.ph); //批号
 
-                            jQuery("#field10921_"+hang_number0).change();
+
+                            jQuery("#field10921_" + hang_number0).change();
 
                             calSum(2);
 
@@ -284,6 +285,8 @@
                             fillMX(13776, item.shipping);
                             fillMX1(13888, item.gh2);
                             fillMX(13657, item.xh);
+                            fillMX(14330, item.lhsqid);
+
                         })
 
                     }
@@ -326,9 +329,9 @@
                         jQuery.each(responseJSON.arr1, function(i, item) {
                             addRow2(2);
                             hang_number0 = parseInt(jQuery("#indexnum2").val()) - 1;
-                            // if (jgrq = '' || jgrq > item.CLOSEDATE) {
-                            //     fillMX(13475, item.CLOSEDATE); //结关日期
-                            // }
+                            //if (jgrq = '' || jgrq > item.CLOSEDATE) {
+                            //fillMX(13475, item.CLOSEDATE); //结关日期
+                            //}
                             fillMX(8147, item.SHIPADVICENO); //SHIPPING
                             fillMX(8148, item.PROCATEGORY); //产品
                             fillMX(10663, item.DELIVERYNO); //交运单号
@@ -354,6 +357,17 @@
 
                             fillMX(10822, item.ZWEIGHT); //包装重量
                             fillMX(10921, item.NTGEW); //净重
+                            var bczz = item.ZWEIGHT * item.sl;
+                            fillMX(13663, bczz); //包材总重量
+                            if (item.VKAUS == 'Z01') { //9350
+                                var bczz = item.ZWEIGHT;
+                            } else {
+                                var bczz = item.ZWEIGHT * item.sl;
+                            }
+
+                            var bccpjz;
+                            bccpjz=item.NTGEW / item.LFIMG * item.sl;
+                            fillMX(13674, bccpjz); //本次产品数量
 
 
                             fillMX(9348, item.REMARK1); //单位描述
@@ -361,7 +375,7 @@
                             fillMX(13883, item.gbm); //柜编码
                             fillMX(13884, item.ph); //批号
                             // jQuery("#field10921_0").trigger("change");
-                            jQuery("#field10921_"+hang_number0).change();
+                            jQuery("#field10921_" + hang_number0).change();
 
                             // calSum(2);
 
@@ -369,15 +383,15 @@
 
 
 
-                            // var closedate = item.CLOSEDATE;
-                            // var gjrq = jQuery("#field13475").val();
-                            // console.log("获得关结日期：" + closedate);
-                            // if (closedate.length > 0) {
-                            //     if (gjrq.length == 0 || gjrq < closedate) {
-                            //         jQuery("#field13475").val(closedate);
-                            //         jQuery("#field13475span").html(closedate);
-                            //     }
-                            // }
+                            var closedate = item.CLOSEDATE;
+                            var gjrq = jQuery("#field13475").val();
+                            console.log("获得关结日期：" + closedate);
+                            if (closedate.length > 0) {
+                                if (gjrq.length == 0 || gjrq < closedate) {
+                                    jQuery("#field13475").val(closedate);
+                                    jQuery("#field13475span").html(closedate);
+                                }
+                            }
 
 
                         });
@@ -390,6 +404,8 @@
                             fillMX(13776, item.shipping);
                             fillMX1(13888, item.gh2);
                             fillMX(13657, item.xh);
+                            fillMX(14330, item.lhsqid);
+
                         })
 
                     }
@@ -472,14 +488,24 @@
                         addRow3(3);
                         var hang_number = parseInt(jQuery("#indexnum3").val()) - 1;
                         jQuery("#field11426_" + hang_number).val(item.sort); //城市点顺序
+
                         jQuery("#field11421_" + hang_number).val(item.midCity); //城市点id
+                        jQuery("#field11421_" + hang_number + "span").html(item.midCity);
+
                         jQuery("#field11422_" + hang_number).val(item.sort); //
+
                         jQuery("#field11423_" + hang_number).val(item.price); //辅线路价格
+                        jQuery("#field11423_" + hang_number + "span").html(item.price);
+
                         jQuery("#field11424_" + hang_number).val(item.tcdj); //同城单价
+                        jQuery("#field11424_" + hang_number + "span").html(item.tcdj);
+
                         jQuery("#field11425_" + hang_number).val(item.index); //同城个数
+                        jQuery("#field11425_" + hang_number + "span").html(item.index);
+
                         var totalPrice = parseFloat(item.index) * parseFloat(item.tcdj);
                         jQuery("#field11661_" + hang_number).val(totalPrice); //同城总价
-                        jQuery("#field11421_" + hang_number + "span").html(item.midCity); //成本中心
+                        jQuery("#field11661_" + hang_number + "span").html(totalPrice);
                     });
                     Dialog.alert("获取辅线路数据成功！");
                 }
@@ -541,14 +567,24 @@
                         addRow3(3);
                         var hang_number = parseInt(jQuery("#indexnum3").val()) - 1;
                         jQuery("#field11426_" + hang_number).val(item.sort); //城市点顺序
+
                         jQuery("#field11421_" + hang_number).val(item.midCity); //城市点id
+                        jQuery("#field11421_" + hang_number + "span").html(item.midCity);
+
                         jQuery("#field11422_" + hang_number).val(item.sort); //
+
                         jQuery("#field11423_" + hang_number).val(item.price); //辅线路价格
+                        jQuery("#field11423_" + hang_number + "span").html(item.price);
+
                         jQuery("#field11424_" + hang_number).val(item.tcdj); //同城单价
+                        jQuery("#field11424_" + hang_number + "span").html(item.tcdj);
+
                         jQuery("#field11425_" + hang_number).val(item.index); //同城个数
+                        jQuery("#field11425_" + hang_number + "span").html(item.index);
+
                         var totalPrice = parseFloat(item.index) * parseFloat(item.tcdj);
                         jQuery("#field11661_" + hang_number).val(totalPrice); //同城总价
-                        jQuery("#field11421_" + hang_number + "span").html(item.midCity); //城市点id
+                        jQuery("#field11661_" + hang_number + "span").html(totalPrice);
                     });
                     Dialog.alert("获取辅线路数据成功！");
 
@@ -686,6 +722,7 @@
         var zyf = 0;
         var zjz = parseFloat(jQuery("#field13667").val()); //总净重
         var jhyzljh = parseFloat(jQuery("#field13670").val()); //计划运载量合计
+        console.log("jfms:"+jfms+",jgd:"+jgd+",tczf:"+tczf+",fxl:"+fxl+",jhyzlhj:"+jhyzljh+",zjz:"+zjz);
         if (jfms == 0) { //包车
             zyf = jgd + tczf + fxl;
         } else if (jfms == 1) { //计重
@@ -693,12 +730,15 @@
         } else { //=2/计件
             zyf = jgd * jhyzljh + tczf + fxl;
         }
-        if(isNaN(zyf)){
+        console.log('zyf:'+zyf);
+        if (isNaN(zyf)) {
             return;
         }
         jQuery("#field8121").val(zyf.toFixed(2));
+        jQuery("#field8121span").html(zyf.toFixed(2));
     }
 </script>
 <script type="text/javascript" src="/sapjsp/util.js"></script>
+
 
 

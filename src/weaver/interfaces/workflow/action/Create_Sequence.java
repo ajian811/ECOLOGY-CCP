@@ -71,6 +71,7 @@ public class Create_Sequence extends BaseBean implements Action {
 				trdh = rs2.getString("trdh");
 				crzt = rs2.getString("crzt");
 				gsdm = rs2.getString("gsdm");
+				sfyg = rs2.getString("sfyg");
 
 
 				if (!"".equals(crzt)) {
@@ -84,23 +85,34 @@ public class Create_Sequence extends BaseBean implements Action {
 
 				String updateSql = "";
 			/**提入单生成规则
-			 * 装卸计划按shipping+送达方简码、城市点、产品组进行分组，有几组生成几个提入单
+			 * 装卸计划
+			 * 无柜情况：
+			 * 按shipping+送达方简码、城市点进行分组，有几组生成几个提入单
+			 * 有柜情况：
+			 * 按s城市点进行分组，有几组生成几个提入单
+
+			 *
 			 */
 			if ("".equals(trdh)) {
-					String sqlstr="SELECT DISTINCT SHIPNO,SDF,SDCS,CPZ FROM FORMTABLE_MAIN_45_DT3 where mainid='"+mainid+"'";
-					rs2.writeLog(sqlstr);
+				String sqlstr="";
+				if ("0".equals(sfyg)) {
+					sqlstr= "SELECT DISTINCT SHIPNO,SDF,SDCS FROM FORMTABLE_MAIN_45_DT3 where mainid='" + mainid + "'";
+				} else if("1".equals(sfyg)){
+					sqlstr= "SELECT DISTINCT SDCS FROM FORMTABLE_MAIN_45_DT3 where mainid='" + mainid + "'";
+				}
+						rs2.writeLog(sqlstr);
 					rs2.execute(sqlstr);
 					String shipno="";//shipping号
 					String SDF="";//送达方
 					String SDCS="";//送达城市
-					String CPZ="";//产品组
 
 
 					while (rs2.next()) {
-						shipno=Util.null2String(rs2.getString("shipno"));
-						SDF=Util.null2String(rs2.getString("sdf"));
+						if ("0".equals(sfyg)) {
+							shipno = Util.null2String(rs2.getString("shipno"));
+							SDF = Util.null2String(rs2.getString("sdf"));
+						}
 						SDCS=Util.null2String(rs2.getString("sdcs"));
-						CPZ=Util.null2String(rs2.getString("cpz"));
 
 
 						String lcbh = gsdm + crzt + currdate1;
@@ -110,14 +122,22 @@ public class Create_Sequence extends BaseBean implements Action {
 						rs1.next();
 						lcbh += formatString(rs1.getInt(1));
 						if (!"".equals(mainid)) {
-							updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where mainid = '" + mainid
-									+ "' and shipno='"+shipno+"' and sdf='"+SDF+"' and sdcs='"+SDCS+"' and cpz='"+CPZ+"'";
+
+							updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where mainid = '" + mainid +"'";
+							if (!"".equals(shipno)){
+								updateSql+=" and shipno='"+shipno+"'";
+							}
+							if (!"".equals(SDF)) {
+								updateSql+=" and sdf = '"+SDF+"'";
+							}
+							if (!"".equals(SDCS)){
+								updateSql+=" and sdcs='"+SDCS+"'";
+							}
+
 							log.writeLog("更新语句:" + updateSql);
 							rs2.executeSql(updateSql);
 						}
-						//String mainid2=getMaid(requestid);
-						//updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where mainid = '" + mainid2
-						//		+ "'";
+
 
 						log.writeLog("更新语句:" + updateSql);
 						rs2.executeSql(updateSql);

@@ -1,0 +1,55 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+     *  TODO
+     *  请在此处编写javascript代码
+     */
+
+    //明细表序号
+    var dt0 = 0;
+    //按扭
+    var dt0_addbuttonName = "addbutton" + dt0; //明细1添加按扭的名称
+    var dt0_delbuttonName = "delbutton" + dt0; //明细1删除按扭的名称
+    //
+    jQuery(function() {
+        inItial();
+        isnull(false);
+        bindBtnFun();
+        //提交事件判断
+        checkCustomize = function() {
+            return true;
+        }
+    });
+
+    //初始化
+    function inItial() {
+        var requestId = jQuery("#requestid").val();
+        if (typeof(requestId) == "undefined") {
+            jQuery("button[name=" + dt0_addbuttonName + "]").click();
+        }
+    }
+
+    //绑定明细表按钮事件
+    function bindBtnFun() {
+        jQuery("button[name=" + dt0_addbuttonName + "]").bind("click", function() {CalFreightServiceImpl
+            isnull(true);
+        });
+        jQuery("button[name=" + dt0_delbuttonName + "]").bind("click", function() {
+            isnull(true);
+        });
+    }
+
+    function isnull() {
+        jQuery("td>input[id^='field13343_']").each(function() { //遍历页面所的的明细行
+            var row = jQuery(this).attr("name").split("_")[1];
+            for (var i = 0; i <= row; i++) {
+                if (jQuery("#field13343_" + i) != null) {
+                    var j = i + 1;
+                    jQuery("#field13343_" + i).val(j);
+                    jQuery("#field13343_" + i + "span").html(j);
+                }
+            }
+
+        });
+    }
+</script>

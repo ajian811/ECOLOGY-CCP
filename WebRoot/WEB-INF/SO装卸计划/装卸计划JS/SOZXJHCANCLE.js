@@ -28,10 +28,11 @@ function zfAction(id){
             if (oAjax.readyState == 4) {
                 var msg = oAjax.responseText;
                 var data = jQuery.trim(msg);
+                log(data);
                 data.replace(/(^\s*)|(\s*$)/g, "");
-                // cof(data)
+
                 var jsonDate = JSON.parse(data);
-                // cof(jsonDate);
+
                 if (jsonDate) {
                     log(jsonDate.message);
                 }

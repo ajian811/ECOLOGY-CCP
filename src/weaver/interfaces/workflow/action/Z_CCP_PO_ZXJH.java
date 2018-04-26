@@ -17,9 +17,7 @@ import weaver.workflow.workflow.WorkflowComInfo;
 public class Z_CCP_PO_ZXJH extends BaseBean implements Action{
 
 
-    static void main(String[] args) {
 
-    }
 
 	@Override
 	public String execute(RequestInfo requestInfo) {

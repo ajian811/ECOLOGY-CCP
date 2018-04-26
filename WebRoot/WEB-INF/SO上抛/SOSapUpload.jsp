@@ -1,21 +1,15 @@
 <%@page import="com.weaver.general.BaseBean"%>
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@page import="com.weaver.integration.log.LogInfo"%>
-<%@page import="java.sql.ResultSet"%>
-<%@page import="java.sql.SQLException"%>
-<%@page import="java.sql.Statement"%>
-<%@page import="weaver.general.StaticObj"%>
-<%@page import="weaver.interfaces.datasource.DataSource"%>
-<%@page import="java.sql.Connection"%>
 <%@page import="weaver.conn.RecordSet"%>
 <%@page import="net.sf.json.JSONArray"%>
 <%@page import="net.sf.json.JSONObject"%>
-<%@page import="java.io.PrintWriter"%>
 <%@page import="weaver.general.Util"%>
 <%@page import="java.math.BigDecimal"%>
 <%@page import="com.sap.mw.jco.*"%>
 <%@page
 	import="com.weaver.integration.datesource.SAPInterationDateSourceImpl"%>
+<%@ page import="java.text.SimpleDateFormat" %>
 
 <%
 	BaseBean bs = new BaseBean();
@@ -47,8 +41,8 @@
 	String CHARG = "";//批号
 	String ZNETWEI = "";//出货净重数量(地磅磅值)
 	String ZPACK = "";//包装性质
-	String ZDATE_1 = "2017-12-15";//打印单据日期
-	String ZDATE_2 = "2017-12-15";//进厂过磅日期
+	String ZDATE_1 = "";//打印单据日期
+	String ZDATE_2 = "";//进厂过磅日期
 	String ZHB = "1";//合并过磅类型
 	Set<String> sets=new HashSet<String>();
 
@@ -101,18 +95,33 @@
 
 				jsObject.put("DELIVERYNO", DELIVERYNO);
 				jsObject.put("DELIVERYITEM", DELIVERYITEM);
-				jsObject.put("LFIMG", LFIMG2);
+				//jsObject.put("LFIMG", LFIMG2);
 				jsObject.put("GEWEI", GEWEI);
 				ZPACK = VKAUS;
+				RecordSet rs3 = new RecordSet();
+				String LFIMG3="";
 				if (ZPACK.equals("Z01")) {
 					ZPACK = "BULK";
+					sql = "SELECT SUM(B.SJFTJZ) as sum " +
+							"FROM formtable_main_45 a,FORMTABLE_MAIN_45_DT3 b WHERE a.id=b.MAINID and b.JYDH='"
+							+ DELIVERYNO + "' and b.XC='" + DELIVERYITEM + "'AND A.REQUESTID IS NULL AND SFZF='0'";
+					rs3.writeLog(sql);
+					rs3.execute(sql);
+					String sum0="";
+					if (rs3.next()){
+					    sum0=Util.null2String(rs3.getString("sum"));
+					}
+					LFIMG3 = sum0;//该项次的总量
+
+
 				}
 				if (ZPACK.equals("Z02")) {
 					ZPACK = "FIXED";
+
 				}
 
 				jsObject.put("ZPACK", ZPACK);
-				jsObject.put("ZDATE_1", ZDATE_1);
+				//jsObject.put("ZDATE_1", ZDATE_1);
 
 				LFIMG = Double.parseDouble(LFIMG2);
 				Double totalDouble2 = 0.00;//该项次的装卸计划运载总量
@@ -139,19 +148,14 @@
 					continue continueFor;
 				} else {
 					//无柜及有柜情况下的sql 根据交运单号及项次查找装卸计划--sql  ,根据交运单号及项次查找理货申请--sql2
-					if (gs > 0) {
-						sql = "SELECT a.cp,a.sfgb,a.zxjhh,a.cysmc,a.requestid,b.jhyzl,a.gbrq FROM formtable_main_45 a,FORMTABLE_MAIN_45_DT2 b WHERE a.id=b.MAINID and b.JYDH='"
-								+ DELIVERYNO + "' and b.DDXC='" + DELIVERYITEM + "'";
-						sql2 = "SELECT b.sapph,b.BCZXSL,b.sapph FROM formtable_main_43 a,FORMTABLE_MAIN_43_DT1 b where a.id=b.MAINID and b.jydh='"
-								+ DELIVERYNO + "' and b.xc='" + DELIVERYITEM + "'";
-					} else {
-						sql = "SELECT a.sfgb,a.zxjhh,a.requestid,b.jhyzl,a.cp,a.sfgb,a.gbrq FROM formtable_main_45 a,FORMTABLE_MAIN_45_DT3 b WHERE a.id=b.MAINID and b.JYDH='"
-								+ DELIVERYNO + "' and b.XC='" + DELIVERYITEM + "'";
-						sql2 = "SELECT b.sapph,b.BPCZXSL as BCZXSL,b.sapph FROM formtable_main_43 a,FORMTABLE_MAIN_43_DT2 b where a.id=b.MAINID and b.jydh='"
-								+ DELIVERYNO + "'";
-					}
+					sql = "SELECT b.PH,B.SJFTJZ,a.sfgb,a.cysjm,a.zxjhh,a.requestid,b.jhyzl,a.cp,a.sfgb,a.gbrq " +
+							"FROM formtable_main_45 a,FORMTABLE_MAIN_45_DT3 b WHERE a.id=b.MAINID and b.JYDH='"
+							+ DELIVERYNO + "' and b.XC='" + DELIVERYITEM + "'AND A.REQUESTID IS NULL AND SFZF='0'";
+
+
+
+
 					bs.writeLog(sql);
-					RecordSet rs3 = new RecordSet();
 					rs3.execute(sql);
 					JSONArray jsArray2 = new JSONArray();
 
@@ -163,22 +167,39 @@
 						String jhyzl = Util.null2String(rs3.getString("jhyzl"));//计划运载量
 						bs.writeLog("获得计划装卸量：" + jhyzl);
 						cp = Util.null2String(rs3.getString("cp"));//车牌
-						cysmc = Util.null2String(rs3.getString("cysmc"));
+						cysmc = Util.null2String(rs3.getString("cysjm"));//承运名称
+						//LFIMG=Util.getDoubleValue(rs3.getString("jhyzl"));//计划运载量
+						Double LFIMGX=0.00;
+						if (ZPACK.equals("Z02")) {
+							LFIMGX = Util.getDoubleValue(rs3.getString("jhyzl"));//计划运载量
+						}else {
+							LFIMGX=Util.getDoubleValue(LFIMG3);
+						}
+						String ph=Util.null2String(rs3.getString("ph"));//批号
+						String sjftjz=Util.null2String(rs3.getString("sjftjz"));//实际分摊净重
+						ZDATE_1=getZDATE_1(zxjhh);//根据装卸计划号查询提入单号 获取提入单打印日期
+
 
 						jsObject.put("cysmc", cysmc);
 						jsObject.put("cp", cp);
+						jsObject.put("LFIMG", LFIMGX);
+						jsObject.put("jz", sjftjz);
+						jsObject.put("sapph", ph);
+						jsObject.put("ZDATE_1", ZDATE_1);
+
+
 
 						//sql2+=" and b.bczxsl='"+jhyzl+"'";
 						/*如果是过磅的：要判断该装卸计划的所有产品已经全部过磅了，如果有部分还没有过磅的，则不计入实际装卸数量的合计值，并有提示“装卸计划XXXX,
 						需要过磅的装卸计划存在未过磅的产品明细不计入总量! ”*/
 						if (sfgb.equals("1")) {
 							String gbrq = Util.null2String(rs3.getString("gbrq"));//过磅日期
-							if (gbrq.equals("")) {
-								message += DELIVERYNO+"项次号："+DELIVERYITEM+",装卸计划" + zxjhh + ",需要过磅的装卸计划存在未过磅的产品明细不计入总量!\n";
-
-								continue continueFor;
-							}
-							jsObject.put("ZDATE_2", gbrq);
+							//if (gbrq.equals("")) {
+							//	message += DELIVERYNO+"项次号："+DELIVERYITEM+",装卸计划" + zxjhh + ",需要过磅的装卸计划存在未过磅的产品明细不计入总量!\n";
+                            //
+							//	continue continueFor;
+							//}
+							jsObject.put("ZDATE_2", formateDate(gbrq));
 
 						}
 
@@ -233,22 +254,13 @@
                     }
 
 					rs.writeLog("获得jsArray2:" + jsArray2);
-					//查询批号
-					RecordSet rs4 = new RecordSet();
-					bs.writeLog(sql2);
-					rs4.execute(sql2);
-					int jsarr = 0;
-					while (rs4.next()) {
-						JSONObject jsObject2 = jsArray2.getJSONObject(jsarr);
-						jsObject2.put("sapph", Util.null2String(rs4.getString("sapph")));
-						jsObject2.put("jz", Util.null2String(rs4.getString("bczxsl")));
-						jsarr++;
-					}
-					rs.writeLog("增加数据后的jsArray2:" + jsArray2);
+
 					for (int l = 0; l < jsArray2.size(); l++) {
 						JSONObject jsObject2 = jsArray2.getJSONObject(l);
 						jsArray.add(jsObject2);
 					}
+
+
 
 
 				}
@@ -312,7 +324,8 @@
 				JSONObject jsonObject = jsArray.getJSONObject(k);
 				table1.appendRow();
 				bs.writeLog("第" + (k + 1) + "行开始录入值...");
-				rs.writeLog(jsonObject.toString());
+				bs.writeLog(jsonObject);
+
 				table1.setValue(jsonObject.get("DELIVERYNO"), "VBELN_VL");//单号
 				table1.setValue(jsonObject.get("DELIVERYITEM"), "POSNR_VL");//项次
 				table1.setValue(jsonObject.get("cysmc"), "GARAGE_N");//车行
@@ -325,6 +338,9 @@
 				table1.setValue(jsonObject.get("ZDATE_1"), "ZDATE_1");//打印单据日期
 				table1.setValue(jsonObject.get("ZDATE_2"), "ZDATE_2");//进厂过磅日期
 				table1.setValue(jsonObject.get("ZHB"), "ZHB");//合并过磅（1,2.3）单独过磅1，合并过磅2，未过磅3。
+
+
+
 			}
 
 			bs.writeLog("设值完成，开始插入表...");
@@ -334,34 +350,38 @@
                 JCO.Table retable = function.getTableParameterList().getTable("IT_HEAD_LOG");
                 bs.writeLog("返回表行数：" + retable.getNumRows());
 //			String result = "";
-                if (retable.getNumRows() > 0)
-                    bs.writeLog("开始读取返回数据>>>>>>>>>>>>");
+                if (retable.getNumRows() > 0) {
+					bs.writeLog("开始读取返回数据>>>>>>>>>>>>");
 
-                for (int j = 0; j < retable.getNumRows(); j++) {
-                    retable.setRow(j);
-                    bs.writeLog("MANDT返回：" + retable.getString("MANDT"));
-                    bs.writeLog("VBELN_VL返回：" + retable.getString("VBELN_VL"));
-                    bs.writeLog("POSNR_VL返回：" + retable.getString("POSNR_VL"));
-                    bs.writeLog("ZMARK返回：" + retable.getString("ZMARK"));
-                    bs.writeLog("ZMESS返回：" + retable.getString("ZMESS"));
-                    String VBELN_VL = retable.getString("VBELN_VL");//单号
-                    String POSNR_VL = retable.getString("POSNR_VL");//项次
-                    String ZMESS = retable.getString("ZMESS");//描述
-                    //成功
-                    if ("S".equals(retable.getString("ZMARK"))) {
-                        //更新SOUPLOAD状态
-                        uploadSAPUpStatus(VBELN_VL, POSNR_VL);
-                        message += VBELN_VL + ",项次号：" + POSNR_VL + ",上抛成功\n";
 
-                    }
+					for (int j = 0; j < retable.getNumRows(); j++) {
+						retable.setRow(j);
+						bs.writeLog("MANDT返回：" + retable.getString("MANDT"));
+						bs.writeLog("VBELN_VL返回：" + retable.getString("VBELN_VL"));
+						bs.writeLog("POSNR_VL返回：" + retable.getString("POSNR_VL"));
+						bs.writeLog("ZMARK返回：" + retable.getString("ZMARK"));
+						bs.writeLog("ZMESS返回：" + retable.getString("ZMESS"));
+						String VBELN_VL = retable.getString("VBELN_VL");//单号
+						String POSNR_VL = retable.getString("POSNR_VL");//项次
+						String ZMESS = retable.getString("ZMESS");//描述
+						//成功
+						if ("S".equals(retable.getString("ZMARK"))) {
+							//更新SOUPLOAD状态
+							uploadSAPUpStatus(VBELN_VL, POSNR_VL);
+							//更新实际过磅重量
+							//updateSjgbjz(VBELN_VL,POSNR_VL);
+							message += VBELN_VL + ",项次号：" + POSNR_VL + ",上抛成功\n";
 
-                    //失败
-                    if ("E".equals(retable.getString("ZMARK"))) {
-                        message += VBELN_VL + ",项次号：" + POSNR_VL + ",上抛失败，失败原因：" + ZMESS + "\n";
+						}
 
-                    }
+						//失败
+						if ("E".equals(retable.getString("ZMARK"))) {
+							message += VBELN_VL + ",项次号：" + POSNR_VL + ",上抛失败，失败原因：" + ZMESS + "\n";
 
-                }
+						}
+
+					}
+				}
             }catch (Exception e){
 			    JSONObject jsonObject=jsArray.getJSONObject(0);
                 message += jsonObject.get("DELIVERYNO") + ",项次号：" + jsonObject.get("DELIVERYITEM") + ",上抛失败，失败原因：" + e + "\n";
@@ -413,12 +433,76 @@
 		}
 		return b3;
 	}%>
-<%!public void uploadSAPUpStatus(String DDH,String XC){
+<%!
+	private void updateSjgbjz(String vbeln_vl, String posnr_vl) {
+	    RecordSet recordSet=new RecordSet();
+	    StringBuffer stringBuffer=new StringBuffer();
+		stringBuffer.append("SELECT  ");
+		stringBuffer.append(" sum(B.SJFTJZ) as total ");
+		stringBuffer.append("FROM  ");
+		stringBuffer.append(" formtable_main_45 A,");
+		stringBuffer.append("  FORMTABLE_MAIN_45_DT3 b");
+		stringBuffer.append("WHERE  ");
+		stringBuffer.append(" A.id = b.MAINID ");
+		stringBuffer.append("AND b.JYDH = '").append(vbeln_vl).append("' ");
+		stringBuffer.append("AND b.XC = '").append(posnr_vl).append("' ");
+		stringBuffer.append("AND A .REQUESTID IS NULL ");
+		stringBuffer.append("AND SFZF = '0'");
+		recordSet.writeLog(stringBuffer.toString());
+		recordSet.execute(stringBuffer.toString());
+		String sjftzj="";
+		if (recordSet.next()){
+		    sjftzj=recordSet.getString("total");
+		}
+		if (!"".equals(sjftzj)){
+		    StringBuffer stringBuffer1=new StringBuffer();
+		    stringBuffer1.append("update UF_SPGHSR set SJGBJZ='").append(sjftzj).append("'")
+					.append(" where DELIVERYNO='").append(vbeln_vl).append("'")
+					.append(" and DELIVERYITEM='").append(posnr_vl).append("'");
+		    recordSet.writeLog(stringBuffer1);
+		    recordSet.execute(stringBuffer1.toString());
+		}
+
+	}
+
+	private String getZDATE_1(String zxjhh) {
+		String ZDATE_1="";
+		RecordSet recordSet=new RecordSet();
+		String sql="SELECT dyrq from uf_trdpldy where zxjhh='"+zxjhh+"'";
+		recordSet.writeLog(sql);
+		recordSet.execute(sql);
+		if (recordSet.next()){
+		    ZDATE_1=Util.null2String(recordSet.getString("dyrq"));
+		}
+
+		return formateDate(ZDATE_1);
+	}
+	private String formateDate(String oldDate){
+	    String ZDATE_1="";
+		if (!"".equals(oldDate)){
+			String[] newDate=oldDate.split("-");
+			String returnDate="";
+			for (int i = 0; i <newDate.length; i++) {
+				returnDate+=newDate[i];
+			}
+			ZDATE_1=returnDate;
+		}
+		return ZDATE_1;
+
+	}
+
+	public void uploadSAPUpStatus(String DDH, String XC){
     if(!"".equals(DDH)&&!"".equals(XC)) {
 
 
 		RecordSet recordSet = new RecordSet();
-		String sql = "update uf_spghsr set SAPUPLOAD='1' where DELIVERYNO='" + DDH + "' AND DELIVERYITEM='" + XC + "'";
+
+		SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat simpleDateFormat1=new SimpleDateFormat("hh:mm");
+		String updateDate=simpleDateFormat.format(new Date());
+		String updateTime=simpleDateFormat1.format(new Date());
+		String sql = "update uf_spghsr set SAPUPLOAD='1',SAPUPLOADDATE='" +updateDate+"'"+",SAPUPLOADTIME='"+updateTime+"'"+
+				" where DELIVERYNO='" + DDH + "' AND DELIVERYITEM='" + XC + "'";
 		recordSet.writeLog(sql);
 		recordSet.execute(sql);
 	}

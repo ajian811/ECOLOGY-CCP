@@ -166,6 +166,7 @@ public class Z_CCP_PO_ZXJH_ZF extends BaseBean implements Action {
                 }
 
             }
+            updateTrdStatus(zxjhh);
         } catch (Exception e) {
             e.printStackTrace();
             rs.writeLog("fail--" + e);
@@ -174,6 +175,14 @@ public class Z_CCP_PO_ZXJH_ZF extends BaseBean implements Action {
         }
         return "1";
 
+    }
+
+    private void updateTrdStatus(String zxjhh) {
+        String sql="";
+        RecordSet rs=new RecordSet();
+        sql="update UF_TRDPLDY set sfzf='1' where zxjhh='"+zxjhh+"'";
+        rs.writeLog(sql);
+        rs.execute(sql);
     }
 
     public Double calCulate(String str1, String str2, String action) {

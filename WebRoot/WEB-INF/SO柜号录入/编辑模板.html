@@ -1,0 +1,235 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+     *  TODO
+     *  请在此处编写javascript代码
+     */
+
+    function checkCustomize() {
+        var guishu = $G("field10501").value - 0;
+        var nodesum = jQuery("#modesnum0").val() - 0;
+        if (nodesum > guishu) {
+            alert("The amount of containers you added must less than " + guishu + " , please check carefully again!");
+            return false;
+        }
+        return true;
+    }
+
+    //创建编号
+    function createBHFun(obj) {
+        // console.log(obj);
+        var index = obj.getAttribute("index");
+        var newnum = "M" + new Date().getTime();
+        jQuery("#field13745_" + index).val(newnum);
+        jQuery("#field13760_" + index + "").val(newnum);
+        jQuery("#field13760_" + index + "span").html(newnum);
+    }
+
+    var sp = "field9285";
+    var spgz = "field10941";
+    jQuery(document).ready(function() { /*对字段进行监听*/
+        jQuery("#" + sp).bindPropertyChange(function() {
+            spcopy(sp);
+        })
+        checkSFYG()
+        //监听是否有柜
+        jQuery("#field13744").bindPropertyChange(function() {
+            delRowFunJM(0);
+            delRowFunJM(1);
+            var sfyg = jQuery("#field13744").val();
+            console.log("sfyg:" + sfyg);
+            if ("0" == sfyg) {
+                jQuery(".wg").show();
+                jQuery(".yg").hide();
+            } else if ("1" == sfyg) {
+                jQuery(".wg").hide();
+                jQuery(".yg").show();
+
+            } else {
+                jQuery(".wg").hide();
+                jQuery(".yg").hide();
+            }
+
+        });
+        //监听同步的在已有柜号后面加个button
+        jQuery("button[name='addbutton1']").bind("click", function() {
+            console.log("addbutton1");
+
+            var index = jQuery("#indexnum1").val() - 1;
+            //var index = jQuery(this).attr("name").split("_")[1];
+            var append = "&nbsp;&nbsp;&nbsp;&nbsp;<input class='e8_btn_top middle' type='button' id='btn13764_" + index + "' style='display:none' index='" + index + "' id='createBH' " +
+                "onclick='createBHFun(this)' value='NEW' title='If the container number does not exist, please click new.'/>";
+            jQuery("#field13764_" + index + "").after(append);
+
+            hideFieldButton(index);
+
+            var comcode = jQuery("#field11581").val();
+            if (comcode == '7020') {
+                var DGC = '<span class="e8_showNameClass"><a title="UNI015">UNIFY SHIPPING SERVICES SDN BHD</a>&nbsp;<span class="e8_delClass" id="51" onclick="del(event,this,1,false,{});" style="opacity: 1; visibility: hidden;">&nbsp;x&nbsp;</span></span>';
+                jQuery("#field13758_" + index + "span").html(DGC);
+                jQuery("#field13758_" + index + "").val('51');
+            }
+            jQuery("#field13760_" + index).bindPropertyChange(function() {
+                var yygh = jQuery("#field13760_" + index).val();
+                console.log("yygh:" + yygh);
+                jQuery("#field13745_" + index).val(yygh);
+
+            })
+            jQuery("#field13745_" + index).bindPropertyChange(function(obj) {
+                console.log(obj);
+                calAmount(obj);
+
+            })
+            jQuery("#field13759_" + index).bindPropertyChange(function(obj) {
+                sfpg(obj);
+
+            })
+
+
+        });
+
+        jQuery("button[name='addbutton0']").bind("click", function() {
+            console.log("addbutton0");
+            var index = jQuery("#indexnum0").val() - 1;
+            var comcode = jQuery("#field11581").val();
+            if (comcode == '7020') {
+                var DGC = '<span class="e8_showNameClass"><a title="UNI015">UNIFY SHIPPING SERVICES SDN BHD</a>&nbsp;<span class="e8_delClass" id="51" onclick="del(event,this,1,false,{});" style="opacity: 1; visibility: hidden;">&nbsp;x&nbsp;</span></span>';
+                jQuery("#field13480_" + index + "span").html(DGC);
+                jQuery("#field13480_" + index + "").val('51');
+            }
+        });
+
+        function checkSFYG() {
+            var sfyg = jQuery("#field13744").val();
+            console.log("sfyg:" + sfyg);
+            if ("0" == sfyg) {
+                jQuery(".wg").show();
+                jQuery(".yg").hide();
+            } else if ("1" == sfyg) {
+                jQuery(".wg").hide();
+                jQuery(".yg").show();
+
+            } else {
+                jQuery(".wg").hide();
+                jQuery(".yg").hide();
+            }
+        }
+
+
+    })
+
+
+    function spcopy(fieldid) {
+        var v_sp = jQuery("#" + fieldid).val();
+        jQuery("#" + spgz).val(v_sp);
+
+    }
+
+
+
+    var dt0_wrbtr = "field9287";
+
+    var dt0 = 0;
+    var dt0_addbuttonName = "addbutton" + dt0;
+    //
+    jQuery(function() {
+        // inItial();
+        hideDetailFun(false);
+        bindDetailFun(false);
+        bindBtnFun();
+    });
+
+    // function inItial() {
+    //     var requestId = jQuery("#requestid").val();
+    //     if (typeof(requestId) == "undefined") {
+    //         jQuery("button[name=" + dt0_addbuttonName + "]").click();
+    //     }
+    // }
+
+    function bindBtnFun() {
+        jQuery("button[name=" + dt0_addbuttonName + "]").bind("click", function() {
+            hideDetailFun(true);
+            bindDetailFun(true);
+        });
+    }
+
+    function bindDetailFun(isLast) {
+        var last = isLast ? ":last" : "";
+        //当前字段
+        jQuery("td>input[id^='" + dt0_wrbtr + "']" + last).each(function() {
+            jQuery(this).bindPropertyChange(function(obj) {
+                calAmount(obj);
+            });
+        });
+    }
+
+    function calAmount(obj) {
+        var row = jQuery(obj).attr("name").split("_")[1];
+        var dt0_wrbtr = jQuery(obj).attr("name").split("_")[0];
+        //取相关数据
+        var v_wrbtr = jQuery('#' + dt0_wrbtr + '_' + row).val(); //当前字段
+        if (v_wrbtr != "") {
+            var a = v_wrbtr.replace(/[！|!|@|$|%|^|&|"|\\|/|?|>|<| | ｜　]/g, "");
+            jQuery('#' + dt0_wrbtr + '_' + row).val(a);
+        }
+    }
+
+    function sfpg(obj) {
+        var row = jQuery(obj).attr("name").split("_")[1];
+        var dt1_wrbtr = jQuery(obj).attr("name").split("_")[0];
+        //取相关数据
+        var v_sfpg = jQuery('#' + dt1_wrbtr + '_' + row).val(); //当前字段
+        if (v_sfpg == 1) {
+            jQuery("#btn13764_" + row).css("display", "inline");
+            jQuery("#field13760_" + row + "_browserbtn").show();
+            jQuery("#field13760_" + row + "span").show();
+        } else {
+            jQuery("#btn13764_" + row).css("display", "none");
+
+            jQuery("#field13760_" + row + "_browserbtn").hide();
+            jQuery("#field13760_" + row + "span").hide();
+            jQuery("#field13760_" + row + "span").html('');
+            jQuery("#field13745_" + row).val('');
+            jQuery("#field13745_" + row + "span").text('');
+        }
+
+    }
+
+
+    function hideField1() {
+        var rowStr = arguments[0] ? "_" + arguments[0] : "";
+        for (var i = 1; i < arguments.length; i++) {
+            var v = jQuery("#" + arguments[i] + rowStr).val();
+            jQuery("#" + arguments[i] + rowStr).hide();
+            jQuery("#" + arguments[i].replace('field', 'field_lable') + rowStr).hide();
+            jQuery("#" + arguments[i] + rowStr + "span").text(v);
+        }
+    }
+
+    function hideFieldButton(row) {
+        jQuery("#field13760_" + row + "_browserbtn").hide();
+        jQuery("#field13760_" + row + "span").hide();
+    }
+
+
+
+    //隐藏明细表字段
+    function hideDetailFun(isLast) {
+        var last = isLast ? ":last" : "";
+        var objs = jQuery("input[name^='check_node_" + dt0 + "']" + last);
+        objs.each(function() {
+            var row = this.value;
+            hideField(row, dt0_wrbtr);
+        });
+    }
+    $(window).load(function() {
+        $("#div0button").css("width", "80px");
+        $("#div1button").css("width", "80px");
+    });
+
+
+</script>
+<script type="text/javascript" src="/sapjsp/utilJM.js"></script>
+
+
+
