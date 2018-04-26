@@ -2801,7 +2801,9 @@ function getAll() {
     
      jQuery.post("/sapjsp/SOSapUpload.jsp",{billids:billids},function(data){
       console.log(data);
-      if(data){
+      var jsonDate=JSON.parse(data);
+      console.log(jsonDate);
+      if(jsonDate){
           /*
        for(var i = 0; i<data.result.length;i++){
 
@@ -2815,7 +2817,7 @@ function getAll() {
 
         }
         */
-          Dialog.alert(data);
+          alert(jsonDate.error);
         _table.reLoad();
       }
 	});

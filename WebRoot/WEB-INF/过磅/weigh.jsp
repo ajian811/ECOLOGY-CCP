@@ -56,6 +56,7 @@
 <script type="text/javascript">
     Ext.LoadMask.prototype.msg = ''; //加载中,请稍后...
     var weighType;
+    var unloadingHead;
     var store1;
     var store2;
     var sm1;
@@ -99,11 +100,11 @@
                     'shipping',
                     'gbm',
                     'sl',
-					'ddh',
-					'xc',
-					'wlh',
-					'wlms',
-					'dwms'
+                    'ddh',
+                    'xc',
+                    'wlh',
+                    'wlms',
+                    'dwms'
                 ]
             })
         });
@@ -279,7 +280,8 @@
             cm : cm1,
             sm : sm1,
             trackMouseOver : false,
-            width : 910,
+            width : '100%',
+            forceFit: true,
             height : 180,
             loadMask : {
                 msg : '正在加载数据，请稍侯……'
@@ -301,7 +303,8 @@
             cm : cm2,
             sm : sm2,
             trackMouseOver : false,
-            width : 910,
+            width : '100%',
+            forceFit: true,
             height : 180,
             loadMask : {
                 msg : '正在加载数据，请稍侯……'
@@ -391,9 +394,9 @@
 		<PARAM NAME="Settings" VALUE="9600,N,8,1">
 	</OBJECT>
 </p>
-<div style="width: 100%;height: 540px;">
+<div style="width: 100%;height: 540px">
 	<div style="width: 100%;height: 50px;">
-		<div id="header" style="width: 100%;">
+		<div id="header" style="width: 100%">
 			<div id="header1" class="header1">
 				<h1>METTLER TOLEDO</h1>
 			</div>
@@ -405,10 +408,15 @@
 
 			</div>
 			<!--改变磅值-->
-			<!--<div style="margin-top:1.5%">
-					<%=SystemEnv.getHtmlLabelName(-11315,user.getLanguage())%>
-					<input id='inputWeigh' onchange='changeWeigh(this)'></input>
-				</div>-->
+
+
+			<%--<div style="margin-top:1.5%">--%>
+				<%--<%=SystemEnv.getHtmlLabelName(-11315,user.getLanguage())%>--%>
+				<%--<input id='inputWeigh' onchange='changeWeigh(this)'></input>--%>
+			<%--</div>--%>
+
+
+
 		</div>
 	</div>
 	<div id="footer" style="width: 100%;height:90px">
@@ -419,27 +427,32 @@
 
 						<table>
 							<tr>
-								<td>&nbsp;&nbsp; <span
-										style="color: red;font-size: 20px;margin-top: 0px;"><%=SystemEnv.getHtmlLabelName(-10883,user.getLanguage())%>：</span>
+								<td style="height: 20px">&nbsp;&nbsp; <span
+										style="color: red;font-size: 15px;margin-top: 0px;"><%=SystemEnv.getHtmlLabelName(-10883,user.getLanguage())%>：</span>
 									<input
-											style="font-size:17px;width:150px;font-weight: bold;margin-top: 10px;"
+											style="font-size:15px;width:300px;font-weight: bold;margin-top: 10px;"
 											type="text" id="plate" name="plate" />
 								</td>
+							<tr/>
+							<tr>
 								<td>&nbsp;&nbsp; <span
-										style="color: red;font-size: 20px;margin-top: 0px;"><%=SystemEnv.getHtmlLabelName(21028,user.getLanguage())%>：</span>
+										style="color: red;font-size: 15px;margin-top: 0px;"><%=SystemEnv.getHtmlLabelName(21028,user.getLanguage())%>：</span>
 									<input
-											style="font-size:17px;width:150px;font-weight: bold;margin-top: 10px;"
+											style="font-size:15px;width:150px;font-weight: bold;margin-top: 10px;"
 											type="text" id="carno1" name="carno1" />
 								</td>
+
 								<td>&nbsp;&nbsp; <span
-										style="color: red;font-size: 20px;margin-top: 0px"><%=SystemEnv.getHtmlLabelName(-10889,user.getLanguage())%>：</span>
+										style="color: red;font-size: 15px;margin-top: 0px"><%=SystemEnv.getHtmlLabelName(-10889,user.getLanguage())%>：</span>
 									<input
-											style="font-size:17px;width:150px;font-weight: bold;margin-top: 10px;disabled:true"
+											style="font-size:15px;width:150px;font-weight: bold;margin-top: 10px;disabled:true"
 											type="text" id="ggh" name="ggh" disabled="true" />
 								</td>
+							<tr/>
 
-							</tr>
+
 						</table>
+						<!--
 						<table>
 							<tr>
 								<td>&nbsp;&nbsp;&nbsp;&nbsp; <span><%=SystemEnv.getHtmlLabelName(-10886,user.getLanguage())%></span> <input
@@ -454,48 +467,54 @@
 								</td>
 							</tr>
 						</table>
+						-->
 					</div>
 				</div>
 
-				<div style="width:15%;float:right;background-color:#c9c9c9">
+				<%--<div style="width:15%;float:right;background-color:#c9c9c9">--%>
 
 
-					<span><%=SystemEnv.getHtmlLabelName(-11275,user.getLanguage())%>：</span><!--提入单是否存在--> <input class="input_footer" type="text"
-																												  value="0" id="trdStatus" readonly /> <br /> <span><%=SystemEnv.getHtmlLabelName(-11276,user.getLanguage())%>：</span><!--提入单是否打印-->
-					<input class="input_footer" type="text" value="0" id="ptStatus"
-						   readonly />
+				<%--<span><%=SystemEnv.getHtmlLabelName(-11275,user.getLanguage())%>：</span><!--提入单是否存在--> <input class="input_footer" type="text"--%>
+				<%--value="0" id="trdStatus" readonly /> <br /> <span><%=SystemEnv.getHtmlLabelName(-11276,user.getLanguage())%>：</span><!--提入单是否打印-->--%>
+				<%--<input class="input_footer" type="text" value="0" id="ptStatus"--%>
+				<%--readonly />--%>
 
 
-				</div>
+				<%--</div>--%>
+
 			</div>
 		</form>
 	</div>
-	<div id="leftdiv" style="height: 430px;width:88%;float: left">
+	<div id="leftdiv" style="height: 370px;width:85%;float: left">
 		<div id="mid1" style="width: 100%;float: left;height:auto"></div>
 		<div id="mid2" style="width: 100%;float: left;height:auto"></div>
 	</div>
-	<div id="right" style="width: 100px;">
+	<div id="right" style="width: 15%;position: absolute;top: 50px;left: 85%;">
 		<div class="right_bb"
-			 style="width: 100px;margin-left:0px;margin-right:0px;">
-			<table>
+			 style="width: 100%;margin-left:0px;margin-right:0px;">
+			<table style="width: 100%;">
 				<tr>
 					<td><input id="weighkg" type="checkbox"
 							   onclick="checkweigh(this)" /><span style="font-size:18px"><%=SystemEnv.getHtmlLabelName(-11277,user.getLanguage())%></span></td><!--空柜（罐）-->
 				</tr>
 				<tr>
+					<td><input id="unloadingHead" type="checkbox"
+							   onclick="checkUnloadingHead(this)" /><span style="font-size:18px"><%=SystemEnv.getHtmlLabelName(-11348,user.getLanguage())%></span></td><!-卸车头-->
+				</tr>
+				<tr>
 					<td><input class="button blue"
-							   style='background-color:#0095cd;padding:6px 0 25px 0' id="inweigh" type="button"
+							   style='background-color:#0095cd;padding:6px 0 25px 0;width: 80%' id="inweigh" type="button"
 							   value="<%=SystemEnv.getHtmlLabelName(-11278,user.getLanguage())%>" onclick="inweigh();" /></td><!--计重-->
 				</tr>
 				<tr>
 					<!-- <td><input class="button blue" id="outweigh" type="button" value="过磅" onclick="outweigh();onSearch2();"/></td> -->
 					<td><input class="button blue"
-							   style='background-color:#0095cd;padding:6px 0 25px 0' id="outweigh" type="button"
+							   style='background-color:#0095cd;padding:6px 0 25px 0;width: 80%' id="outweigh" type="button"
 							   value="<%=SystemEnv.getHtmlLabelName(-11279,user.getLanguage())%>" onclick="outweigh();" /></td><!--过磅-->
 				</tr>
 				<tr>
 					<td><input class="button blue"
-							   style='background-color:#0095cd;padding:6px 0 25px 0' onclick="getWeight()"
+							   style='background-color:#0095cd;padding:6px 0 25px 0;width: 80%' onclick="getWeight()"
 							   type="button" value="<%=SystemEnv.getHtmlLabelName(-11280,user.getLanguage())%>" /></td><!--取磅值-->
 				</tr>
 				<tr>
@@ -503,17 +522,17 @@
 				</tr>
 				<tr>
 					<td><input class="button blue"
-							   style='background-color:#0095cd;padding:6px 0 25px 0' type="button" value="<%=SystemEnv.getHtmlLabelName(-11281,user.getLanguage())%>"
+							   style='background-color:#0095cd;padding:6px 0 25px 0;width: 80%' type="button" value="<%=SystemEnv.getHtmlLabelName(-11281,user.getLanguage())%>"
 							   onclick="deleteWeigh()" /></td><!--虚拟删除-->
 				</tr>
 				<tr>
 					<td><input class="button blue"
-							   style='background-color:#0095cd;padding:6px 0 25px 0' type="button" value="<%=SystemEnv.getHtmlLabelName(-11313,user.getLanguage())%>"
+							   style='background-color:#0095cd;padding:6px 0 25px 0;width: 80%' type="button" value="<%=SystemEnv.getHtmlLabelName(-11313,user.getLanguage())%>"
 							   onclick="virweigh()" /></td><!--模拟过磅-->
 				</tr>
 				<tr>
 					<td><input class="button blue"
-							   style='background-color:#0095cd;padding:6px 0 25px 0' type="button" value="<%=SystemEnv.getHtmlLabelName(-11322,user.getLanguage())%>"
+							   style='background-color:#0095cd;padding:6px 0 25px 0;width: 80%' type="button" value="<%=SystemEnv.getHtmlLabelName(-11322,user.getLanguage())%>"
 							   onclick="weighprint()" /></td><!--模拟过磅-->
 				</tr>
 				<!--
@@ -526,6 +545,22 @@
 
 			</table>
 		</div>
+	</div>
+	<div id="bottomdiv">
+		<table style="width: 100%">
+			<tr>
+				<td>&nbsp;&nbsp;&nbsp;&nbsp; <span><%=SystemEnv.getHtmlLabelName(-10886,user.getLanguage())%></span> <input
+						class="input_footer" type="text" value="0" id="tare" readonly />
+				</td>
+				<td>&nbsp;&nbsp; <span><%=SystemEnv.getHtmlLabelName(-10887,user.getLanguage())%></span> <input
+						class="input_footer" type="text" value="0" id="grosswt"
+						readonly />
+				</td>
+				<td>&nbsp;&nbsp; <span><%=SystemEnv.getHtmlLabelName(-10884,user.getLanguage())%></span> <input
+						class="input_footer" type="text" value="0" id="nw" readonly />
+				</td>
+			</tr>
+		</table>
 	</div>
 </div>
 
@@ -596,12 +631,23 @@
                 if (cp.length > 0) {
                     $("#carno1").val(cp);
                 }
-                var trdStatus = "";
-                (result.trdStatus == "1") ? trdStatus = "存在" : trdStatus = "不存在";
-                var ptStatus = "";
-                (result.ptStatus == "1") ? ptStatus = "已打印" : ptStatus = "未打印";
-                $("#trdStatus").val(trdStatus);
-                $("#ptStatus").val(ptStatus);
+                // var trdStatus = "";
+                // (result.trdStatus == "1") ? trdStatus = "存在" : trdStatus = "不存在";
+                // var ptStatus = "";
+                // (result.ptStatus == "1") ? ptStatus = "已打印" : ptStatus = "未打印";
+                // $("#trdStatus").val(trdStatus);
+                // $("#ptStatus").val(ptStatus);
+                //ptStatus--是否为四次过磅
+
+                if("1"==result.ptStatus){
+                    console.log("是否为四次过磅"+result.ptStatus);
+
+                    // jQuery("#unloadingHead").click();
+                    if(unloadingHead!="unloadingHead") {
+                        jQuery("#unloadingHead").next("span").click();
+                    }
+                }
+
                 status="1";
                 onSearch1();
 
@@ -666,7 +712,8 @@
                 carno : carno,
                 weight : weight,
                 ggh : ggh,
-                weighType : weighType
+                weighType : weighType,
+                unloadingHead:unloadingHead
                 //配置传到后台的参数
             },
             success : function(response) { //success中用response接受后台的数据
@@ -921,6 +968,8 @@
     //磅值清零
     function reset() {
         $("#endweight").html("0");
+        $("#carno1").html("");
+
         //$("#plate").val("");
     }
     //有柜无柜控制填写
@@ -937,11 +986,28 @@
             $("#plate").val("");
             $("#plate").attr("disabled", true);
             $("#ggh").attr("disabled", false);
+            $("#unloadingHead").attr("disabled", true);
         } else {
             $("#ggh").val("");
             $("#plate").attr("disabled", false);
             $("#ggh").attr("disabled", true);
+            $("#unloadingHead").attr("disabled", false);
         }
+    }
+    //卸车头
+    function  checkUnloadingHead(obj) {
+        if (unloadingHead == obj.id) {
+            obj.checked = false;
+            unloadingHead = "";
+            $("#weighkg").attr("disabled", false);
+        } else {
+            obj.checked = true;
+            unloadingHead = obj.id;
+            $("#weighkg").attr("disabled",true);
+
+        }
+        console.log(unloadingHead);
+
     }
     //取磅值
     function getWeight() {
@@ -977,23 +1043,28 @@
                     win.hide();
                     try {
                         Ext.Ajax.request({
-                            url : '/ServiceAction/com.eweaver.app.weight.servlet.Uf_lo_pandAction',
+                            url : '/weightJsp/gbcz.jsp',
                             params : {
                                 action : "deleteweigh",
                                 plate : $("#plate").val(),
+								carno:$("#carno1").val(),
                                 reason : $("#reason").val()
                             },
                             success : function(response) { //success中用response接受后台的数据
-                                //var we = response.responseText;
-                                if ("unable" == response.responseText) {
+                                var responseText = response.responseText;
+                                var jsonmessage=JSON.parse(responseText);
+                                console.log(jsonmessage);
+                                var message=jsonmessage.message;
+
+                                if ("unable" == message) {
                                     alert("<%=SystemEnv.getHtmlLabelName(-11304,user.getLanguage())%>");//删除失败，已过磅或提单不存在！
                                 } else {
-                                    onSearch2();
-                                    var sql1 = 'update uf_lo_ladingmain set ifstatus = \'40288098276fc2120127704884290211\'  where ladingno =\'' + pla + '\'';
-                                    //alert(sql1);
-                                    DataService.executeSql(sql1, {
-                                        callback : function(data) {}
-                                    });
+                                    onSearch1();
+                                    // var sql1 = 'update uf_lo_ladingmain set ifstatus = \'40288098276fc2120127704884290211\'  where ladingno =\'' + pla + '\'';
+                                    // //alert(sql1);
+                                    // DataService.executeSql(sql1, {
+                                    //     callback : function(data) {}
+                                    // });
                                 }
                             },
                             failure : function() {
@@ -1014,7 +1085,7 @@
     });
 
     function deleteWeigh() {
-        if ($("#plate").val().length < 1) {
+        if ($("#plate").val().length < 1&&$("#carno1").val().length<1) {
             alert("<%=SystemEnv.getHtmlLabelName(-11305,user.getLanguage())%>");//未输入提单号!
         } else {
             $("#reason").val("");
@@ -1215,24 +1286,61 @@
 
     jQuery(document).ready(function() {/*对字段进行监听*/
         OpenPort();
+        jQuery('#plate').bind('input propertychange', function() {
+            jQuery("#carno1").val("");
+
+            if (unloadingHead=="unloadingHead") {
+                // jQuery("#unloadingHead").click();
+                jQuery("#unloadingHead").next("span").click()
+
+            }
+        });
+        jQuery('#ggh').bind('input propertychange', function() {
+            var s = jQuery("#ggh").val();
+            // var a = s.replace(/[！|!|@|$|%|^|&|"|'|，|\\|/|?|>|<| | ｜　]/g, "");
+            var a=s.replace(/[^\d|\w|,]/g,"");
+            jQuery("#ggh").val(a);
+        });
+
+        // jQuery('#ggh').bind('input propertychange', function() {
+        //     var s = jQuery("#ggh").val();
+        //     var a = s.replace(/[！|!|@|$|%|^|&|"|\\|/|?|>|<| | ｜　]/g, "");
+        //     jQuery("#ggh").val(a);
+        // });
+
     })
 
-	function weighprint() {
+    function weighprint() {
         var ifprint=confirm("确认要打印吗");
         // console.log(selectedRow1);
         console.log(store1);
-        // console.log(sm1);
-        // console.log(selected1);
-		var records=store1.data;
-		var zxjhh=records.get(1).get("planNo");
-		var trdh=records.get(1).get("trdh");
-		url="/ReportServer?reportlet=ecoapp/dmlo/so/WeightingSheet.cpt&loadno="+zxjhh+"&ladno="+trdh;
-			//aodno装卸计划号+ladno提入单号""
+        console.log(sm1);
+        var selectRows = sm1.getSelections();
+
+
+        // var records=store1.data;
+        // var zxjhh=records.get(1).get("planNo");
+        // var trdh=records.get(1).get("trdh");
+        // if (trdh.length==0){
+        //     trdh=records.get(0).get("trdh");
+        // }
+        //aodno装卸计划号+ladno提入单号""
 
 
         if (ifprint){
-			window.open(url);
-		}
+            for (var i=0;i<selectRows.length;i++){
+                var zxjhh=selectRows[i].get("planNo");
+                var trdh=selectRows[i].get("trdh");
+
+                url="/ReportServer?reportlet=ecoapp/dmlo/so/WeightingSheet.cpt&loadno="+zxjhh+"&ladno="+trdh;
+                if (zxjhh.length>0&&trdh.length>0){
+                    window.open(url);
+
+                }
+
+
+            }
+        }
 
     }
 

@@ -354,7 +354,7 @@ public class Z_CCP_DELIVERY_DG_PO extends BaseBean implements Action {
 				buffer.append("'").append(pritem).append("',");
 				buffer.append("'").append(goodgroup).append("',");
 				buffer.append("'").append(wlh).append("',");
-				buffer.append("'").append(wlname).append("',");
+				buffer.append("'").append(wlname.replace("'","''")).append("',");
 				buffer.append("'").append(jhyzl).append("',");
 				buffer.append("'").append(yyzl).append("',");
 				buffer.append("'").append(syyzl).append("',");

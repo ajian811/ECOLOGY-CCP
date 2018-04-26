@@ -5,6 +5,7 @@ import java.util.*;
 
 import com.sap.mw.jco.JCO;
 
+import org.apache.poi.hssf.record.Record;
 import weaver.conn.RecordSet;
 import weaver.formmode.setup.ModeRightInfo;
 import weaver.general.BaseBean;
@@ -100,16 +101,9 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 				sfzf = Util.null2String(rs.getString("sfzf"));// 是否作废
 			}
 				log.writeLog("是否有柜:" + sfyg);
-				if ("1".equals(sfzf)) {
-					return SUCCESS;
-				}
 
 				String unitdesc="";
-					if ("0".equals(sfyg)) {
-					if("0".equals(currentnodetype)){
-						return SUCCESS;
-					}
-						String sql = "select t2.TRDH from " + tablename + " t1 ";
+						String sql = "select DISTINCT t2.TRDH from " + tablename + " t1 ";
 						sql += " left join " + tablename + "_dt3 t2 on t1.id = t2.mainid";
 						sql += " where t1.requestid= '" + requestid + "'";
 						sql += " group by t2.TRDH";
@@ -161,20 +155,9 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
                             localModeRightInfo1.setNewRight(true);
                             localModeRightInfo1.editModeDataShare(userid, 381, Integer.parseInt(id));
 
-							/*
-							StringBuffer sb = new StringBuffer();// 插入权限表
-							sb.append("insert into MODEDATASHARE_381");
-							sb.append("(SOURCEID,TYPE,CONTENT,SECLEVEL,SHARELEVEL) values");
-							sb.append("(").append("(select id from uf_trdpldy where trdh = '" + trdh + "')")
-									.append(",");
-							sb.append("'").append("1").append("',");
-							sb.append("'").append("1").append("',");
-							sb.append("'").append("0").append("',");
-							sb.append("'").append("3").append("')");
-							log.writeLog("插入权限执行的sql:" + sb.toString());
-							rs1.executeSql(sb.toString());// 先插入主表
-							*/
-							String dt3Sql = "select * from " + tablename + "_dt3 where trdh = '" + trdh + "'";
+
+							String dt3Sql = "select gbm,cp,jhyzl,shipno,jydh,xc,wlhm,wlms,sdfmc,dwms,ph from " + tablename + "_dt3 where trdh = '" + trdh + "'";
+							rs.writeLog(dt3Sql);
 							rs.execute(dt3Sql);
 
 							while (rs.next()) {
@@ -188,13 +171,18 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 
 								pono = Util.null2String(rs.getString("jydh"));// 交运单号
 								poitem = Util.null2String(rs.getString("xc"));// 订单项次
-								wlh = Util.null2String(rs.getString("wlh"));// 物料号码
-								wlname = Util.null2String(rs.getString("wlname"));// 物料描述
+								wlh = Util.null2String(rs.getString("wlhm"));// 物料号码
+								wlname = Util.null2String(rs.getString("wlms"));// 物料描述
 								sdfmc = Util.null2String(rs.getString("sdfmc"));// 送达方名称
 								unitdesc = Util.null2String(rs.getString("dwms"));// 单位描述
+								ph = Util.null2String(rs.getString("ph"));// 批号
+								gbm = Util.null2String(rs.getString("gbm"));// 批号
+
+								gbm=getSJGH(gbm,shipping,requestid);//获得实际编号，根据明细3中的柜号 在明细1中获取实际柜号，如果实际柜号为空 则返回原柜号
 
 
-								String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,shipping,jydh,ddxc,wlhm,wlms,bzfs,sl) values ";
+
+								String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,shipping,jydh,ddxc,wlhm,wlms,ph,bzfs,sl,gbm) values ";
 								insertSql += "(" + id + ",";
 								insertSql += "'" + cp + "',";
 								insertSql += "'" + shipping + "',";
@@ -202,140 +190,16 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 								insertSql += "'" + poitem + "',";
 								insertSql += "'" + wlh + "',";
 								insertSql += "'" + wlname + "',";
+								insertSql += "'" + ph + "',";
 								insertSql += "'" + unitdesc + "',";
-								insertSql += "'" + sl + "')";
+								insertSql += "'" + sl + "',";
+								insertSql += "'" + gbm + "')";
 								log.writeLog("插入建模明细执行的sql :" + insertSql);
 								rs3.executeSql(insertSql);// 后插入明细
 							}
 							Boolean result=updateKhmc(sdfmc,str1);
 						}
-					} else {
-						String selectSql = " select t2.jydh as d2jydh,t2.ddxc as d2ddxc,t2.sdfmc,t2.wlhm as d2wlhm,t2.wlms as d2wlms,t2.cp as d2cp,t2.trdh as d2trdh,t2.jhyzl as d2jhyzl,t2.gbm as d2gbm,t2.ph as d2ph,t2.dwms as dwms,t1.* from "
-								+ tablename + " t1";
-						selectSql += " left join " + tablename + "_dt2  t2 on t1.id = t2.mainid";
-						selectSql += " where t1.requestid= " + requestid;
-						log.writeLog("查询流程表单的sql:" + selectSql);
-						rs1.execute(selectSql);
 
-						while (rs1.next()) {
-							// dt2,一个提入单号多个产品
-							Map<String, String> map = new HashMap<String, String>();
-
-							cp = Util.null2String(rs1.getString("d2cp"));// 产品
-							sl = Util.null2String(rs1.getString("d2jhyzl"));// 数量
-							trdh = Util.null2String(rs1.getString("d2trdh"));// 提入单号
-							gbm = Util.null2String(rs1.getString("d2gbm"));// 柜编码
-
-							pono = Util.null2String(rs1.getString("d2jydh"));// 交运单号
-							poitem = Util.null2String(rs1.getString("d2ddxc"));// 订单项次
-							wlh = Util.null2String(rs1.getString("d2wlhm"));// 物料号码
-							wlname = Util.null2String(rs1.getString("d2wlms"));// 物料描述
-							ph = Util.null2String(rs1.getString("d2ph"));// 批号
-							bzxz = Util.null2String(rs1.getString("d2bzxz"));// 包装性质
-							shipno = Util.null2String(rs1.getString("ygshipno"));// shipno
-							sdfmc = Util.null2String(rs1.getString("sdfmc"));// 送达方名称
-							unitdesc = Util.null2String(rs1.getString("dwms"));// 单位描述
-
-
-
-
-							map.put("cp", cp);
-							map.put("sl", sl);
-							map.put("gbm", gbm);
-							map.put("pono", pono);
-							map.put("poitem", poitem);
-							map.put("wlh", wlh);
-							map.put("wlname", wlname);
-							map.put("ph", ph);
-							map.put("bzxz", bzxz);
-							map.put("shipno", shipno);
-							map.put("unitdesc", unitdesc);
-
-
-							list.add(map);
-						}
-
-					}
-
-
-
-				if ("1".equals(sfyg)) {
-					if (!"0".equals(currentnodetype)) {
-						return SUCCESS;
-					}
-					StringBuffer buffer = new StringBuffer();
-					buffer.append("insert into UF_TRDPLDY");
-					buffer.append(
-							"(TRDH,ZXJHH,LCID,LCBH,DYCS,SFDY,SFYG,YJYSRQ,YJYSSJ,FORMMODEID,LX,cp,sfzf,MODEDATACREATER," +
-                                    "modedatacreatertype,modedatacreatedate,modedatacreatetime,modeuuid) values");
-					buffer.append("('").append(trdh).append("',");
-					buffer.append("'").append(zxjhh).append("',");
-					buffer.append("'").append(requestid).append("',");
-					buffer.append("'").append(lcbh).append("',");
-					buffer.append("'").append("0").append("',");
-					buffer.append("'").append("0").append("',");
-					buffer.append("'").append(sfyg).append("',");
-					buffer.append("'").append(yjysrq).append("',");
-					buffer.append("'").append(yjyssj).append("',");
-					buffer.append("'").append("381").append("',");
-					buffer.append("'").append("0").append("',");
-					buffer.append("'").append(carno).append("',");
-					buffer.append("'").append("0").append("',");
-					buffer.append("'").append(userid).append("',");
-
-                    buffer.append("'").append("0").append("',");
-                    Date d1=new Date();
-                    SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
-                    SimpleDateFormat dateFormat1=new SimpleDateFormat("HH:mm");
-                    buffer.append("'").append(dateFormat.format(d1)).append("',");
-                    buffer.append("'").append(dateFormat1.format(d1)).append("',");
-                    str1 = UUID.randomUUID().toString();
-                    buffer.append("'").append(str1).append("')");
-
-					log.writeLog("插入建模主表执行的sql :" + buffer.toString());
-					rs1.executeSql(buffer.toString());// 先插入主表
-
-                    String sql="select id from UF_TRDPLDY where modeuuid='"+str1+"'";
-                    log.writeLog(sql);
-                    rs1.execute(sql);
-                    String id="";
-                    if(rs1.next()){
-                        id=Util.null2String(rs1.getString("id"));
-                    }
-                    ModeRightInfo localModeRightInfo1 = new ModeRightInfo();
-                    localModeRightInfo1.setNewRight(true);
-                    localModeRightInfo1.editModeDataShare(userid, 381, Integer.parseInt(id));
-                    /*
-					StringBuffer sb = new StringBuffer();// 插入权限表
-					sb.append("insert into MODEDATASHARE_381");
-					sb.append("(SOURCEID,TYPE,CONTENT,SECLEVEL,SHARELEVEL) values");
-					sb.append("(").append("(select id from uf_trdpldy where trdh = '" + trdh + "')").append(",");
-					sb.append("'").append("1").append("',");
-					sb.append("'").append("1").append("',");
-					sb.append("'").append("0").append("',");
-					sb.append("'").append("3").append("')");
-					log.writeLog("插入权限执行的sql:" + sb.toString());
-					rs1.executeSql(sb.toString());// 先插入主表
-*/
-                    Boolean result=updateKhmc(sdfmc,str1);
-
-					for (int i = 0; i < list.size(); i++) {
-						String insertSql = "insert into uf_trdpldy_dt1(mainid,cp,gbm,jydh,ddxc,wlhm,wlms,sl,ph,shipping,bzfs) values ";
-						insertSql += "((select id from uf_trdpldy where trdh = '" + trdh + "'),";
-						insertSql += "'" + list.get(i).get("cp") + "',";
-						insertSql += "'" + list.get(i).get("gbm") + "',";
-						insertSql += "'" + list.get(i).get("pono") + "',";
-						insertSql += "'" + list.get(i).get("poitem") + "',";
-						insertSql += "'" + list.get(i).get("wlh") + "',";
-						insertSql += "'" + list.get(i).get("wlname") + "',";
-						insertSql += "'" + list.get(i).get("sl") + "',";
-						insertSql += "'" + list.get(i).get("ph") + "',";
-						insertSql += "'" + list.get(i).get("shipno") + "',";
-						insertSql += "'" + list.get(i).get("unitdesc") + "')";
-						log.writeLog("插入建模明细执行的sql :" + insertSql);
-						rs1.executeSql(insertSql);// 后插入明细
-					}
-				}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -349,6 +213,29 @@ public class Z_CCP_INSERT_TRD extends BaseBean implements Action {
 		}
 		return Action.SUCCESS;
 	}
+
+	private String getSJGH(String gbm,String shipping,int requestid) {
+    	String sjgh="";
+		RecordSet recordSet =new RecordSet();
+		String sql="SELECT sjgh FROM FORMTABLE_MAIN_45_DT1 where gbh='"+gbm+"'" ;
+				if(!"".equals(shipping)) {
+					sql+=" and shipping='" + shipping + "'";
+				}
+				if(requestid>0) {
+					sql+=" and mainid=(select id from FORMTABLE_MAIN_45 where requestid=" + requestid + ")";
+				}
+		recordSet.writeLog(sql);
+		recordSet.execute(sql);
+		if (recordSet.next()){
+			sjgh= recordSet.getString("sjgh");
+		}
+		if ("".equals(sjgh)){
+			sjgh=gbm;
+		}
+
+    	return  sjgh;
+	}
+
 	public Boolean updateKhmc(String khmc,String uuid){
     	Boolean result=false;
     	String sql="update uf_trdpldy set khmc='"+khmc+"' where modeuuid='"+uuid+"'";

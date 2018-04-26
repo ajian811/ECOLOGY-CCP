@@ -1,0 +1,121 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+
+    var html = "<input type='button' value='作废' class='middle e8_btn_top_zf' id='zf' onclick='zfFun()' />";
+    $(".zf").append(html);
+
+    function zfFun(){
+        var zt=jQuery("#disfield11443  option:selected").val();
+        console.log("zt:"+zt);
+        if(zt=='4'){
+            Dialog.alert("该暂估单已作废，无需重复作废！");
+            return;
+        }
+        if(confirm("确认作废该暂估单吗？")){
+            var BELNR=jQuery("#field11480").val();//SAP凭证编号
+            var BUKRS=jQuery("#field11462").val();//公司代码
+            // var GJAHR=jQuery("#field11462").val().substr(0, 4);//会计年度
+            var GJAHR=jQuery("#field11474").val().substr(0, 4);//会计年度 xxy
+
+            var djbh=jQuery("#field11721").val();//单据编号
+            console.log("BELNR:"+BELNR+",BUKRS:"+BUKRS+",GJAHR:"+GJAHR+",djbh:"+djbh);
+            jQuery.ajax({
+                url: "/sapjsp/ZGD_ZF.jsp",
+                data: {
+                    "BELNR": BELNR,
+                    "BUKRS":BUKRS,
+                    "GJAHR":GJAHR,
+                    "djbh":djbh
+                },
+                type: "POST",
+                dataType: "JSON",
+                async: false,
+                success: function(data) {
+                    if (data) {
+                        var newdata=data.replace(/\s/g,'');
+                        console.log(newdata);
+                        console.log("-------");
+                        var jsondate=JSON.parse(newdata);
+                        console.log(jsondate);
+                        var STBLG=jsondate.STBLG;
+                        if(STBLG.length>0){
+                            Dialog.alert("获取到冲销凭证号："+STBLG+",作废暂估单成功，请刷新本页面！");
+                        }else {
+                            var msg=jsondate.msg;
+                            if("success"==msg){
+                                Dialog.alert("无凭证号，作废成功，请刷新本页面！")
+                            }else{
+                                Dialog.alert("已有凭证号，但没有获取到冲销凭证号，作废暂估单失败，请稍候重试！");
+                            }
+                        }
+                    }
+                }
+            })
+        }
+    }
+    function rlaodWin(){
+        window.location.reload();
+    }
+    $(document).ready(function() {
+        var html = "<input type='button' value='暂估单上传SAP' class='middle e8_btn_top_first' id='upsap' />";
+        $("#needButton").append(html);
+        $("#upsap").click(function() {
+            upsap();
+        });
+    });
+
+    function upsap() {
+        var djbh = $("#field11721").val(); //单据编号
+        var flag = $("#field11482").val(); //返回标识
+        if (djbh == '' || djbh == null) {
+            Dialog.alert("没有单据编号，上传失败");
+            return;
+        }
+        if (flag == 'X') {
+            Dialog.alert("已经上传SAP成功,无需多次上传");
+            return;
+        }
+        jQuery.ajax({
+            url: "/sapjsp/ZGD_UP_SAP.jsp",
+            data: {
+                "djbh": djbh
+            },
+            type: "POST",
+            dataType: "JSON",
+            async: false,
+            success: function(data) {
+                if (data) {
+                    console.log(data);
+                    console.log("-------");
+                    console.log(JSON.parse(data));
+                    if (JSON.parse(data).flag == "X") {
+                        alert("上抛暂估单数据成功");
+                        window.location.reload();
+                    } else {
+                        Dialog.alert(data);
+                    }
+                }
+            }
+        })
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

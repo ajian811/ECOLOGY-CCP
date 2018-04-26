@@ -22,35 +22,6 @@
 
 //查询明细表
     if(type.equals("search")){
-/*
-        JSONArray jsonArray=new JSONArray();
-        RecordSet recordSet=new RecordSet();
-        String tablename="";
-        String sql="";
-        String dh="";//采购凭证号
-        String xc="";//采购凭证的项目编号
-        String wlqypc="";//物料启用批次
-        String tmdw="";//条目单位
-        String gc="";//工厂
-        String wlh="";//物料号
-        String wlmx="";//物料描述
-        String bz1="";//备注1
-        String LSMNG="";//交货单的计量单位数量
-        String LSMEH="";//计量单位
-        String BSART1="";//订单类型
-        String packxz="";//包装性质
-
-
-        tablename=getTableNameByTrdh(trdh);
-        sql="select * from "+tablename+" where trdh='"+trdh+"'";
-        recordSet.writeLog(sql);
-        recordSet.execute(sql);
-        while (recordSet.next()){
-
-
-        }
-        */
-
 
 
         JSONArray jsonArr2=new JSONArray();
@@ -59,7 +30,8 @@
         String xc="";
         String lcid="";
         String tmdw="";
-        sql.append("SELECT DISTINCT b.jydh,b.ddxc,a.lcid from UF_TRDPLDY a,UF_TRDPLDY_DT1 b where a.id=b.MAINID and a.TRDH='")
+        String sl="";
+        sql.append("SELECT DISTINCT b.jydh,b.ddxc,a.lcid,b.sl from UF_TRDPLDY a,UF_TRDPLDY_DT1 b where a.id=b.MAINID and a.TRDH='")
                 .append(trdh+"'");
 //out.print(sql);
         rs.executeSql(sql.toString());
@@ -74,15 +46,17 @@
             dh=Util.null2String(rs.getString("jydh"));
             xc=Util.null2String(rs.getString("ddxc"));
             lcid=Util.null2String(rs.getString("lcid"));
+            sl=Util.null2String(rs.getString("sl"));
 
             jsonObject.put("dh",dh);
             jsonObject.put("xc",xc);
             jsonObject.put("lcid",lcid);
+            jsonObject.put("sl",sl);
             jsonArray.add(jsonObject);
         }
         String LSMNG="";
         String LSMEH="";
-        sql0="SELECT JZ,TRDH FROM UF_GBJL WHERE JZ IS NOT NULL AND TRDH='"+trdh+"'";
+        sql0="SELECT JZ,TRDH FROM UF_GBJL WHERE JZ IS NOT NULL AND TRDH='"+trdh+"' AND SFZF='0'";
         rs.writeLog(sql0);
         rs.execute(sql0);
         if(rs.next()){
@@ -107,6 +81,8 @@
             JSONObject jsonObject=jsonArray.getJSONObject(i);
             dh=jsonObject.getString("dh");
             xc=jsonObject.getString("xc");
+            sl=jsonObject.getString("sl");
+
 
             StringBuffer sql2 = new StringBuffer();
             sql2.append("select * from uf_jmclxq where PONO='" + dh + "' AND" + " POITEM='" + xc + "'");
@@ -134,8 +110,12 @@
                 map.put("LSMNG", LSMNG);//交货单的计量单位数量
                 map.put("LSMEH", LSMEH);//计量单位
                 map.put("cp", cp);//车牌
+                if ("X".equals(Util.null2String(rs.getString("packxz")))) {
+                    map.put("ychl", Util.null2String(sl));//已出货量
+                }else{
+                    map.put("ychl", "");//已出货量
 
-                map.put("ychl",Util.null2String(rs.getString("ychl")));//已出货量
+                }
 
 
                 if (!bs.equals("X")) {
@@ -185,6 +165,7 @@
         if(!mx0.equals("")&&mx0!=null){
             mx0Jsons0=JSONArray.fromObject(mx0);
             rs.writeLog("获得明细0的数据为："+mx0Jsons0);
+            rs.writeLog("mx0Jsons0 size:"+mx0Jsons0.size());
         }
         if(!mx1.equals("")&&mx1!=null){
             mx1Jsons0=JSONArray.fromObject(mx1);
@@ -192,6 +173,8 @@
         }
         mx0Jsons=checkJsonArrByWlpzh(mx0Jsons0,billid);
         mx1Jsons=checkJsonArrByWlpzh(mx1Jsons0,billid);
+        //mx0Jsons=mx0Jsons0;
+        //mx1Jsons=mx1Jsons0;
 
         try{
             rs.writeLog("开始连接SAP...");
@@ -210,7 +193,11 @@
             JCO.Table table1=function.getTableParameterList().getTable("IT_HEAD_UP");
 
             //明细表0上抛字段
+            JSONArray jsonArray=new JSONArray();
+            JSONArray jsonArray2=new JSONArray();
+
             if(mx0Jsons.size()>0){
+                String mxtype="mx0";
                 rs.writeLog("mx0Jsons:"+mx0Jsons);
                 for(int i=0;i<mx0Jsons.size();i++){
                     rs.writeLog("遍历mx0Jsons");
@@ -226,9 +213,11 @@
                     table1.setValue(Util.null2String(mx0JObject.get("ERFME")), "ERFME");	 //条目单位
                     table1.setValue(Util.null2String(mx0JObject.get("LSMNG")), "LSMNG");	 //交货单的计量单位数量
                     table1.setValue(Util.null2String(mx0JObject.get("LSMEH")), "LSMEH");	 //交货单的计量单位
-                    table1.setValue(Util.null2String(mx0JObject.get("BUDAT")),"BUDAT");//凭证中的过帐日期
+                    //table1.setValue(Util.null2String(mx0JObject.get("BUDAT")),"BUDAT");//凭证中的过帐日期
+                    table1.setValue("20180207","BUDAT");//凭证中的过帐日期
 
-                    table1.setValue(Util.null2String(mx0JObject.get("BLDAT")), "BLDAT");	 //凭证中的凭证日期
+                    table1.setValue("20180207", "BLDAT");	 //凭证中的凭证日期
+                    //table1.setValue(Util.null2String(mx0JObject.get("BLDAT")), "BLDAT");	 //凭证中的凭证日期
 
 
                     table1.setValue(Util.null2String(mx0JObject.get("CAR_NO")), "CAR_NO");	 //车号
@@ -241,10 +230,58 @@
                     table1.setValue(Util.null2String(mx0JObject.get("BEIZHU3")), "BEIZHU3");
 
                 }
+                //
+                sapconnection.execute(function);
+                rs.writeLog("获取IT_HEAD_LOG");
+                // JCO.Structure ret = function.getExportParameterList().getStructure("RETURN");
+                // rs.writeLog("RETURN: " + ret.getString("MESSAGE"));
 
+                JCO.Table retable=function.getTableParameterList().getTable("IT_HEAD_LOG");
+                rs.writeLog("返回表行数："+retable.getNumRows());
+
+
+                for (int i = 0; i < retable.getNumRows(); i++) {
+                    JSONObject jsonObject=new JSONObject();
+                    retable.setRow(i);
+                    String EBELN=retable.getString("EBELN");//采购凭证号
+                    String EBELP=retable.getString("EBELP");//采购凭证的项目编号
+                    String ZMARK=retable.getString("ZMARK");//Delivery download flag
+                    String ZMESS=retable.getString("ZMESS");//Download information
+                    String MBLNR=retable.getString("MBLNR");//物料凭证编号
+                    String ZNO=retable.getString("ZNO");//批次确认单号
+                    String ZNO_ITEM=retable.getString("ZNO_ITEM");//批次确认单号项目号
+                    //去除字符开头的0
+                    String ZNO_ITEM1=ZNO_ITEM.replaceAll("^(0+)", ""); ;//批次确认单号项目号
+
+                    jsonObject.put("MBLNR",MBLNR);
+                    jsonObject.put("mxtype",mxtype);
+                    jsonObject.put("ZNO_ITEM",ZNO_ITEM1);
+                    jsonObject.put("mxtype","MX0");
+                    if("E".equals(ZMARK)){
+                        jsonObject.put("ZMESS",ZMESS);
+                        jsonArray.add(jsonObject);
+                    }else {
+                        jsonArray2.add(jsonObject);
+
+                    }
+
+
+                    rs.writeLog("EBELN返回："+retable.getString("EBELN"));
+                    rs.writeLog("EBELP返回："+retable.getString("EBELP"));
+                    rs.writeLog("ZMARK返回："+retable.getString("ZMARK"));
+                    rs.writeLog("ZMESS返回："+retable.getString("ZMESS"));
+                    rs.writeLog("MBLNR返回："+retable.getString("MBLNR"));
+                    rs.writeLog("ZNO返回："+retable.getString("ZNO"));
+                    rs.writeLog("ZNO_ITEM返回："+retable.getString("ZNO_ITEM"));
+
+
+                }
 
             }
+
+
             if(mx1Jsons.size()>0){
+                String mxtype="mx1";
                 for(int i=0;i<mx1Jsons.size();i++){
                     rs.writeLog("遍历mx1Jsons");
                     table1.appendRow();
@@ -262,11 +299,14 @@
                     table1.setValue(Util.null2String(mx1JObject.get("CHARG")), "CHARG");	 //批号
                     table1.setValue(Util.null2String(mx1JObject.get("LICHA")), "LICHA");	 //供应商的批次
                     table1.setValue(Util.null2String(mx1JObject.get("HSDAT")), "HSDAT");	 //生产日期
-                    table1.setValue(Util.null2String(mx1JObject.get("VFDAT")), "VFDAT");	 //货架寿命到期日
+                    //table1.setValue(Util.null2String(mx1JObject.get("VFDAT")), "VFDAT");	 //货架寿命到期日
+                    table1.setValue("20180217", "VFDAT");	 //货架寿命到期日
                     table1.setValue(Util.null2String(mx1JObject.get("HSDAT")), "HSDAT");	 //生产日期
-                    table1.setValue(Util.null2String(mx1JObject.get("BUDAT")),"BUDAT");//凭证中的过帐日期
+                    //table1.setValue(Util.null2String(mx1JObject.get("BUDAT")),"BUDAT");//凭证中的过帐日期
+                    table1.setValue("20180207","BUDAT");//凭证中的过帐日期
 
-                    table1.setValue(Util.null2String(mx1JObject.get("BLDAT")), "BLDAT");	 //凭证中的凭证日期
+                    //table1.setValue(Util.null2String(mx1JObject.get("BLDAT")), "BLDAT");	 //凭证中的凭证日期
+                    table1.setValue("20180207", "BLDAT");	 //凭证中的凭证日期
 
 
                     table1.setValue(Util.null2String(mx1JObject.get("CAR_NO")), "CAR_NO");	 //车号
@@ -279,68 +319,60 @@
                     table1.setValue(Util.null2String(mx1JObject.get("BEIZHU3")), "BEIZHU3");
 
                 }
+                //
+                sapconnection.execute(function);
+                rs.writeLog("获取IT_HEAD_LOG");
+                // JCO.Structure ret = function.getExportParameterList().getStructure("RETURN");
+                // rs.writeLog("RETURN: " + ret.getString("MESSAGE"));
+
+                JCO.Table retable=function.getTableParameterList().getTable("IT_HEAD_LOG");
+                rs.writeLog("返回表行数："+retable.getNumRows());
+
+
+                for (int i = 0; i < retable.getNumRows(); i++) {
+                    JSONObject jsonObject=new JSONObject();
+                    retable.setRow(i);
+                    String EBELN=retable.getString("EBELN");//采购凭证号
+                    String EBELP=retable.getString("EBELP");//采购凭证的项目编号
+                    String ZMARK=retable.getString("ZMARK");//Delivery download flag
+                    String ZMESS=retable.getString("ZMESS");//Download information
+                    String MBLNR=retable.getString("MBLNR");//物料凭证编号
+                    String ZNO=retable.getString("ZNO");//批次确认单号
+                    String ZNO_ITEM=retable.getString("ZNO_ITEM");//批次确认单号项目号
+                    //去除字符开头的0
+                    String ZNO_ITEM1=ZNO_ITEM.replaceAll("^(0+)", ""); ;//批次确认单号项目号
+
+                    jsonObject.put("MBLNR",MBLNR);
+                    jsonObject.put("mxtype",mxtype);
+                    jsonObject.put("ZNO_ITEM",ZNO_ITEM1);
+                    jsonObject.put("mxtype","MX1");
+                    
+                    if("E".equals(ZMARK)){
+                        jsonObject.put("ZMESS",ZMESS);
+                        jsonArray.add(jsonObject);
+                    }else {
+                        jsonArray2.add(jsonObject);
+
+                    }
+
+
+                    rs.writeLog("EBELN返回："+retable.getString("EBELN"));
+                    rs.writeLog("EBELP返回："+retable.getString("EBELP"));
+                    rs.writeLog("ZMARK返回："+retable.getString("ZMARK"));
+                    rs.writeLog("ZMESS返回："+retable.getString("ZMESS"));
+                    rs.writeLog("MBLNR返回："+retable.getString("MBLNR"));
+                    rs.writeLog("ZNO返回："+retable.getString("ZNO"));
+                    rs.writeLog("ZNO_ITEM返回："+retable.getString("ZNO_ITEM"));
+
+                }
             }
 
 
 
-            //
-            sapconnection.execute(function);
-            rs.writeLog("获取IT_HEAD_LOG");
-            // JCO.Structure ret = function.getExportParameterList().getStructure("RETURN");
-            // rs.writeLog("RETURN: " + ret.getString("MESSAGE"));
 
-            JCO.Table retable=function.getTableParameterList().getTable("IT_HEAD_LOG");
-            rs.writeLog("返回表行数："+retable.getNumRows());
-
-            JSONArray jsonArray=new JSONArray();
-            JSONArray jsonArray2=new JSONArray();
-            for (int i = 0; i < retable.getNumRows(); i++) {
-                JSONObject jsonObject=new JSONObject();
-                retable.setRow(i);
-                String EBELN=retable.getString("EBELN");//采购凭证号
-                String EBELP=retable.getString("EBELP");//采购凭证的项目编号
-                String ZMARK=retable.getString("ZMARK");//Delivery download flag
-                String ZMESS=retable.getString("ZMESS");//Download information
-                String MBLNR=retable.getString("MBLNR");//物料凭证编号
-                String ZNO=retable.getString("ZNO");//批次确认单号
-                String ZNO_ITEM=retable.getString("ZNO_ITEM");//批次确认单号项目号
-                //去除字符开头的0
-                String ZNO_ITEM1=ZNO_ITEM.replaceAll("^(0+)", ""); ;//批次确认单号项目号
-
-                jsonObject.put("MBLNR",MBLNR);
-                jsonObject.put("ZNO",ZNO);
-                jsonObject.put("ZNO_ITEM",ZNO_ITEM1);
-                if("E".equals(ZMARK)){
-                    jsonObject.put("ZMESS",ZMESS);
-                    jsonArray.add(jsonObject);
-                }else {
-                    jsonArray2.add(jsonObject);
-
-                }
-
-
-                rs.writeLog("EBELN返回："+retable.getString("EBELN"));
-                rs.writeLog("EBELP返回："+retable.getString("EBELP"));
-                rs.writeLog("ZMARK返回："+retable.getString("ZMARK"));
-                rs.writeLog("ZMESS返回："+retable.getString("ZMESS"));
-                rs.writeLog("MBLNR返回："+retable.getString("MBLNR"));
-                rs.writeLog("ZNO返回："+retable.getString("ZNO"));
-                rs.writeLog("ZNO_ITEM返回："+retable.getString("ZNO_ITEM"));
-                /*
-                if((retable.getString("ZMARK")).equals("E")){
-                    out.write("PO上抛失败，错误信息:"+retable.getString("ZMESS"));
-                    return;
-                }
-                if((retable.getString("ZMARK")).equals("S")){
-                    out.write("PO上抛成功，返回信息:"+retable.getString("ZMESS"));
-                    return;
-                }
-*/
-            }
             JSONObject jsonObject=new JSONObject();
             jsonObject.put("success",jsonArray2);
             jsonObject.put("failure",jsonArray);
-
 
             if(sapconnection!=null){
                 JCO.releaseClient(sapconnection);
@@ -348,6 +380,7 @@
 
             //更新成功的
             updateSuccessByJson(jsonObject,billid);
+            updateAllUploadStatus(billid);
 
             rs.writeLog(jsonObject.toString());
             out.write(jsonObject.toString());
@@ -401,7 +434,7 @@
 
     for (int i = 0; i < jsonArray.size(); i++) {
         JSONObject jsonObject1=jsonArray.getJSONObject(i);
-        String ZNO=jsonObject1.getString("ZNO");
+        String ZNO=jsonObject1.getString("mxtype");
         String ZNO_ITEM=jsonObject1.getString("ZNO_ITEM");
 
         String MBLNR=jsonObject1.getString("MBLNR");
@@ -460,8 +493,42 @@
     return  result;
 }
 %>
-//校验每条明细是否上抛，如果已经上抛（有物料凭证号）则不能上抛
-<%!public JSONArray checkJsonArrByWlpzh(JSONArray jsonArray,String billid){
+<%!
+    //校验如果所有明细的物料凭证号都不为空，则更新 alluplooad状态为yes
+    private void updateAllUploadStatus(String billid) {
+        RecordSet rs=new RecordSet();
+        String sql="";
+        Boolean checkMX1=false;
+        String checkMX1Counts="";
+        Boolean checkMX2=false;
+        String checkMX2Counts="";
+
+        sql="SELECT COUNT(*) AS COUNTS FROM uf_popcqr_DT2 WHERE WLPZH IS  NULL AND MAINID="+billid;
+        rs.writeLog(sql);
+        rs.execute(sql);
+        while (rs.next()){
+            checkMX1Counts=rs.getString("counts");
+        }
+
+        sql="SELECT COUNT(*) AS COUNTS FROM uf_popcqr_DT1 WHERE WLPZH IS  NULL AND MAINID="+billid;
+        rs.writeLog(sql);
+        rs.execute(sql);
+        while (rs.next()){
+            checkMX2Counts=rs.getString("counts");
+        }
+        checkMX1=("0".equals(checkMX1Counts));
+        checkMX2=("0".equals(checkMX2Counts));
+
+        if (checkMX1&&checkMX2){
+         sql="update uf_popcqr set allupload='1' where id="+billid;
+         rs.writeLog(sql);
+         rs.execute(sql);
+
+        }
+    }
+    //校验每条明细是否上抛，如果已经上抛（有物料凭证号）则不能上抛
+
+    public JSONArray checkJsonArrByWlpzh(JSONArray jsonArray, String billid){
     JSONArray jsonArray1=new JSONArray();
     String ZNO="";//明细表 MX0 MX1
     String tablename="";//表面
@@ -471,7 +538,7 @@
         for (int i = 0; i <jsonArray.size() ; i++) {
             Boolean check = false;
             JSONObject jsonObject =jsonArray.getJSONObject(i);
-            ZNO=jsonObject.getString("ZNO");
+            ZNO=jsonObject.getString("mxtype");
             ZNO_ITEM=jsonObject.getString("ZNO_ITEM");
             JSONObject jsonTable=getTableNameByZNO(ZNO);
             tablename=jsonTable.getString("tablename");

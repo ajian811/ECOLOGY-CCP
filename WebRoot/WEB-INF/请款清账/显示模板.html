@@ -1,0 +1,95 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+
+        bindChange();
+
+        checkCustomize = function() {
+            return true;
+        }
+    });
+
+    function bindChange() {
+        var html1 = "<input type='button' value='上传清帐凭证' class='middle e8_btn_top_first' id='upsap' />";
+        $("#upsap").append(html1);
+        $("#upsap").click(function() {
+            upsap();
+        });
+    }
+
+
+    function upsap() {
+        var yddzddh = $("#field14206").val();
+        if (yddzddh == '' || yddzddh == null) {
+            Dialog.alert("请选择月度对账单号，复制凭证内容失败!");
+            return;
+        }
+        var bill=getQueryString("billid");
+        console.log("billid:"+bill);
+        var sqbh=$("#field14203").val();//申请编号
+        jQuery.ajax({
+            url: "/sapjsp/QK_UP_SAP.jsp",
+            data: {
+                "yddzd": yddzddh,
+                "sqbh":sqbh,
+                "id":bill
+            },
+            type: "POST",
+            dataType: "JSON",
+            async: false,
+            success: function(data) {
+                var datas = JSON.parse(data);
+                if (datas) {
+                    console.log(datas);
+                    var msg="";
+
+                    if (datas.flag == "X") {
+                        jQuery.each(datas.result, function(i, item) {
+                            var ZOANO=item.ZOANO;//装卸计划号
+                            var AC_DOC_NO=item.AC_DOC_NO;//凭证号
+                            var REF_DOC_NO=item.REF_DOC_NO;//发票号
+                            var ERR_MSG=item.ERR_MSG;//错误信息
+                            var FLAG=item.FLAG;//成功标识
+                            if(FLAG=="X"){
+                                msg+="装卸计划号："+ZOANO+",发票号："+REF_DOC_NO+"上抛SAP成功，返回凭证号："+AC_DOC_NO+"\n";
+                            }else {
+                                msg+="装卸计划号："+ZOANO+",发票号："+REF_DOC_NO+"上抛SAP失败，失败原因："+ERR_MSG+"\n";
+
+                            }
+                        });
+                        msg+="请刷新该界面！";
+                        alert(msg);
+
+
+                    } else {
+                        Dialog.alert("系统报错了："+datas.err+",请联系管理员");
+                    }
+                }
+            }
+        })
+    }
+
+    function ValSapn(fieldid, fieldval) {
+        jQuery(fieldid).val(fieldval);
+        jQuery(fieldid + "span").text(fieldval);
+    }
+    function getQueryString(name) {
+        var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+        var r = window.location.search.substr(1).match(reg);
+
+        if (r != null) {
+            console.log("获得requestid："+unescape(r[2]));
+            return unescape(r[2]);
+        }
+        return null;
+    }
+
+</script>
+
+
+
+
+
+
+
+

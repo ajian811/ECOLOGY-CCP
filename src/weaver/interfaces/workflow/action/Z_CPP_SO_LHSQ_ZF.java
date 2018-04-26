@@ -40,103 +40,111 @@ public class Z_CPP_SO_LHSQ_ZF extends BaseBean implements Action {
 			String id = "";
 			String shipno = "";
 			String lcbh = "";
-			String gh="";
-			String zxjhh="";
-			String sfzf="";
+			String gh = "";
+			String zxjhh = "";
+			String sfzf = "";
 			if (rs.next()) {
 				sfyg = Util.null2String(rs.getString("sfyg"));
 				id = Util.null2String(rs.getString("id"));
 				shipno = Util.null2String(rs.getString("shipping"));
 				lcbh = Util.null2String(rs.getString("lcbh"));
 				gh = Util.null2String(rs.getString("gh"));
-				zxjhh=Util.null2String(rs.getString("ZXJHH"));
-				sfzf=Util.null2String(rs.getString("sfzf"));
+				zxjhh = Util.null2String(rs.getString("ZXJHH"));
+				sfzf = Util.null2String(rs.getString("sfzf"));
 			} else {
-				message = "查询不到该流程";
-				requestInfo.getRequestManager().setMessagecontent(message);
-				return Action.FAILURE_AND_CONTINUE;
+				return "查询不到该流程";
 			}
-			if(sfzf.equals("0")){
-				return Action.SUCCESS;
+			//判断是否已作废
+			{
+				sql = "select sfzf from  uf_solhsq  where lcid = " + requestid;
+				rs.writeLog(sql);
+				rs.execute(sql);
+				if(rs.next()){
+					String  lcsfzf = Util.null2String(rs.getString("sfzf"));
+					if("1".equals(lcsfzf)){
+						return "1";
+					}
+				}
 			}
-			// 有柜情况
-			if (sfyg.equals("1")) {
-				// 1.根据Shipping和柜号查询装卸计划是否作废
-				
-				sql = "select requestid,zxjhh,SFZF from formtable_main_45 where ghcx='" + gh
-						+ "' AND SFYG='1' AND YGSHIPNO='" + shipno + "'";
-				rs.writeLog(sql);
-				rs.execute(sql);
-				String SFZF = "";
-				String requestid1 = "";
-				if (rs.next()) {
-					zxjhh = Util.null2String(rs.getString("zxjhh"));
-					SFZF = Util.null2String(rs.getString("SFZF"));
-					requestid1 = Util.null2String(rs.getString("requestid"));
-					if (!SFZF.equals("1")) {
-						message = "报错：装卸计划号为：" + zxjhh + "的SO装卸计划尚未作废";
-						requestInfo.getRequestManager().setMessagecontent(message);
-						return Action.FAILURE_AND_CONTINUE;
-					}
-					// 根据requestid在workflow_requestbase表中查询当前节点状态 0--创建
-					// 3--归档
-					RecordSet rs1=new RecordSet();
-					sql = "SELECT currentnodetype FROM workflow_requestbase where requestid='" + requestid1 + "'";
-					rs1.writeLog(sql);
-					rs1.execute(sql);
-					String dqjd = "";
-					if (rs1.next()) {
-						dqjd = rs1.getString("currentnodetype");
-						
-					}
-					writeLog("获得节点："+dqjd);
-					if (!dqjd.equals("3")) {
-						String jdname = "";
-						if (dqjd.equals("0")) {
-							jdname = "创建";
-						}
-						if (dqjd.equals("1")) {
-							jdname = "审批";
-						}
-						message = "报错：装卸计划号为：" + zxjhh + "的SO装卸计划尚已作废，但尚未归档，目前仍在" + jdname + "节点";
-						requestInfo.getRequestManager().setMessagecontent(message);
-						return Action.FAILURE_AND_CONTINUE;
-					}
-				}
-				
-				/*
-				 * 2.根据理货单号查询柜费/装柜劳务/吊柜费暂估单是否均已上抛，如果全部未上抛的，则作废理货清单时，将相关的柜费/装柜劳务/
-				 * 吊柜费暂估单全部作废。
-				 * 如果全部已作废的，则只需作废理货清单。如果部分已上抛的，则提示“关联的暂估单号XXXX已上抛，请先作废暂估单！”
-				 */
-				sql = "select DJSTATUS,djbh from uf_zgfy where lgbh='" + lcbh + "'";
-				rs.writeLog(sql);
-				rs.execute(sql);
-				while (rs.next()) {
-					String djstatus = Util.null2String(rs.getString("DJSTATUS"));
-					String djbh = Util.null2String(rs.getString("djbh"));
-					if ((!djstatus.equals("0")) && (!djstatus.equals("4"))) {
-						message = "报错：暂估单编号为：" + djbh + "已上抛SAP，请先作废该暂估单后再操作";
-						requestInfo.getRequestManager().setMessagecontent(message);
-						return Action.FAILURE_AND_CONTINUE;
-					}
-				}
-				sql = "select DJSTATUS from uf_zgfy where lgbh='" + lcbh + "'";
-				rs.writeLog(sql);
-				rs.execute(sql);
-				while (rs.next()) {
-					String djstatus = Util.null2String(rs.getString("DJSTATUS"));
-					RecordSet rs2 = new RecordSet();
-					if (djstatus.equals("4")) {
-						break;
-					} else if (djstatus.equals("0")) {
-						sql = "update uf_zgfy set DJSTATUS='4' where lgbh='" + lcbh + "'";
-						rs2.writeLog(sql);
-						rs2.execute(sql);
-					}
-				}
 
-				// 3.根据明细表里的单号、项次回写同步表里的已装卸数量和剩余数量
+
+
+
+			//if (sfyg.equals("1")) {
+			// 1.根据Shipping和柜号查询装卸计划是否作废
+
+			// sql = "select requestid,zxjhh,SFZF from formtable_main_45 where ghcx='" + gh
+			// 		+ "' AND SFYG='1' AND YGSHIPNO='" + shipno + "'";
+			sql = "select requestid,zxjhh,SFZF from formtable_main_45 where ghcx='" + gh + "'  AND YGSHIPNO='" + shipno
+					+ "'";
+			rs.writeLog(sql);
+			rs.execute(sql);
+			String SFZF = "";
+			String requestid1 = "";
+			if (rs.next()) {
+				zxjhh = Util.null2String(rs.getString("zxjhh"));
+				SFZF = Util.null2String(rs.getString("SFZF"));
+				requestid1 = Util.null2String(rs.getString("requestid"));
+				if (!SFZF.equals("1")) {
+					return "报错：装卸计划号为：" + zxjhh + "的SO装卸计划尚未作废";
+				}
+				// 根据requestid在workflow_requestbase表中查询当前节点状态 0--创建
+				// 3--归档
+				RecordSet rs1 = new RecordSet();
+				sql = "SELECT currentnodetype FROM workflow_requestbase where requestid='" + requestid1 + "'";
+				rs1.writeLog(sql);
+				rs1.execute(sql);
+				String dqjd = "";
+				if (rs1.next()) {
+					dqjd = rs1.getString("currentnodetype");
+
+				}
+				writeLog("当前节点:"+dqjd);
+				if (!dqjd.equals("3")) {
+					String jdname = "";
+					if (dqjd.equals("0")) {
+						jdname = "创建";
+					}
+					if (dqjd.equals("1")) {
+						jdname = "审批";
+					}
+					return "报错：装卸计划号为：" + zxjhh + "的SO装卸计划尚已作废，但尚未归档，目前仍在" + jdname + "节点";
+				}
+			}
+
+			/*
+			 * 2.根据理货单号查询柜费/装柜劳务/吊柜费暂估单是否均已上抛，如果全部未上抛的，则作废理货清单时，将相关的柜费/装柜劳务/
+			 * 吊柜费暂估单全部作废。
+			 * 如果全部已作废的，则只需作废理货清单。如果部分已上抛的，则提示“关联的暂估单号XXXX已上抛，请先作废暂估单！”
+			 */
+			sql = "select DJSTATUS,djbh from uf_zgfy where lgbh='" + lcbh + "'";
+			rs.writeLog(sql);
+			rs.execute(sql);
+			while (rs.next()) {
+				String djstatus = Util.null2String(rs.getString("DJSTATUS"));
+				String djbh = Util.null2String(rs.getString("djbh"));
+				if ((!djstatus.equals("0")) && (!djstatus.equals("4"))) {
+					return "报错：暂估单编号为：" + djbh + "已上抛SAP，请先作废该暂估单后再操作";
+				}
+			}
+			sql = "select DJSTATUS from uf_zgfy where lgbh='" + lcbh + "'";
+			rs.writeLog(sql);
+			rs.execute(sql);
+			while (rs.next()) {
+				String djstatus = Util.null2String(rs.getString("DJSTATUS"));
+				RecordSet rs2 = new RecordSet();
+				if (djstatus.equals("4")) {
+					break;
+				} else if (djstatus.equals("0")) {
+					sql = "update uf_zgfy set DJSTATUS='4' where lgbh='" + lcbh + "'";
+					rs2.writeLog(sql);
+					rs2.execute(sql);
+				}
+			}
+
+			// 3.根据明细表里的单号、项次回写同步表里的已装卸数量和剩余数量
+			//作废有柜
+			{
 				sql = "SELECT JYDH,XC,BCZXSL FROM FORMTABLE_MAIN_43_DT1 where MAINID='" + id + "'";
 				rs.writeLog(sql);
 				rs.execute(sql);
@@ -152,16 +160,16 @@ public class Z_CPP_SO_LHSQ_ZF extends BaseBean implements Action {
 						jsonObject.put("bczxsl", bczxsl);
 						jsonArray.add(jsonObject);
 					} else {
-						Boolean ifcz=false;
+						Boolean ifcz = false;
 						for (int i = 0; i < jsonArray.size(); i++) {
 							JSONObject jsonObject = jsonArray.getJSONObject(i);
 							if (jydh.equals(jsonObject.get("jydh")) && xc.equals(jsonObject.get("xc"))) {
 								Double total = calCulate(bczxsl, jsonObject.get("bczxsl").toString(), "add");
 								jsonObject.put("bczxsl", total.toString());
-								ifcz=true;
+								ifcz = true;
 							}
 						}
-						if (!ifcz){
+						if (!ifcz) {
 							JSONObject jsonObject = new JSONObject();
 							jsonObject.put("jydh", jydh);
 							jsonObject.put("xc", xc);
@@ -186,15 +194,102 @@ public class Z_CPP_SO_LHSQ_ZF extends BaseBean implements Action {
 						ychl = Util.null2String(rs.getString("ychl"));
 					}
 					Double newcyl = calCulate(ychl, bczxsl, "sub");
-					sql = "update UF_SPGHSR set ychl='" + newcyl + "' WHERE DELIVERYNO='" + jydh + "' and DELIVERYITEM='" + xc + "'";
+					sql = "update UF_SPGHSR set ychl='" + newcyl + "' WHERE DELIVERYNO='" + jydh
+							+ "' and DELIVERYITEM='" + xc + "'";
 					rs.writeLog(sql);
 					rs.execute(sql);
 				}
-
-
 			}
-			// 无柜情况无操作
+			// 4.根据明细表里的单号、项次回写同步表里的已装卸数量和剩余数量
+			//作废无柜
+			{
+				sql = "SELECT JYDH,XC,bpczxsl FROM FORMTABLE_MAIN_43_DT2 where MAINID='" + id + "'";
+				rs.writeLog(sql);
+				rs.execute(sql);
+				JSONArray jsonArray = new JSONArray();
+				while (rs.next()) {
+					String jydh = Util.null2String(rs.getString("jydh"));
+					String xc = Util.null2String(rs.getString("xc"));
+					String bczxsl = Util.null2String(rs.getString("bpczxsl"));
+					if (jsonArray.size() == 0) {
+						JSONObject jsonObject = new JSONObject();
+						jsonObject.put("jydh", jydh);
+						jsonObject.put("xc", xc);
+						jsonObject.put("bczxsl", bczxsl);
+						jsonArray.add(jsonObject);
+					} else {
+						Boolean ifcz = false;
+						for (int i = 0; i < jsonArray.size(); i++) {
+							JSONObject jsonObject = jsonArray.getJSONObject(i);
+							if (jydh.equals(jsonObject.get("jydh")) && xc.equals(jsonObject.get("xc"))) {
+								Double total = calCulate(bczxsl, jsonObject.get("bczxsl").toString(), "add");
+								jsonObject.put("bczxsl", total.toString());
+								ifcz = true;
+							}
+						}
+						if (!ifcz) {
+							JSONObject jsonObject = new JSONObject();
+							jsonObject.put("jydh", jydh);
+							jsonObject.put("xc", xc);
+							jsonObject.put("bczxsl", bczxsl);
+							jsonArray.add(jsonObject);
+						}
+					}
 
+				}
+				writeLog("获得单号项次总装卸数量：" + jsonArray.toString());
+				// 获得批号项次数量的json数组更新同步表
+				for (int i = 0; i < jsonArray.size(); i++) {
+					JSONObject jsonObject = jsonArray.getJSONObject(i);
+					String jydh = jsonObject.getString("jydh");
+					String xc = jsonObject.getString("xc");
+					String bczxsl = jsonObject.getString("bczxsl");
+					sql = "select YCHL FROM UF_SPGHSR WHERE DELIVERYNO='" + jydh + "' and DELIVERYITEM='" + xc + "'";
+					rs.writeLog(sql);
+					rs.execute(sql);
+					String ychl = "";
+					if (rs.next()) {
+						ychl = Util.null2String(rs.getString("ychl"));
+					}
+					Double newcyl = calCulate(ychl, bczxsl, "sub");
+					sql = "update UF_SPGHSR set ychl='" + newcyl + "' WHERE DELIVERYNO='" + jydh
+							+ "' and DELIVERYITEM='" + xc + "'";
+					rs.writeLog(sql);
+					rs.execute(sql);
+				}
+			}
+			//updatalhsq建模
+			{
+				sql = "update uf_solhsq set sfzf=1 where lcid = " + requestid;
+				rs.writeLog(sql);
+				rs.execute(sql);
+			}
+			//update 批次建模
+			{
+				sql = "update uf_sappcsl set zt=1 where lcid = " + requestid;
+				rs.writeLog(sql);
+				rs.execute(sql);
+			}
+
+			//更新柜号录入该shipping的柜号为未使用
+			if((!"".equals(gh)&&(!"".equals(shipno)))) {
+				sql = "SELECT T1.ID FROM UF_GHLR_DT1 T1,UF_GHLR T2 WHERE T1.MAINID=T2.ID " +
+						"AND T1.CODE='" + gh + "' and t2.shipping='" + shipno + "' and t1.sfyx='1'";
+				writeLog(sql);
+				rs.execute(sql);
+				String detailId = "";
+				if (rs.next()) {
+					detailId = Util.null2String(rs.getString("id"));
+				}
+				if (!"".equals(detailId)) {
+					sql = "update uf_ghlr_dt1 set sfsy='0' where id=" + detailId;
+					writeLog(sql);
+					rs.execute(sql);
+				}
+			}
+
+
+			
 		} catch (
 
 		Exception e)
@@ -202,10 +297,10 @@ public class Z_CPP_SO_LHSQ_ZF extends BaseBean implements Action {
 		{
 			e.printStackTrace();
 			rs.writeLog("fail--" + e);
-			requestInfo.getRequestManager().setMessagecontent("数据更新失败，请联系系统管理员！");
-			return Action.FAILURE_AND_CONTINUE;
+ 			return "数据异常，请联系系统管理员！";
+
 		}
-		return Action.SUCCESS;
+		return "1";
 
 	}
 

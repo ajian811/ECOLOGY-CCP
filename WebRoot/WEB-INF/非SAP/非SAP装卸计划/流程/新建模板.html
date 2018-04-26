@@ -1,0 +1,448 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    var hang_number;
+    $(document).ready(function() {
+
+
+
+        //监听明细本次装卸数量变化，计算 本次产品净重 公式：本次产品净重=本次装卸数量/数量*净重
+        // jQuery("#submitdtlid0").bindPropertyChange(function () {
+        //     var submitdtlid0=jQuery("#submitdtlid0").val();
+        //     var indexs=submitdtlid0.split(",");
+        //     for(var i=0;i<indexs.length;i++){
+        //         var index=indexs[i];
+        //         jQuery("#field13557_"+index).bindPropertyChange(function () {
+        //             var bczxsl=jQuery("#field13557_"+index).val();
+        //             if(bczxsl.length>0) {
+        //                 var sl = jQuery("#field13556_" + index).val();
+        //                 var jz = jQuery("#field14448_" + index).val();
+        //
+        //                 var bccpjz = bczxsl / sl * jz;
+        //
+        //                 jQuery("#field14449_" + index + "span").html(bccpjz.toFixed(2));
+        //                 jQuery("#field14449_" + index).val(bccpjz.toFixed(2));
+        //             }
+        //
+        //         })
+        //
+        //     }
+        //
+        // })
+
+        //是否有运费联动
+        var value = $("#field13517").val();
+        if (value == '0') {
+            $(".hideFee").hide();
+        } else if (value == '1') {
+            $(".hideFee").show();
+        } else {
+            $(".hideFee").show();
+        }
+
+        checkCustomize = function () {
+            var sfzf = jQuery("#field14315  option:selected").val(); //是否作废
+            console.log("是否作废：" + sfzf);
+            if (sfzf == "1") {
+                return true;
+            }
+            return checkjxcygy() && checkYF() && checkYzl() && checkZyf();
+
+        }
+
+        //如果有运费则，总运费不能为空
+        function checkZyf() {
+            var result = false;
+            var i = $("#field13517").val();
+            var zyf = $("#field13544").val();
+            var mx2num=$("#nodesnum1").val();
+            if (i == "1") {
+                if (zyf.length > 0) {
+                    if(mx2num>0) {
+                        var submitdtlid0s=$("#submitdtlid0").val().split(",");
+                        for(var i=0;i<submitdtlid0s.length;i++){
+                            var index=submitdtlid0s[i];
+                            var cbzx=$("#field13716_"+index).val();
+                            if(cbzx.length==0){
+                                console.log("cbzx:"+cbzx);
+                                Dialog.alert("有运费时，成本中心不能为空");
+                                break;
+                            }
+                            result=true;
+
+                        }
+
+
+                    }else{
+                        Dialog.alert("有运费时，明细2不能为空")
+                    }
+                } else {
+                    Dialog.alert("有运费时，总费用不能为空")
+                }
+            } else {
+                result = true;
+            }
+
+            return result;
+
+        }
+
+        //如果有运费 必须辅助路线明细行数>0
+        function checkYF() {
+            var i = $("#field13517").val();
+            if (i == '1') {
+                var k = $("#nodesnum1").val();
+                if (k == '0') {
+                    Dialog.alert("有运费时，辅助路线明细表行数要大于0");
+                    return false;
+                }
+                return true;
+            }
+            return true;
+        }
+
+
+        function checkYzl() {
+            var submitdtlid0 = jQuery("#submitdtlid0").val().split(",");
+            var jnArr = [];
+            var result = false;
+            for (var i = 0; i < submitdtlid0.length; i++) {
+                var plannum = parseFloat(jQuery("#field13557_" + submitdtlid0[i]).val()); //计划装卸量
+                // var totalnum = parseFloat(jQuery("#field13556_" + submitdtlid0[i]).val()); //总量
+                var shipNum = parseFloat(jQuery("#field13558_" + submitdtlid0[i]).val()); //剩余运载量
+                var pono = jQuery("#field13548_" + submitdtlid0[i]).val(); //原始单号
+                var poitem = jQuery("#field13549_" + submitdtlid0[i]).val(); //项次
+                console.log("plannum:" + plannum + ",shipnum:" + shipNum);
+                if (plannum > shipNum) {
+                    alert("PO单号:" + pono + "项次：" + poitem + "计划装卸数量超过了剩余量");
+                    return false;
+                }
+                ;
+
+
+                var jn = {
+                    "pono": pono,
+                    "poitem": poitem,
+                    "plannum": plannum.toString()
+                }
+                jnArr.push(jn);
+            }
+            console.log(jnArr);
+            jQuery.ajax({
+                url: "/sapjsp/NONSAP_zxjh.jsp",
+                data: {
+                    "dtdata": JSON.stringify(jnArr),
+                    "type": "checkCount"
+                },
+                type: "POST",
+                async: false,
+                dateType: "json",
+                success: function (data) {
+                    var datatext = data.replace(/(^\s*)|(\s*$)/g, "");
+                    if (datatext) {
+                        if (datatext == "success") {
+                            console.log(datatext);
+                            result = true;
+                        } else {
+                            Dialog.alert(datatext);
+                        }
+
+
+                    }
+                }
+            });
+
+            return result;
+        }
+
+
+        var html = "<input type='button' value='生成辅线路' class='middle e8_btn_top_first' id='accquire' />";
+        $("#needButton").append(html);
+        $("#accquire").click(function () {
+            accquireYF();
+        });
+        var html = "<input type='button' value='重新生成辅线路' class='middle e8_btn_top_first' id='refreshYF' />";
+        $("#refresh").append(html);
+        $("#refreshYF").click(function () {
+            refreshYF();
+        });
+
+
+        //是否有运费 xxy add 2017-12-25
+        $("#field13517").bind('change', function () {
+            var value = $("#field13517").val();
+            if (value == '0') {
+                delRowFunmd0(2);
+                !$(".hideFee").find("input[type!='button']").val("");
+                $(".hideFee").find("select").val("");
+                $(".hideFee").find(".e8_showNameClass").empty();
+
+
+                $(".hideFee").hide();
+            } else if (value == '1') {
+                delRowFunmd0(1);
+                $(".hideFee").show();
+            } else {
+                delRowFunmd0(1);
+                $(".hideFee").show();
+            }
+        })
+        function checkAccquireYF() {
+            var resullt=false;
+            var startCity = $("#field13537").val(); //起点城市
+
+            var endCity = $("#field13538").val(); //终点城市
+            var list = [];
+            var comm = [];
+            var cysjm = $("#field13524").val(); //承运商简码
+            var cx = $("#field13527").val(); //车型
+            //var dw = $("#field13528").val(); //吨位
+            var dw = 0;
+            var ysrq = $("#field13518").val(); //运输日期
+            var jflx = $("#field13526").val(); //计费方式
+            var yslx = $("#field13523").val(); //运输方式
+
+            if (startCity.length==0){
+                Dialog.alert("起点城市不能为空");
+            }else  if(endCity.length==0){
+                Dialog.alert("终点城市不能为空");
+            } else  if(cysjm.length==0){
+                Dialog.alert("承运商简码不能为空");
+            }else  if(cx.length==0){
+                Dialog.alert("车型不能为空");
+            }else  if(dw.length==0){
+                Dialog.alert("吨位不能为空");
+            }else  if(ysrq.length==0){
+                Dialog.alert("运输日期不能为空");
+            }else  if(jflx.length==0){
+                Dialog.alert("计费方式不能为空");
+            }else  if(yslx.length==0){
+                Dialog.alert("运输方式不能为空");
+            }else{
+                resullt=true;
+            }
+            return resullt;
+        }
+
+        function accquireYF() {
+            if (!checkAccquireYF()){
+                return;
+            };
+            delRowFunmd0(1);
+
+            // var sfyg = $("#field10642").val(); //是否有柜
+            var startCity = $("#field13537").val(); //起点城市
+            var endCity = $("#field13538").val(); //终点城市
+            var list = [];
+            var comm = [];
+            var cysjm = $("#field13524").val(); //承运商简码
+            var cx = $("#field13527").val(); //车型
+            var dw = $("#field13528").val(); //吨位
+            var ysrq = $("#field13518").val(); //运输日期
+            var jflx = $("#field13526").val(); //计费方式
+            var yslx = $("#field13523").val(); //运输方式
+            var xllx = "0";
+            var cqb = $("#field13513").val(); //厂区别
+            comm.push(cysjm, cx, dw, ysrq, jflx, yslx, xllx, cqb);
+
+            for (var i = 0; i < $("#indexnum0").val(); i++) {
+                var csd=$("#field13572_" + i).val();
+                if(csd .length>0) {
+
+                    var temp = {
+                        'sendName': $("#field13570_" + i).val(),
+                        'sendAddress': $("#field13573_" + i).val(),
+                        'midCity': $("#field13572_" + i).val()
+
+                    }
+                    list.push(temp);
+                } else {
+                    alert("请检查供应商城市点！");
+                    return
+                }
+            }
+
+
+            //alert(JSON.stringify(list));
+            jQuery.ajax({
+                url: "/weightJsp/ACCQUIRE_ASSISTYF.jsp",
+                data: {
+                    "startCity": startCity,
+                    "endCity": endCity,
+                    "list": JSON.stringify(list),
+                    "comm": comm
+                },
+                type: "POST",
+                dateType: "json",
+                success: function (data) {
+                    if (data) {
+                        delRowFunmd0(1);
+                        console.log(JSON.parse(data));
+                        jQuery.each(JSON.parse(data), function (i, item) {
+                            addRow1(1);
+                            hang_number = parseInt(jQuery("#indexnum1").val()) - 1;
+
+
+                            fillMX("14316", item.sort);//城市点顺序
+                            fillMX("14322", item.midCity);//城市点id
+                            fillMX("14318", item.price); //辅线路价格
+                            fillMX("14319", item.tcdj);//同城单价
+                            fillMX("14320", item.index);//同城个数
+                            var totalPrice = parseFloat(item.index) * parseFloat(item.tcdj);
+                            fillMX("14321", totalPrice);//同城总价
+
+                        });
+                        Dialog.alert("获取辅线路数据成功！");
+                    }
+                },
+                error: function () {
+                    Dialog.alert("获取辅线路数据失败！");
+                }
+            })
+        }
+
+        function fillMX(fieldname, value) {
+            jQuery("#field" + fieldname + "_" + hang_number).val(value);
+            jQuery("#field" + fieldname + "_" + hang_number + "span").html(value);
+
+
+        }
+
+        function refreshYF() {
+            if ($("#indexnum2").val() - 0 <= 0) {
+                alert("请先点击生成辅线路");
+                return;
+            }
+            accquireYF();
+        }
+
+
+        jQuery(document).ready(function () {
+            jQuery("#field13540").bindPropertyChange(function () { //价格档
+                zjg();
+            })
+            jQuery("#field13526").bindPropertyChange(function () { //计费模式
+                zjg();
+                jQuery("#field13539").val('');
+                jQuery("#field13539span").html('');
+            })
+            jQuery("#field13542").bindPropertyChange(function () { //同城总运费
+                zjg();
+            })
+            jQuery("#field13543").bindPropertyChange(function () { //辅路线总价
+                zjg();
+            })
+            jQuery("#field9688").bindPropertyChange(function () { //运输方式
+                jQuery("#field13539").val('');
+                jQuery("#field13539span").html('');
+            })
+            jQuery("#field13521").bindPropertyChange(function () { //承运商
+                jQuery("#field13539").val('');
+                jQuery("#field13539span").html('');
+            })
+            jQuery("#field13527").bindPropertyChange(function () { //车型
+                jQuery("#field13539").val('');
+                jQuery("#field13539span").html('');
+            })
+        })
+
+        function zjg() {
+            var sfyyf = jQuery("#field13517").val();
+            if (sfyyf == 1) {
+                var jfms = parseFloat(jQuery("#field13526").val());
+                var jgd = parseFloat(jQuery("#field13540").val());
+                var tczf = parseFloat(jQuery("#field13542").val());
+                if(tczf.length==0){
+                    tczf=0;
+                }
+                var fxl = parseFloat(jQuery("#field13543").val());
+                if (fxl.length==0){
+                    fxl=0;
+                }
+                var zyf = 0;
+                var yf = 0;
+                var zjz = parseFloat(jQuery("#field14333").val()); //总净重
+                var jhyzljh = parseFloat(jQuery("#field14334").val()); //计划运载量合计
+                if (jfms == 0) { //包车
+                    zyf = jgd + tczf + fxl;
+                    yf = jgd;
+                } else if (jfms == 1) { //计重
+                    if (jgd != '' && jgd != 0 && zjz != '' && zjz != 0) {
+                        zyf = jgd * zjz / 1000 + tczf + fxl;
+                    } else {
+                        zyf = tczf + fxl;
+                    }
+                    yf = jgd * zjz / 1000;
+                } else { //2计件
+                    zyf = jgd * jhyzljh + tczf + fxl;
+                    yf = jgd * jhyzljh;
+                }
+                //Dialog.alert("计费模式："+jfms + "/价格档："+jgd+"/同城总费："+tczf+"/辅线路："+fxl+"/总净重："+zjz+"/计划运载量合计："+jhyzljh+"/总运费："+zyf);
+                fillField("13544", zyf.toFixed(2))
+
+            }
+        }
+
+
+    })
+    function fillField(fieldid, value) {
+        jQuery("#field" + fieldid).val(value);
+        jQuery("#field" + fieldid + "span").html(value);
+
+    }
+
+
+    function checkjxcygy(){
+        var result=false;
+        //field13569;//供应商
+        //field13571;//送达方
+        //field14332;//车辆需求项次
+        //field13548;//原始单号
+        //field13549;//订单项次
+        //field13557;//本次装卸数量
+        for (var i = 0; i < $("#indexnum0").val(); i++) {
+            var clxqxc= jQuery("#field14332_" + i + "span").html();
+            var sdf =  jQuery("#field13571_" + i).val();
+            var gys = jQuery("#field13569_" + i).val();
+            var ysdh = jQuery("#field13548_" + i).val();
+            var ddxc = jQuery("#field13549_" + i).val();
+            var bczxsl = jQuery("#field13557_" + i).val();
+
+            if(clxqxc != null && clxqxc != ''){
+                if(gys == null || gys == ''){
+                    if(sdf == null || sdf == ''){
+                        Dialog.alert("原始单号："+ysdh+",订单项次："+ ddxc +"中无送达方或供应商，请检查！");
+                        return result;
+                    }
+                }else{
+                    if(sdf != null && sdf != ''){
+                        Dialog.alert("原始单号："+ysdh+",订单项次："+ ddxc +"中同时有送达方和供应商，请检查！");
+                        return result;
+                    }
+                }
+                if(bczxsl == null || bczxsl == ''){
+                    Dialog.alert("原始单号："+ysdh+",订单项次："+ ddxc +"中无本次装卸数量，请检查！");
+                    return result;
+                }
+            }
+            result=true;
+            return result;
+        }
+    }
+</script>
+<script type="text/javascript" src="/sapjsp/util.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

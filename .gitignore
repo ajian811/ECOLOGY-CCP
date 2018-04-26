@@ -67,3 +67,9 @@ src/weaver/workflow/
 !/classbean/
 /Test/
 Test/
+/WebRoot/WEB-INF/CustomSearchBySimpleIframe1.jsp
+/WebRoot/WEB-INF/cwshyddy.jsp
+/WebRoot/WEB-INF/SO装卸计划/装卸计划JSP/SOZxjhCancel.jsp
+!/WebRoot/WEB-INF/SO装卸计划/装卸计划JSP/SOZxjhCancel.jsp
+!/WebRoot/WEB-INF/weightStyle/
+/WebRoot/WEB-INF/weightStyle/

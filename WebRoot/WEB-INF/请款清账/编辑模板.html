@@ -1,0 +1,164 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+     *  TODO
+     *  请在此处编写javascript代码
+     */
+    jQuery(document).ready(function() { /*对字段进行监听*/
+        ergodicDetailed();
+    })
+
+    function ergodicDetailed() { /* 便利明细表，并获取数据 */
+        var mc = "field14289";
+        var zt = 0;
+        jQuery("td>input[id^='" + mc + "_']").each(function() {
+            var v = jQuery(this).val();
+            if (v != null && v != '') {
+                zt = 1;
+            }
+        });
+        if (zt == 1) {
+            hideField('field14231'); //备注
+            hideField('field14242'); //抬头文本
+            hideField('field14226');
+            hideFieldButton(null, 'field14226'); //付款方式
+            hideFieldButton(null, 'field14229'); //付款基准日
+            hideFieldButton(null, 'field14234'); //记账日期
+            hideFieldButton(null, 'field14235'); //报税日期
+        } else {
+            bindChange();
+        }
+    }
+
+    //隐藏字段的输入框
+    function hideField(fieldid) {
+        var v = jQuery("#" + fieldid).val();
+        jQuery("#" + fieldid).hide();
+        jQuery("#" + fieldid.replace('field', 'field_lable')).hide();
+        jQuery("#" + fieldid + "span").text(v);
+    }
+
+    function hideFieldButton() {
+        var rowStr = arguments[0] ? "_" + arguments[0] : ""; //第一个参数为明细表行号,若主表传null
+        for (var i = 1; i < arguments.length; i++) {
+            jQuery("#" + arguments[i] + rowStr).closest("td").find("button").hide();
+        }
+    }
+
+
+    function bindChange() {
+        var html1 = "<input type='button' value='复制凭证内容按钮' class='middle e8_btn_top_first' id='copybutton' />";
+        $("#copybutton").append(html1);
+        $("#copybutton").click(function() {
+            copybutton();
+        });
+    }
+
+    function copybutton() {
+        var yddzddh = $("#field14206").val();
+        if (yddzddh == '' || yddzddh == null) {
+            Dialog.alert("请选择月度对账单号，复制凭证内容失败!");
+            return;
+        }
+        var submitdtlid0 = $("#submitdtlid0").val().split(",");
+        var jsonObj = {};
+        var jsonObj2 = {};
+
+        for (var i = 0; i < submitdtlid0.length; i++) {
+            var index = submitdtlid0[i];
+            var fph = $("#field14284_" + index).val(); //发票号
+            var sjzfje = $("#field14301_" + index).val(); //实际支付金额
+            var sjzfhb = $("#field14288_" + index).val(); //实际支付货币
+            /*if (sjzfje == null || sjzfje == '') {
+                Dialog.alert("请填写发票的实际支付金额！");
+                return;
+            }*/
+            jsonObj[fph] = sjzfje;
+            jsonObj2[fph] = sjzfhb;
+        }
+        console.log("jsonArr:" + JSON.stringify(jsonObj))
+        console.log("jsonArr:" + JSON.stringify(jsonObj2))
+
+        var fkfs = jQuery("#field14226").val(); //付款方式
+        var fktkdm = jQuery("#field14228").val(); //付款条款代码
+        var hzyhlx = jQuery("#field14221").val(); //合作银行类型
+        var fkjzrq = jQuery("#field14229").val(); //付款基准日期
+        var fkJson = {};
+        fkJson["fkfs"] = fkfs;
+        fkJson["fktkdm"] = fktkdm;
+        fkJson["hzyhlx"] = hzyhlx;
+        fkJson["fkjzrq"] = fkjzrq;
+
+        console.log("fkJson:" + JSON.stringify(fkJson));
+
+
+        /*if (fkjzr == null || fkjzr == '') {
+            Dialog.alert("请选择付款基准日！");
+            return;
+        }*/
+
+        jQuery.ajax({
+            url: "/sapjsp/QK_COPY_FPGL.jsp",
+            data: {
+                "yddzddh": yddzddh,
+                "fphJson": JSON.stringify(jsonObj),
+                "fphJson2": JSON.stringify(jsonObj2),
+                "fkJson": JSON.stringify(fkJson)
+            },
+            type: "POST",
+            dataType: "JSON",
+            async: false,
+            success: function(data) {
+                var datas = JSON.parse(data);
+                if (datas) {
+                    console.log(datas);
+                    if (datas.flag == "X") {
+                        Dialog.alert("复制凭证内容成功");
+                        delRowFunJM(1);
+                        jQuery.each(datas.result, function(i, item) {
+                            addRow1(1);
+                            var hang_number = parseInt(jQuery("#indexnum1").val()) - 1;
+                            //ValSapn("#field14246_" + hang_number, item.KOART); //凭证日期
+                            ValSapn("#field14247_" + hang_number, item.handingplancode); //装卸计划号
+                            ValSapn("#field14248_" + hang_number, item.sappzbh); //暂估单sap凭证
+                            ValSapn("#field14249_" + hang_number, item.fph); //发票号
+                            // ValSapn("#field14250_" + hang_number, item.GJAHR); //凭证抬头文本
+                            ValSapn("#field14251_" + hang_number, item.jzm); //记账码
+                            ValSapn("#field14252_" + hang_number, item.zzkm); //总账科目
+                            ValSapn("#field14253_" + hang_number, item.plannotaxacount); //金额
+                            ValSapn("#field14254_" + hang_number, item.sm); //税码
+                            ValSapn("#field14255_" + hang_number, item.fpse); //税金基值
+                            //ValSapn("#field14256_" + hang_number, item.cbzx); //成本中心
+                            ValSapn("#field14278_" + hang_number, item.MARK); //特殊总账标记
+
+                            ValSapn("#field14274_" + hang_number, item.zfhbje); //支付货币金额
+                            ValSapn("#field14273_" + hang_number, item.zfhb); //支付货币
+                            jQuery("#field14273_" + hang_number + "__").change();
+                            jQuery("#field14274_" + hang_number + "__").change();
+
+
+
+                            ValSapn("#field14268_" + hang_number, item.fkfs); //付款方式
+                            ValSapn("#field14267_" + hang_number, item.fktkdm); //付款条款代码
+                            ValSapn("#field14262_" + hang_number, item.hzyhlx); //银行合作类型
+                            ValSapn("#field14266_" + hang_number, item.fkjzrq); //付款基准日期
+
+                            calSum(1);
+                        });
+
+                    } else {
+                        Dialog.alert(datas.msg);
+                    }
+                }
+            }
+        })
+    }
+
+    function ValSapn(fieldid, fieldval) {
+        jQuery(fieldid).val(fieldval);
+        //jQuery(fieldid + "span").text(fieldval);
+    }
+</script>
+<script type="text/javascript" src="/sapjsp/util.js">
+</script>
+

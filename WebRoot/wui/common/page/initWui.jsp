@@ -46,8 +46,11 @@ function downloads(id){
         response.sendRedirect("/login/Login.jsp");
         return;
     }
+	out.write("");
 %>
-<%@page import="java.util.Map"%><%!
+<%@page import="java.util.Map"%>
+<%@ page import="java.io.PrintWriter" %>
+<%!
 private String getCurrWuiConfig(HttpSession session, User user, String keyword) throws Exception {
 	
 	if (keyword == null || "".equals(keyword)) {

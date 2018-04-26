@@ -72,7 +72,7 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 				}
 			}
 
-			String selectSql = "select t1.*,t2.trdh from " + tablename + " t1 ";
+			String selectSql = "select T1.id,SFYG,TRDH,YCYR,SFZF,GSDM from " + tablename + " t1 ";
 			selectSql += " left join " + tablename + "_dt1 t2 on t1.id = t2.mainid";
 			selectSql += " where t1.requestid= '" + requestid + "'";
 			selectSql += " and t2.trdh is null";
@@ -119,8 +119,8 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 						gyscode = Util.null2String(rs.getString("gyscode"));
 						goodgroup = Util.null2String(rs.getString("goodgroup"));
 						kwdesc = Util.null2String(rs.getString("kwdesc"));
-						log.writeLog("调用存储过程Create_Seq_Po");
-						rs1.executeProc("Create_Seq_Po", "");
+						log.writeLog("调用存储过程fn_no_make");
+						rs1.executeProc("fn_no_make", "");
 						rs1.next();
 						lcbh += formatString(rs1.getInt(1));
 
@@ -157,8 +157,8 @@ public class Create_Sequence_ZXJH_PO extends BaseBean implements Action {
 				} else if ("1".equals(sfyg) && "".equals(trdh)) {
 					String lcbh = gsdm+ inout + currdate1;
 					// 调用存储过程自编号
-					log.writeLog("调用存储过程Create_Seq_Po");
-					rs1.executeProc("Create_Seq_Po", "");
+					log.writeLog("调用存储过程fn_no_make");
+					rs1.executeProc("fn_no_make", "");
 					rs1.next();
 					lcbh += formatString(rs1.getInt(1));
 					if (!"".equals(mainid)) {

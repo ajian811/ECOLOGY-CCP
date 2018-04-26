@@ -48,14 +48,15 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 					tablename = Util.null2String(rs.getString("tablename"));
 				}
 			}
-
+			String currentdate0="";
 			Date date = new Date();
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
 			String currentdate = format.format(date);// 当前日期
 
 			SimpleDateFormat format1 = new SimpleDateFormat("yyyyMMdd");
+			SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
 			String currentdate1 = format1.format(date);// 当前日期
-
+			currentdate0=format2.format(date);
 			// 主表数据
 			String sfyg = "";// 是否有柜
 			//String id = "";// 主表id
@@ -96,7 +97,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 			String notaxamt = "";// 未税金额 明细合计
 			String amount = "";// 暂估金额
 			String zgfylx = "1";// 暂估费用类型 异常费用/正常费用
-			String credate = currentdate;// 创建日期
+			String credate = currentdate0;// 创建日期
 			String cysname = "";// 承运商名称
 			String cyscode = "";// 承运商代码
 			String creditpsn = "";// 制单人
@@ -105,7 +106,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 			String djlx = "0";// 单据类型
 
 			String hl = "1";// 汇率 默认为1
-			String creditdate = currentdate;// 凭证日期
+			String creditdate = currentdate0;// 凭证日期
 			String fylx = "1";// 费用类型 1运费2吊柜费3装柜劳务费4柜费
 			String cx = "";// 车型
 			String sz = "1";// 税则 默认为1
@@ -150,6 +151,9 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 				dj2 = Util.null2String(rs.getString("dj2")) == "" ? "0.00" : rs.getString("dj2");// 装柜单价（/柜）
 				creditpsn = Util.null2String(rs.getString("sqr"));
 
+
+
+
 				mainMap.put("lcbh", lcbh);// 流程编号
 				mainMap.put("requestid", requestid + "");// 请求id
 				mainMap.put("feename", feename);// 费用名称
@@ -181,9 +185,9 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 			}
 			if (!"1".equals(sfzf)) {
 				if ("1".equals(sfyg)) {
-					String dtsql = " select t2.SALEORDER,t2.ORDERITEM as ,sum(LLJZ) as lljz,max(dw) as wlh from formtable_main_43 t1 left join";
+					String dtsql = " select t2.SALEORDER,t2.ORDERITEM as ,sum(LLJZ) as lljz,wlh,t2.costencer from formtable_main_43 t1 left join";
 					dtsql += " formtable_main_43_dt1 t2 on t1.id = t2.mainid";
-					dtsql += " group by t2.SALEORDER,t2.ORDERITEM,t1.requestid";
+					dtsql += " group by t2.SALEORDER,t2.ORDERITEM,t1.requestid,t2.wlh,t2.costencer";
 					dtsql += " having t1.requestid = '" + requestid + "'";
 					log.writeLog(dtsql);
 					if (dtrs.execute(dtsql)) {
@@ -199,7 +203,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 							map.put("jzdm", jzdm);// 记帐代码
 							map.put("account", account);// 科目
 							map.put("dtnotaxamt", dtnotaxamt);// 分摊费用
-							map.put("costcenter", costcenter);// 成本中心
+							map.put("costcenter", dtrs.getString("costencer"));// 成本中心
 							map.put("itemtext", itemtext);// 项目文本
 							map.put("khdz", khdz);// 客户地址
 							map.put("ddlx", "0");// 订单类型
@@ -214,9 +218,10 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 						if (Double.parseDouble(dj1) > 0) {
 							// 运柜
 							mainMap.put("sum", dj1 + "");
-							mainMap.put("djtitle", djtitle + "运柜费");
+							mainMap.put("djtitle", djtitle);
 							mainMap.put("currency", bz1);// 货币码
 							mainMap.put("cysname", yggys);// 承运商名称
+							mainMap.put("cyscode",cyscode);//承运商简码
 							mainMap.put("fylx", "4");// 费用类型
 							mainMap.put("feename", "4");// 费用名称
 							double all = 0.00;
@@ -233,13 +238,14 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 									all += Double.parseDouble(dtnotaxamt);// n-1次的和
 								}
 							}
-							createZGD(mainMap, list);
+							String ttwb="DGC Fee";//抬头文本
+							createZGD(mainMap, list,ttwb);
 
 						}
 						if (Double.parseDouble(dj2) > 0) {
 							// 装柜
 							mainMap.put("sum", dj2 + "");
-							mainMap.put("djtitle", djtitle + "装柜费");
+							mainMap.put("djtitle", djtitle);
 							mainMap.put("currency", bz2);// 货币码
 							mainMap.put("cysname", zggys);// 承运商名称
 							mainMap.put("fylx", "3");// 费用类型
@@ -258,14 +264,17 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 									all += Double.parseDouble(dtnotaxamt);// n-1次的和
 								}
 							}
-							createZGD(mainMap, list);
+							String ttwb="Stuffing Fee";//抬头文本
+
+							createZGD(mainMap, list,ttwb);
 						}
 						if ("1".equals(sfdg) && Double.parseDouble(dj3) > 0) {
 							// 吊柜
 							mainMap.put("sum", dj3 + "");
-							mainMap.put("djtitle", djtitle + "吊柜费");
+							mainMap.put("djtitle", djtitle);
 							mainMap.put("currency", bz3);// 货币码
 							mainMap.put("cysname", dggys);// 承运商名称
+							mainMap.put("cyscode",cyscode);
 							mainMap.put("fylx", "2");// 费用类型
 							mainMap.put("feename", "2");// 费用名称
 							double all = 0.00;
@@ -282,7 +291,8 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 									all += Double.parseDouble(dtnotaxamt);// n-1次的和
 								}
 							}
-							createZGD(mainMap, list);
+							String ttwb="Grounded Fee";//抬头文本
+							createZGD(mainMap, list,ttwb);
 						}
 
 						// 打印log
@@ -317,7 +327,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 		return Action.SUCCESS;
 	}
 
-	public boolean createZGD(Map mainMap, List<Map<String, String>> list) {
+	public boolean createZGD(Map mainMap, List<Map<String, String>> list,String ttwb) {
 		BaseBean log = new BaseBean();
 		Date date = new Date();
 		SimpleDateFormat format1 = new SimpleDateFormat("yyyyMMdd");
@@ -337,6 +347,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 			mainMap.put("djbh", djbh);
 		}
 		if (mainMap.size() > 0) {
+
 			StringBuffer buffer = new StringBuffer();
 			buffer.append(
 					"Insert into UF_ZGFY (REQUESTID,lgbh,feename,djtitle,djstatus,zxplanno,comcode,comname,hbkpyz,pztype,currency,carno,dw,notaxamt,amount,zgfylx,credate,cysname,cyscode,creditpsn,creditdate,remark,djbh,djlx,fylx,cx,sz,FORMMODEID,hl," +
@@ -344,7 +355,7 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 			buffer.append("'").append(mainMap.get("requestid")).append("',");// 流程Id
 			buffer.append("'").append(mainMap.get("lcbh")).append("',");// 理柜编号
 			buffer.append("'").append(mainMap.get("feename")).append("',");// 费用名称
-			buffer.append("'").append(mainMap.get("djtitle")).append("',");// 单据抬头
+			buffer.append("'").append(ttwb).append(" ").append(mainMap.get("djtitle")).append("',");// 单据抬头
 			buffer.append("'").append(mainMap.get("djstatus")).append("',");// 单据状态
 			buffer.append("'").append(mainMap.get("zxplanno")).append("',");// 装卸计划单号
 			buffer.append("'").append(mainMap.get("comcode")).append("',");// 公司名称
@@ -359,7 +370,8 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 			buffer.append("'").append(mainMap.get("zgfylx")).append("',");// 暂估费用类型
 			buffer.append("'").append(mainMap.get("credate")).append("',");// 创建日期
 			buffer.append("'").append(mainMap.get("cysname")).append("',");// 承运商名称
-			buffer.append("'").append(mainMap.get("cyscode")).append("',");// 承运商代码
+			String cyscode=getCyscodeByName(mainMap.get("cysname").toString());
+			buffer.append("'").append(cyscode).append("',");// 承运商代码
 			buffer.append("'").append(mainMap.get("creditpsn")).append("',");// 制单人
 			buffer.append("'").append(mainMap.get("creditdate")).append("',");// 凭证日期
 			buffer.append("'").append(mainMap.get("remark")).append("',");// 备注
@@ -429,7 +441,8 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 								insertSql += "'" + list.get(i).get("zl") + "',";
 								insertSql += "'" + list.get(i).get("khdz") + "',";
 								insertSql += "'" + list.get(i).get("ddlx") + "',";
-								insertSql += "'" + list.get(i).get("itemtext") + "')";
+								//insertSql += "'" + list.get(i).get("itemtext") + "')";
+								insertSql += "'"+ttwb+"')";
 
 								total += Double.parseDouble(list.get(i).get("dtnotaxamt"));// 计算合计
 								log.writeLog("插入建模明细的sql:" + insertSql);
@@ -511,4 +524,16 @@ public class Z_CCP_INSERT_ZGD_SO extends BaseBean implements Action {
 
 		return b1.divide(b2, 2, BigDecimal.ROUND_HALF_UP).doubleValue();
 	}
+	public String getCyscodeByName(String cysname){
+		String cyscode="";
+		RecordSet recordSet=new RecordSet();
+		String sql="select concode from UF_DMLO_CONSOLIDAT where id="+cysname;
+		recordSet.writeLog(sql);
+		recordSet.execute(sql);
+		if (recordSet.next()) {
+			cyscode = Util.null2String(recordSet.getString("concode"));
+		}
+		return cyscode;
+	}
 }
+

@@ -24,12 +24,58 @@
         }
 
         checkCustomize = function() {
-            var sfzf = jQuery("#field11761  option:selected").val(); //是否作废
+            var sfzf = jQuery("#field13433").val(); //是否作废
             console.log("是否作废：" + sfzf);
             if (sfzf == "1") {
                 return true;
             }
-            return checkYF() && checkSl();
+            return checkCbzx()&&checkYF()&&checkSl()&&checkZyf();
+
+        }
+        //如果有运费则，成本中心不能为空
+        function checkCbzx() {
+            var sfyg = jQuery("#field10642").val();
+            console.log("sfyg:"+sfyg)
+            var submitFlag;
+            var cbzxFlag;
+            if("0"==sfyg){
+                submitFlag="submitdtlid1";
+                cbzxFlag="field10726";a
+            }else if("1"==sfyg){
+                submitFlag="submitdtlid0";
+                cbzxFlag="field9736";
+            }else {
+                return false;
+            }
+            var submits=jQuery("#"+submitFlag).val().split(",");
+            for(var i=0;i<submits.length;i++){
+                var index= submits[i];
+                var cbzx=jQuery("#"+cbzxFlag+"_"+index).val();
+                if (cbzx.length==0){
+                    Dialog.alert("有运费时成本中心不能为空，明细表第"+(++i)+"行成本中心为空");
+                    return false;
+                }
+            }
+            return true;
+
+
+
+        }
+        //如果有运费则，总运费不能为空
+        function checkZyf() {
+            var result=false;
+            var i = $("#field9685").val();
+            var zyf= $("#field9709").val();
+            if(i=="1"){
+                if(zyf.length>0){
+                    result=true;
+                }else {
+                    Dialog.alert("有运费时，总费用不能为空")
+                }
+            }else{
+                result=true;
+            }
+            return result;
 
         }
         //如果有运费 必须辅助路线明细行数>0
@@ -113,13 +159,13 @@
 
         //校验有柜数量
         function checkYgSl() {
-            var submitdtlid2 = jQuery("#submitdtlid2").val().split(",");
+            var submitdtlid2 = jQuery("#submitdtlid0").val().split(",");
             var jnArr = [];
             var result = false;
             for (var i = 0; i < submitdtlid2.length; i++) {
-                var plannum = parseFloat(jQuery("#field9343_" + submitdtlid2[i]).val()); //计划装卸量
-                var totalnum = parseFloat(jQuery("#field8149_" + submitdtlid2[i]).val()); //总量
-                var shipNum = parseFloat(jQuery("#field9344_" + submitdtlid2[i]).val()); //已运载量
+                var plannum = parseFloat(jQuery("#field9719_" + submitdtlid2[i]).val()); //计划装卸量
+                var totalnum = parseFloat(jQuery("#field11901_" + submitdtlid2[i]).val()); //总量
+                var shipNum = parseFloat(jQuery("#field9720_" + submitdtlid2[i]).val()); //已运载量
 
                 console.log("plannum:" + plannum + ",totalnum:" + totalnum);
                 if (plannum > totalnum - shipNum) {
@@ -127,8 +173,8 @@
                     return false;
                 };
 
-                var pono = jQuery("#field10663_" + submitdtlid2[i]).val(); //po单号
-                var poitem = jQuery("#field10664_" + submitdtlid2[i]).val(); //po项次
+                var pono = jQuery("#field9712_" + submitdtlid2[i]).val(); //po单号
+                var poitem = jQuery("#field9713_" + submitdtlid2[i]).val(); //po项次
                 var jn = {
                     "pono": pono,
                     "poitem": poitem,
@@ -166,12 +212,12 @@
 
 
 
-        var html = "<input type='button' value='生成辅线路' class='middle e8_btn_top_first' id='accquire' />";
+        var html = "<input type='button' value='生成辅线路CalculateTotalFee' class='middle e8_btn_top_first' id='accquire' />";
         $("#needButton").append(html);
         $("#accquire").click(function() {
             accquireYF();
         });
-        var html = "<input type='button' value='重新生成辅线路' class='middle e8_btn_top_first' id='refreshYF' />";
+        var html = "<input type='button' value='重新生成辅线路ReCaluFee' class='middle e8_btn_top_first' id='refreshYF' />";
         $("#refresh").append(html);
         $("#refreshYF").click(function() {
             refreshYF();
@@ -234,7 +280,7 @@
                             var fields = ponoses[i].split("|");
                             addRow0(0);
                             var hang_number = parseInt(jQuery("#indexnum0").val()) - 1;
-                            jQuery("#field9711_" + hang_number).val(fields[0]);
+                            // jQuery("#field9711_" + hang_number).val(fields[0]);
                             jQuery("#field9712_" + hang_number).val(fields[1]);
                             jQuery("#field9713_" + hang_number).val(fields[2]);
                             jQuery("#field9721_" + hang_number).val(fields[3]);
@@ -276,6 +322,9 @@
 
                     }
                     list.push(temp);
+                } else {
+                    alert("请检查供应商城市点！");
+                    return
                 }
             }
         } else if (sfyg == '0') {
@@ -289,6 +338,9 @@
 
                     }
                     list.push(temp);
+                } else {
+                    alert("请检查供应商城市点！");
+                    return
                 }
             }
         } else {
@@ -439,6 +491,8 @@
         })
         jQuery("#field9686").bindPropertyChange(function() { //计费模式
             zjg();
+            jQuery("#field11781").val('');
+            jQuery("#field11781span").html('');
         })
         jQuery("#field11941").bindPropertyChange(function() { //同城总运费
             zjg();
@@ -446,24 +500,54 @@
         jQuery("#field11942").bindPropertyChange(function() { //辅路线总价
             zjg();
         })
+        jQuery("#field9688").bindPropertyChange(function() { //运输方式
+            jQuery("#field11781").val('');
+            jQuery("#field11781span").html('');
+        })
+        jQuery("#field9690").bindPropertyChange(function() { //承运商
+            jQuery("#field11781").val('');
+            jQuery("#field11781span").html('');
+        })
+        jQuery("#field9693").bindPropertyChange(function() { //车型
+            jQuery("#field11781").val('');
+            jQuery("#field11781span").html('');
+        })
     })
 
     function zjg() {
-        var jfms = parseFloat(jQuery("#field9686").val());
-        var jgd = parseFloat(jQuery("#field9698").val());
-        var tczf = parseFloat(jQuery("#field11941").val());
-        var fxl = parseFloat(jQuery("#field11942").val());
-        var zyf = 0;
-        var zjz = parseFloat(jQuery("#field13675").val()); //总净重
-        var jhyzljh = parseFloat(jQuery("#field13678").val()); //计划运载量合计
-        if (jfms == 0) { //包车
-            zyf = jgd + tczf + fxl;
-        } else if (jfms == 1) { //计重
-            zyf = jgd * zjz / 1000 + tczf + fxl;
-        } else { //2计件
-            zyf = jgd * jhyzljh + tczf + fxl;
+        var sfyyf = jQuery("#field9685").val();
+        if (sfyyf == 1) {
+            var jfms = parseFloat(jQuery("#field9686").val());
+            var jgd = parseFloat(jQuery("#field9698").val());
+            var tczf = parseFloat(jQuery("#field11941").val());
+            var fxl = parseFloat(jQuery("#field11942").val());
+            var zyf = 0;
+            var yf = 0;
+            var zjz = parseFloat(jQuery("#field13675").val()); //总净重
+            var jhyzljh = parseFloat(jQuery("#field13678").val()); //计划运载量合计
+            if (jfms == 0) { //包车
+                zyf = jgd + tczf + fxl;
+                yf = jgd;
+            } else if (jfms == 1) { //计重
+                if (jgd != '' && jgd != 0 && zjz != '' && zjz != 0) {
+                    zyf = jgd * zjz / 1000 + tczf + fxl;
+                } else {
+                    zyf = tczf + fxl;
+                }
+                yf = jgd * zjz / 1000;
+            } else { //2计件
+                zyf = jgd * jhyzljh + tczf + fxl;
+                yf = jgd * jhyzljh;
+            }
+            jQuery("#field9709").val(zyf.toFixed(2));
+            jQuery("#field9701").val(yf.toFixed(2));
+            jQuery("#field9709span").html(zyf.toFixed(2));
+            jQuery("#field9701span").html(yf.toFixed(2));
         }
-        jQuery("#field9709").val(zyf.toFixed(2));
     }
 </script>
 <script type="text/javascript" src="/sapjsp/util.js"></script>
+
+
+
+

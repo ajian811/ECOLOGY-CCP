@@ -1,5 +1,5 @@
 <!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
-<script type="text/javascript">
+<script language="javascript">
     jQuery(document).ready(function() {
         var sfyg = jQuery("#field8061").val();
         if (sfyg.length > 0) {
@@ -15,13 +15,42 @@
         }
         jQuery("#indexnum1").bindPropertyChange(function() {
 
-
-
             var zxjhh = jQuery("#field8381").val();
             if (zxjhh.length == 0) {
-                Dialog.alert("请先选装卸计划号");
+                //Dialog.alert("请先选装卸计划号");
             }
             addZxjhh(zxjhh);
+        });
+        //无柜是否拼柜为0时候，拼柜Shipping=无柜Shipping
+        jQuery("#field14328").bindPropertyChange(function() {
+            var wgsfpg= jQuery("#field14328").val();
+            var wgship=jQuery("#field13761").val();
+            if (wgsfpg=="0"){
+                jQuery("#field13778span").html(wgship);
+                jQuery("#field13778").val(wgship);
+                jQuery("#field14331").val("'"+wgship+"'");
+
+
+            }
+            if(wgsfpg=="1"){
+                var wgships=jQuery("#field13778").val().split(",");
+                console.log("wgships:"+wgships)
+                var wgship2="";
+                for(var i=0;i<wgships.length;i++){
+                    var wgship0=wgships[i];
+                    console.log("wgship0:"+wgship0)
+                    if (i==(wgships.length-1)){
+                        wgship2+="'"+wgship0+"'"
+                    }else{
+                        wgship2+="'"+wgship0+"',"
+
+                    }
+                    console.log("wgship2:"+wgship2);
+
+                }
+                jQuery("#field14331").val(wgship2);
+
+            }
         });
 
         function addZxjhh(zxjhh) {
@@ -38,10 +67,14 @@
                     delRowFunmd0(0);
                     jQuery(".yg").hide();
                     jQuery(".wg").show();
+                    EliminateFieldValNO();
+                    wggys();
                 } else {
                     delRowFunmd0(1);
                     jQuery(".wg").hide();
                     jQuery(".yg").show();
+                    EliminateFieldValYES();
+                    yggys();
                 }
             } else {
                 delRowFunmd0(0);
@@ -63,15 +96,100 @@
         jQuery("#field9461").bindPropertyChange(function() {
             delRowFunmd0(0);
         });
+
+        jQuery("#field13761").bindPropertyChange(function() {
+            var xnghval = jQuery("#field13762").val();
+            jQuery("#" + xnghval).click();
+        });
+
+        jQuery("#field9461").bindPropertyChange(function() {
+            var xnghval1 = jQuery("#field7841").val();
+            del(event, jQuery("#" + xnghval1), 1, false, {});
+        });
+
+        jQuery("#field13762").bindPropertyChange(function() {
+            delRowFunmd0(1);
+        });
+
         checkCustomize = function() {
             var sfzf = jQuery("#field13401 option:selected").val();
             console.log("是否作废:" + sfzf);
-            if(sfzf=='1'){
+            if (sfzf == '1') {
                 return true;
             }
-            return checkALL();
+
+            var sap1 = checkpcsl('field8016', 'field8018', 'field12921', 'field12922', 'field13696', 'field11922');
+            /*                  //物料       //单位        //批号        //最大量       //已装         //本次    */
+            var sap2 = checkpcsl('field12421', 'field12423', 'field12881', 'field12901', 'field13695', 'field7832');
+            var summx = SumNumber();
+            if (summx == 0) { //判断明细1，明细2是否有内容
+                Dialog.alert('请增加产品明细！');
+                return false;
+            }
+
+            return (checkALL() && sap1 && sap2);
+
         }
     });
+    /*
+    1.是否有柜=YES,请增加触发动作，清除无柜shipping、虚拟柜号、拼柜shipping的值
+    2.是否有柜=NO,请增加触发动作，清除Shipping、柜号、货柜厂、是否吊柜、封签号、运柜供应商、运柜费币种、
+    运柜单价/柜、吊柜供应商、吊柜费币种、吊柜单价/柜的值，目前是没有清除的；并显示装柜费Stuffing Container Fee的相关字段：
+    装柜供应商、重量(KG)、装柜单价/MT、装柜费币种、装柜费总价
+    ------------------------------------------------------------------------------------------------------------------------------------------------
+    1. 如主表公司代码=7020时，且是否有柜=YES, 则运柜供应商和吊柜供应商默认(UNI015 UNIFY SHIPPING SERVICES SDN BHD），装柜供应商默认（ DCM428  S.S.LONG ENTERPRISE）
+    2.运柜供应商选择时，需按主表的厂区别过滤。
+    ------------------------------------------------------------------------------------------------------------------------------------------------
+    无柜时，选择shipping 和柜号后，如非拼柜的，主表上的以下栏位需带出相关的值：
+    客户名称（送达方名称）、备注、ETD、ETA、ClosingDate、ShippingMark
+    拼柜的情况，待缪俊确认是否要带出这些字段值
+    */
+
+    function EliminateFieldValYES() {
+        //EliminateVal("field13761"); //无柜Shipping
+        //EliminateVal("field13762"); //虚拟柜号
+        var wgshipping = jQuery("#field13761").val();
+        var xngh = jQuery("#field13762").val();
+        jQuery("#" + xngh).click();
+        jQuery("#" + wgshipping).click();
+    }
+
+
+    function EliminateFieldValNO() {
+        EliminateVal("field7826"); //理货日期
+        EliminateVal("field13428"); //客户名称
+        EliminateVal("field13429"); //备注
+        EliminateVal("field13427"); //closeingDate
+        EliminateVal("field13431"); //ETD
+        EliminateVal("field13430"); //ETA
+        EliminateVal("field13436"); //Shipping Mark
+        EliminateVal("field9461"); //有柜Shipping
+        EliminateVal("field7841"); //柜号
+        EliminateVal("field8281"); //是否吊柜
+        EliminateVal("field9081"); //货柜厂
+    }
+
+    function yggys() {
+        var gysval = '<span class="e8_showNameClass"><a title="UNI015">UNIFY SHIPPING SERVICES SDN BHD</a>&nbsp;<span class="e8_delClass" id="51" onclick="del(event,this,1,false,{});" style="opacity: 1; visibility: hidden;">&nbsp;x&nbsp;</span></span>';
+        jQuery("#field8881span").html(gysval);
+        jQuery("#field8881").val(51);
+        var dggys1 = '<span class="e8_showNameClass"><a title="UNI015">UNIFY SHIPPING SERVICES SDN BHD</a>&nbsp;<span class="e8_delClass" id="50" onclick="del(event,this,1,false,{});" style="opacity: 1; visibility: hidden;">&nbsp;x&nbsp;</span></span>';
+        jQuery("#field8301span").html(dggys1);
+        jQuery("#field8301").val(50);
+    }
+
+    function wggys() {
+        var yggys1 = jQuery("#field8881").val();
+        jQuery("#" + yggys1).click();
+        var dggys1 = jQuery("#field8301").val();
+        jQuery("#" + dggys1).click();
+
+    }
+
+    function EliminateVal(fieldid) {
+        jQuery("#" + fieldid + "_span").html('');
+        jQuery("#" + fieldid).val('');
+    }
 
     function checkALL() {
         var sfyg = jQuery("#field8061").val();
@@ -80,6 +198,9 @@
         }
         if (sfyg == "1") {
             return check1() && checkYg();
+            // if(check1() && checkYg()){
+            //     return false;
+            // }
         }
         return false;
     }
@@ -95,7 +216,8 @@
             var dh1 = jQuery("#field10741_" + index1).val(); //订单号
             var xc1 = jQuery("#field10742_" + index1).val(); //项次号
             var slpc = jQuery("#field11922_" + index1).val(); //该批次次装卸数量
-            var sltotal = jQuery("#field13301_" + index1).val(); //应该装卸总量
+            var yzsl = jQuery("#field11702_" + index1).val(); //已装卸量
+            var sltotal = jQuery("#field11921_" + index1).val(); //装卸总量
             console.log("取得数据---订单号:" + dh1 + ",项次：" + xc1 + ",该批次次装卸数量：" + slpc + ",应该装卸总量:" + sltotal);
 
             if (mxjsls.length > 0) {
@@ -112,31 +234,62 @@
 
             } else {
                 var mxjs = {
-                    "dh" : dh1,
-                    "xc" : xc1,
-                    "sl" : slpc,
-                    "sltotal" : sltotal
+                    "dh": dh1,
+                    "xc": xc1,
+                    "sl": slpc,
+                    "sltotal": sltotal,
+                    "yzsl": yzsl
                 };
                 mxjsls.push(mxjs);
             }
 
         }
+        var mxjsajx = [];
         console.log(JSON.stringify(mxjsls));
         for (var i = 0; i < mxjsls.length; i++) {
             var jsobj = mxjsls[i];
-            if (parseFloat(jsobj.sl) == parseFloat(jsobj.sltotal)) {
+
+            var mxajx = {
+                "ddh": jsobj.dh,
+                "xc": jsobj.xc,
+                "bczxsl": jsobj.sl
+            }
+
+            mxjsajx.push(mxajx);
+
+            if (parseFloat(jsobj.sl) + parseFloat(jsobj.yzsl) <= parseFloat(jsobj.sltotal)) {
                 //Dialog.alert("数目填写正确");
                 result = true;
-
             } else {
-                Dialog.alert("提示！单号为：" + jsobj.dh + ",项次为：" + jsobj.xc + ",应装卸总数为：" + jsobj.sltotal + ",实际填写装卸总数为：" + jsobj.sl);
+                Dialog.alert("提示！单号为：" + jsobj.dh + ",项次为：" + jsobj.xc + ",已装卸总数为：" + jsobj.yzsl + ",本次填写装卸总数为：" + jsobj.sl + "总数量为:" + jsobj.sltotal);
             }
 
         }
+
+
+        jQuery.ajax({
+            url: "/sapjsp/lhsq.jsp",
+            data: {
+                "mxdata": JSON.stringify(mxjsajx)
+            },
+            type: "POST",
+            async: false,
+            success: function(data) {
+                var newData = data.replace(/(^\s*)|(\s*$)/g, "");
+                console.log(newData);
+                if (newData) {
+                    if (newData == "success") {
+                        console.log("数据更新成功");
+                        result = true;
+                    } else {
+                        Dialog.alert(newData);
+                    }
+                }
+            }
+        });
         return result;
-
-
     }
+
 
     function checkYg() {
         var result = false;
@@ -145,32 +298,41 @@
         var xcid; //项次表单id
         var bczxslid; //本次装卸数量表单id
         var sfyg = jQuery("#field8061").val();
+        var submitdtlid;
         if (sfyg == "1") {
             mxnum = "#indexnum0";
             ddhid = "#field9901_";
             xcid = "#field9903_";
             bczxslid = "#field7832_";
+            submitdtlid = "#submitdtlid0";
         }
         if (sfyg == "0") {
             mxnum = "#indexnum1";
             ddhid = "#field10741_";
             xcid = "#field10742_";
             bczxslid = "#field8009_";
-        }
-        console.log(mxnum + "--" + ddhid + "--" + xcid + "--" + bczxslid);
+            submitdtlid = "#submitdtlid1";
 
+        }
+        var idss = jQuery(submitdtlid).val();
+
+        console.log(mxnum + "--" + ddhid + "--" + xcid + "--" + bczxslid + "--" + submitdtlid);
+        console.log(idss);
+
+        var submitdtlids = idss.split(",");
         var jsonArr = [];
-        var indenum = parseInt(jQuery(mxnum).val());
-        for (var i = 0; i < indenum; i++) {
+        console.log(submitdtlids);
+        for (var j = 0; j < submitdtlids.length; j++) {
+            var i = submitdtlids[j];
             var arr;
             var ddh = jQuery(ddhid + i).val();
             var xc = jQuery(xcid + i).val();
             var bczxsl = jQuery(bczxslid + i).val();
             if (ddh.length > 0 && xc.length > 0 && bczxsl.length > 0) {
                 arr = {
-                    "ddh" : ddh,
-                    "xc" : xc,
-                    "bczxsl" : bczxsl
+                    "ddh": ddh,
+                    "xc": xc,
+                    "bczxsl": bczxsl
                 };
                 jsonArr.push(arr);
             }
@@ -178,24 +340,22 @@
         console.log(jsonArr);
 
         jQuery.ajax({
-            url : "/sapjsp/lhsq.jsp",
-            data : {
-                "mxdata" : JSON.stringify(jsonArr)
+            url: "/sapjsp/lhsq.jsp",
+            data: {
+                "mxdata": JSON.stringify(jsonArr)
             },
-            type : "POST",
-            async : false,
-            success : function(data) {
-                var newData=data.replace(/(^\s*)|(\s*$)/g, "");
+            type: "POST",
+            async: false,
+            success: function(data) {
+                var newData = data.replace(/(^\s*)|(\s*$)/g, "");
                 console.log(newData);
                 if (newData) {
-                    if (newData =="success") {
+                    if (newData == "success") {
                         console.log("数据更新成功");
                         result = true;
                     } else {
                         Dialog.alert(newData);
                     }
-
-
                 }
             }
         })
@@ -209,22 +369,36 @@
         var dateRanges = [];
         var bczxsl;
         var zsl;
-        var num = jQuery("#indexnum0").val();
+        // var num = jQuery("#indexnum0").val();
+        var submitdtlid0 = jQuery("#submitdtlid0").val();
+        var num = submitdtlid0.split(",");
         var tt;
         var result = true;
         var failmsg;
-        for (var i = 0; i < num; i++) {
+        for (var j = 0; j < num.length; j++) {
+            var i = num[j];
             bczxsl = jQuery("#field7832_" + i).val();
             var zdzxl = jQuery("field12901_" + i).val(); //最大装卸量
             var ph = jQuery("field12881_" + i).val(); //批号
-
+            var pcyzzsl = 0; //批次已装卸数量
+            var pcbczzsl = 0; //累计本次批次装卸数量
+            for (var n = 0; n < num.length; n++) {
+                var pc = jQuery("field12881_" + n).val(); //批号
+                if (ph == pc) {
+                    pcyzzsl = jQuery("#field13700_" + n).val();
+                    pcbczzsl = pcbczzsl + jQuery("#field7832_" + n).val();
+                }
+            }
+            if (zdzxl - pcyzzsl - pcbczzsl < 0) {
+                return false;
+            }
             zsl = parseFloat(jQuery("#field7831_" + i).val()) - parseFloat(jQuery("#field11701_" + i).val());
             console.log(bczxsl + "-" + zsl);
             if (bczxsl - zsl > 0) {
                 result = false;
                 failmsg = {
-                    "ddh" : jQuery("#field9901_" + i).val(),
-                    "xc" : jQuery("#field9903_" + i).val()
+                    "ddh": jQuery("#field9901_" + i).val(),
+                    "xc": jQuery("#field9903_" + i).val()
                 };
                 break;
             }
@@ -238,8 +412,8 @@
                     if (tt - zsl > 0) {
                         result = false;
                         failmsg = {
-                            "ddh" : jQuery("#field9901_" + i).val(),
-                            "xc" : jQuery("#field9903_" + i).val()
+                            "ddh": jQuery("#field9901_" + i).val(),
+                            "xc": jQuery("#field9903_" + i).val()
                         };
                         break;
                     }
@@ -254,58 +428,84 @@
             }
         }
         if (result) {
-
             return true;
         } else {
-            Dialog.alert("单号为：" + failmsg.ddh + "，项次为：" + failmsg.xc + "的明细中，本次装卸数量只和不能大于剩余总数量，请重新填写!");
+            Dialog.alert("单号为：" + failmsg.ddh + "，项次为：" + failmsg.xc + "的明细中，本次装卸数量之和不能大于剩余总数量，请重新填写!");
             return false;
         }
     }
+
+    function checkpcsl(wlf, dwf, phf, maxf, yzf, bcf) {
+        //物料 //单位//批号//最大量 //已装//本次
+        /*
+                var wlf = 'field8016'; //物料
+                var dwf = 'field8018'; //单位
+                var phf = 'field12921'; //批号
+                var maxf = 'field12922'; //最大量
+                var yzf = 'field13696'; //已装
+                var bcf = 'field11922'; //本次
+        */
+        var mxarr = {};
+        var yzarr = {};
+        var bcarr = {};
+
+        jQuery("td>input[id^='" + wlf + "_']").each(function() {
+            var row = jQuery(this).attr("name").split("_")[1];
+            var wl = jQuery("#" + wlf + "_" + row).val(); //物料
+            var dw = jQuery("#" + dwf + "_" + row).val(); //单位
+            var ph = jQuery("#" + phf + "_" + row).val(); //批号
+            var max = jQuery("#" + maxf + "_" + row).val(); //最大量
+            var yz = jQuery("#" + yzf + "_" + row).val(); //已装
+            var bc = jQuery("#" + bcf + "_" + row).val(); //本次
+            //alert(wl + '+' + dw + '+' + max + '+' + yz + '+' + bc);
+
+            mxarr[wl + '-' + dw + '-' + ph] = parseFloat(max);
+            yzarr[wl + '-' + dw + '-' + ph] = parseFloat(yz);
+            if (isNaN(bcarr[wl + '-' + dw + '-' + ph])) {
+                bcarr[wl + '-' + dw + '-' + ph] = parseFloat('0');
+            }
+            bcarr[wl + '-' + dw + '-' + ph] += parseFloat(bc);
+
+        });
+
+        console.log(mxarr);
+        console.log(yzarr);
+        console.log(bcarr);
+
+        for (var it in mxarr) {
+            console.log(it);
+            //console.log(it + '+' + bcarr[it] + '+' + yzarr[it] + '+' + maxarr[it]);
+            console.log(bcarr[it]);
+            console.log(yzarr[it]);
+            console.log(mxarr[it]);
+            if (bcarr[it] + yzarr[it] > mxarr[it]) {
+                Dialog.alert(it + '本次与已装合计为:' + (bcarr[it] + yzarr[it]) + '大于SAP批次总量:' + mxarr[it]);
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return true;
+    }
+
+    function SumNumber() {
+        var sum = 0;
+        jQuery("td>input[id^='field8016_']").each(function() {
+            var row = jQuery(this).attr("name").split("_")[1];
+            var wl = jQuery("#field8016_" + row).val(); //物料
+            if (wl != null) {
+                sum++;
+            }
+        });
+        jQuery("td>input[id^='field12421_']").each(function() {
+            var row = jQuery(this).attr("name").split("_")[1];
+            var wl = jQuery("#field12421_" + row).val(); //物料
+            if (wl != null) {
+                sum++;
+            }
+        });
+        return sum;
+    }
 </script>
 <script type="text/javascript" src="/sapjsp/util.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

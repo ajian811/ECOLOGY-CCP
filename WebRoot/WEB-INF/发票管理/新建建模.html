@@ -1,0 +1,77 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+    *  TODO
+     *  请在此处编写javascript代码
+     */
+    var hang_number0;
+    jQuery(document).ready(function(){
+        checkCustomize=function(){
+            var se=jQuery("#field12284").val();//税额
+            var mxse=jQuery("#field12561").val();//明细税额
+            if(se==mxse){
+
+                return true;
+            }else{
+                alert("税额必须与明细税额一致");
+                return false;
+            }
+        }
+        jQuery("#field12162").bindPropertyChange(function () {
+            var yddzdh="";
+            yddzdh=jQuery("#field12162").val();
+            console.log("yddzdh:"+yddzdh);
+            delRowFunJM(1);
+            if(yddzdh.length==0){
+                return
+            }
+            jQuery.ajax({
+                url:"/sapjsp/FPGL.jsp",
+                data:{
+                    "yddzdh":yddzdh
+                },
+                type:"POST",
+                dateType:"JSON",
+                success:function (data) {
+                    var jsondate=JSON.parse(data);
+                    console.log(jsondate)
+                    jQuery.each(jsondate,function (i,item) {
+                        addRow1(1);
+                        hang_number0=jQuery("#indexnum1").val()-1;
+
+                        fillMX(13895,item.zxjhh);
+                        fillMX(13896,item.costtype);
+                        fillMX(13897,item.carriername);
+                        fillMX(13898,item.transdate);
+                        fillMX(13899,item.cartype);
+                        fillMX(13900,item.platenum);
+                        fillMX(13901,item.weight);
+                        fillMX(13902,item.location);
+                        fillMX(13903,item.plannotaxacount);
+                        fillMX(13904,item.billingmode);
+                        fillMX(13905,item.itemtype);
+                        fillMX(13906,item.zfdx);
+                        fillMX(13907,item.fyzgbz);
+                        fillMX(13908,item.hl);
+                        fillMX(13909,item.djbh);
+                        fillMX(13910,item.sappzbh);
+
+
+                    })
+                }
+
+            })
+            
+        })
+
+    });
+
+    function fillMX(fieldid, value) {
+        jQuery("#field" + fieldid + "_" + hang_number0).val(value); //input赋值
+        jQuery("#field" + fieldid + "_" + hang_number0 + "span").html(value); //span赋值
+
+    }
+</script>
+<script type="text/javascript" src="/sapjsp/utilJM.js"></script>
+
+

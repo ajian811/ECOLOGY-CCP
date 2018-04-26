@@ -1,0 +1,52 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+     *  TODO
+     *  请在此处编写javascript代码
+     */
+    var button1 = '&nbsp&nbsp&nbsp<input name="zh" class="e8_btn_top middle" value="打印" _hasinit="true" style="max-width:';
+    button1 += '100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="打印" type="button" onclick="dabutton()">';
+    jQuery(".dayinbutton").append(button1);
+
+
+    function GetQueryString(name) { /*取URL中的参数*/
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    function dabutton() {
+        var billid = GetQueryString('billid');
+        jQuery.getJSON("/sapjsp/getAllRequestid.jsp", {
+            billids: billid
+        }, function(data) {
+            console.log(data);
+            if (data) {
+                for (var i = 0; i < data.result.length; i++) {
+                    /*if(data.result[i].sfdy == '1'){
+                      Dialog.alert("该提入单已经被打印,提入单号为:" + data.result[i].trdh);
+                      //alert("该提入单已经被打印,提入单号为:" + data.result[i].trdh);
+                    }else */
+                    if (data.result[i].sfzf == '1') {
+                        Dialog.alert("该提入单已经已经作废,提入单号为:" + data.result[i].trdh);
+                    } else {
+                        if(data.result[i].otherUrl=="1"){
+                            window.open("/ReportServer?reportlet=ecoapp/dmlo/po/PoNote.cpt&id=" + billid);
+                        }else {
+                            //window.open("/formmode/view/FormModePrint.jsp?isfromTab=0&modeId=381&formId=-55&type=4&billid=" + billid + "&viewfrom=fromsearchlist&opentype=1&customid=281");
+                            window.open("/ReportServer?reportlet=ecoapp/dmlo/so/WeightingOrder.cpt&id=" + billid);
+                        }
+                    }
+                }
+                _table.reLoad();
+            }
+        });
+
+    }
+</script>
+
+
+
+
+

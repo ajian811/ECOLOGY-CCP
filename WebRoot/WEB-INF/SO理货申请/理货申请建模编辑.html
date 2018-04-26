@@ -1,0 +1,82 @@
+<!-- script代码，如果需要引用js文件，请使用与HTML中相同的方式。 -->
+<script type="text/javascript">
+    /*
+    *  TODO
+     *  请在此处编写javascript代码
+     */
+    jQuery(document).ready(function (){
+        var sfyg = jQuery("#field13783").val();
+        var actgh = jQuery("#field14324").val();
+        // var a='<input type="hidden" id="fieldsql14324" >';
+        // jQuery("#field14324").after(a);
+
+        if (sfyg.length > 0) {
+            //Dialog.alert(sfyg +" 1 "+actgh +" sfyg.length="+sfyg.length + (sfyg == "0") + (sfyg == 0));
+            if (sfyg == "0") {   //无柜
+                jQuery("#fieldsql14324").removeAttr("tempvalue");
+
+            } else { //有柜
+
+                if(actgh=="") {
+                    console.log("需要sql属性联动");
+                    //  pageLoadInitValueMy("14324",-1);
+                    // jQuery("#fieldsql14324").attr("tempvalue","SELECT T2.actcontainer FROM UF_GHLR T1,UF_GHLR_DT1 T2 WHERE T1.ID=T2.MAINID and T1.SHIPPING='$13806$' AND T2.CODE='$13791$'");
+                    // fieldAttrOperate.pageLoadInitValue("14324",-1);
+                }else{
+                    jQuery("#fieldsql14324").removeAttr("tempvalue");
+
+                }
+            }
+        }
+    })
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

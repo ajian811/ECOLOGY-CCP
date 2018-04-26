@@ -58,16 +58,8 @@ public class Create_Sequence extends BaseBean implements Action {
 					tablename = Util.null2String(rs.getString("tablename"));
 				}
 			}
-			String currentnodetype = "";
-			String sql0="SELECT currentnodetype FROM workflow_requestbase where REQUESTID="+requestid;
-			rs.writeLog(sql0);
-			rs.execute(sql0);
-			while (rs.next()){
-				currentnodetype=Util.null2String(rs.getString("currentnodetype"));
-			}
-			writeLog("获得当前节点类型id："+currentnodetype);
 			String selectSql = "select t1.*,t2.trdh from " + tablename + " t1 ";
-			selectSql += " left join " + tablename + "_dt2 t2 on t1.id = t2.mainid";
+			selectSql += " left join " + tablename + "_dt3 t2 on t1.id = t2.mainid";
 			selectSql += " where t1.requestid= '" + requestid + "'";
 			selectSql += " and t2.trdh is null";
 			log.writeLog("查询主表的selectSql:" + selectSql);
@@ -75,12 +67,11 @@ public class Create_Sequence extends BaseBean implements Action {
 			// requestid = '" + requestid + "'";
 			rs2.execute(selectSql);
 			if (rs2.next()) {
-				sfyg = rs2.getString("sfyg");
 				mainid = rs2.getString("id");
 				trdh = rs2.getString("trdh");
 				crzt = rs2.getString("crzt");
-				sfzf = rs2.getString("sfzf");
 				gsdm = rs2.getString("gsdm");
+				sfyg = rs2.getString("sfyg");
 
 
 				if (!"".equals(crzt)) {
@@ -91,53 +82,69 @@ public class Create_Sequence extends BaseBean implements Action {
 					}
 				}
 			}
-			if (!"1".equals(sfzf)) {
+
 				String updateSql = "";
+			/**提入单生成规则
+			 * 装卸计划
+			 * 无柜情况：
+			 * 按shipping+送达方简码、城市点进行分组，有几组生成几个提入单
+			 * 有柜情况：
+			 * 按s城市点进行分组，有几组生成几个提入单
+
+			 *
+			 */
+			if ("".equals(trdh)) {
+				String sqlstr="";
 				if ("0".equals(sfyg)) {
-					if("0".equals(currentnodetype)){
-						return SUCCESS;
-					}
-					String sql = "select t2.shipno from " + tablename + " t1 ";
-					sql += " left join " + tablename + "_dt3 t2 on t1.id = t2.mainid";
-					sql += " where t1.requestid= '" + requestid + "'";
-					sql += " and t2.trdh is null";
-					sql += " group by t2.shipno";
-					log.writeLog("查询明细3的sql:" + sql);
-					rs.execute(sql);
-					while (rs.next()) {
+					sqlstr= "SELECT DISTINCT SHIPNO,SDF,SDCS FROM FORMTABLE_MAIN_45_DT3 where mainid='" + mainid + "'";
+				} else if("1".equals(sfyg)){
+					sqlstr= "SELECT DISTINCT SDCS FROM FORMTABLE_MAIN_45_DT3 where mainid='" + mainid + "'";
+				}
+						rs2.writeLog(sqlstr);
+					rs2.execute(sqlstr);
+					String shipno="";//shipping号
+					String SDF="";//送达方
+					String SDCS="";//送达城市
+
+
+					while (rs2.next()) {
+						if ("0".equals(sfyg)) {
+							shipno = Util.null2String(rs2.getString("shipno"));
+							SDF = Util.null2String(rs2.getString("sdf"));
+						}
+						SDCS=Util.null2String(rs2.getString("sdcs"));
+
+
 						String lcbh = gsdm + crzt + currdate1;
-						// String id = rs.getString("id");// 获取明细表id
-						String shipno = rs.getString("shipno");// 获取shippingno
 						// 调用存储过程自编号
 						log.writeLog("调用存储过程fn_no_make");
 						rs1.executeProc("fn_no_make", "");
 						rs1.next();
 						lcbh += formatString(rs1.getInt(1));
+						if (!"".equals(mainid)) {
 
-						updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where shipno = '" + shipno
-								+ "' and  mainid = '" + mainid
-								+ "'";
+							updateSql = "update " + tablename + "_dt3 set trdh = '" + lcbh + "' where mainid = '" + mainid +"'";
+							if (!"".equals(shipno)){
+								updateSql+=" and shipno='"+shipno+"'";
+							}
+							if (!"".equals(SDF)) {
+								updateSql+=" and sdf = '"+SDF+"'";
+							}
+							if (!"".equals(SDCS)){
+								updateSql+=" and sdcs='"+SDCS+"'";
+							}
+
+							log.writeLog("更新语句:" + updateSql);
+							rs2.executeSql(updateSql);
+						}
+
+
 						log.writeLog("更新语句:" + updateSql);
 						rs2.executeSql(updateSql);
-					}
-				} else if ("1".equals(sfyg) && "".equals(trdh)) {
-					if(!"0".equals(currentnodetype)){
-						return  SUCCESS;
-					}
-					String lcbh = gsdm + crzt + currdate1;
-					// 调用存储过程自编号
-					log.writeLog("调用存储过程fn_no_make");
-					rs1.executeProc("fn_no_make", "");
-					rs1.next();
-					lcbh += formatString(rs1.getInt(1));
-					if (!"".equals(mainid)) {
-						updateSql = "update " + tablename + "_dt2 set trdh = '" + lcbh + "' where mainid = '" + mainid
-								+ "'";
-						log.writeLog("更新语句:" + updateSql);
-						rs2.executeSql(updateSql);
+
 					}
 				}
-			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.writeLog(e);
@@ -175,4 +182,19 @@ public class Create_Sequence extends BaseBean implements Action {
 		}
 		return result;
 	}
+
+	public String getMaid(int requestid){
+		String mainid="";
+		RecordSet recordSet=new RecordSet();
+		String sql="";
+		sql="select id from formtable_main_45 where lcid='"+requestid+"'";
+		recordSet.writeLog(sql);
+		recordSet.execute(sql);
+		if (recordSet.next()){
+			mainid=Util.null2String(recordSet.getString("id"));
+		}
+		return mainid;
+	}
 }
+
+
